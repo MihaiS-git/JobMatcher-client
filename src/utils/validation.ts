@@ -40,3 +40,30 @@ export function validatePassword(password: string): string | null {
   }
   return null;
 }
+
+export function validateConfirmPassword(password: string, confirmPassword: string): string | null {
+  if(!confirmPassword.trim()){
+    return "Confirm password is required."
+  }
+  if(password.trim() !== confirmPassword.trim()){
+    return "Passwords must match."
+  }
+  return null;
+}
+
+export function validateName(name: string): string | null {
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,}$/;
+
+  if(!name.trim()){
+    return "Name field is required."
+  }
+
+  if(name.trim().length < 2){
+    return "Name must be at least 2 characters long."
+  }
+
+  if(!nameRegex.test(name)){
+    return "Name must be at least 2 characters and contain only letters, spaces, hyphens or apostrophes."
+  }
+  return null;
+}
