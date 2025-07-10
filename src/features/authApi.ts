@@ -4,7 +4,11 @@ import type { AuthenticationRequest, AuthResponse, RegisterRequest } from "../ty
 import type { RootState } from "../store";
 
 
-const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8080/api/v0";
+const BASE_URL = import.meta.env.VITE_BASE_URL!;
+
+if (!BASE_URL) {
+  throw new Error("VITE_BASE_URL is not defined! Check your .env or deployment settings.");
+}
 
 export const authApi = createApi({
   reducerPath: "authApi",
