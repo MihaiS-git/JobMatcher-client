@@ -39,7 +39,9 @@ const RegistrationPage = () => {
             htmlFor="confirmPassword"
             className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
           >
-            Confirm<br/>Password
+            Confirm
+            <br />
+            Password
             <input
               id="confirmPassword"
               type="password"
@@ -48,7 +50,7 @@ const RegistrationPage = () => {
               placeholder="Confirm password..."
             />
           </label>
-                    <label
+          <label
             htmlFor="firstName"
             className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
           >
@@ -61,7 +63,7 @@ const RegistrationPage = () => {
               placeholder="John"
             />
           </label>
-                              <label
+          <label
             htmlFor="lastName"
             className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
           >
@@ -74,25 +76,31 @@ const RegistrationPage = () => {
               placeholder="Doe"
             />
           </label>
-          
+
           <div className="w-full text-center py-8">
             <button
               type="submit"
               className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 px-12 py-1 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base"
             >
-              Login
+              Auth
             </button>
           </div>
           <div className="flex flex-col items-center justify-center">
             <p className="text-xs font-extralight">
               Do you have an account?{" "}
-              <Link to="/auth" className="text-blue-800 underline dark:text-blue-100 hover:text-red-600">
-                Auth
+              <Link
+                to="/auth"
+                className="text-blue-800 underline dark:text-blue-100 hover:text-red-600"
+              >
+                Login
               </Link>
             </p>
             <p className="text-xs font-extralight">
               Forgot your password?{" "}
-              <Link to="/reset-password" className="text-blue-800 underline dark:text-blue-100 hover:text-red-600">
+              <Link
+                to="/reset-password"
+                className="text-blue-800 underline dark:text-blue-100 hover:text-red-600"
+              >
                 Reset Password
               </Link>
             </p>
