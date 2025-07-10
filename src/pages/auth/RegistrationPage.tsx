@@ -82,7 +82,7 @@ const RegistrationPage = () => {
               type="submit"
               className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 px-12 py-1 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base"
             >
-              Auth
+              Submit
             </button>
           </div>
           <div className="flex flex-col items-center justify-center">
