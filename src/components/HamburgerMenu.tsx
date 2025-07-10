@@ -1,5 +1,7 @@
 import { IoMdCloseCircle } from "react-icons/io";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
+import { clearCredentials } from "../features/authSlice";
 
 interface HamburgerMenuProps {
   openState: boolean;
@@ -10,6 +12,16 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   openState,
   handleClose,
 }) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const isAuth = useAppSelector((state) => state.auth.isAuthenticated);
+
+  const handleLogout = () => {
+    dispatch(clearCredentials());
+    navigate("/auth");
+    handleClose();
+  };
+
   return (
     <>
       <div
@@ -32,21 +44,31 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
               </NavLink>
             </li>
             <li>
-              <NavLink
-                to="/"
-                className="hover:text-blue-950 dark:hover:text-blue-400"
-                onClick={handleClose}
-              >
-                Sign In
-              </NavLink>
+              {isAuth ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="hover:text-blue-950 dark:hover:text-blue-400"
+                >
+                  Logout
+                </button>
+              ) : (
+                <NavLink
+                  to="/auth"
+                  className="hover:text-blue-950 dark:hover:text-blue-400"
+                  onClick={handleClose}
+                >
+                  Sign In
+                </NavLink>
+              )}
             </li>
           </ul>
-            <button
-              className="fixed bottom-24 right-6 bg-gray-300 text-gray-950 rounded-full"
-              onClick={handleClose}
-            >
-              <IoMdCloseCircle className="w-6 h-6"/>
-            </button>
+          <button
+            className="fixed bottom-24 right-6 bg-gray-300 text-gray-950 rounded-full"
+            onClick={handleClose}
+          >
+            <IoMdCloseCircle className="w-6 h-6" />
+          </button>
         </div>
       </div>
     </>
