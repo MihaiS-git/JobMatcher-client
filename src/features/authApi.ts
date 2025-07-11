@@ -8,8 +8,8 @@ import type {
 import type { RootState } from "../store";
 import type { ValidateResetTokenResponse } from "../types/ValidateResetTokenResponse";
 
-/* const BASE_URL = import.meta.env.VITE_BASE_URL!; */
-const BASE_URL = 'http://localhost:8080/api/v0';
+const BASE_URL = import.meta.env.VITE_BASE_URL!;
+/* const BASE_URL = 'http://localhost:8080/api/v0'; */
 
 if (!BASE_URL) {
   throw new Error(
