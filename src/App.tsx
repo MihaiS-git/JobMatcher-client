@@ -4,7 +4,8 @@ import RootLayout from "./components/RootLayout";
 import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/auth/AuthPage";
 import RegistrationPage from "./pages/auth/RegistrationPage";
-import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import PasswordRecoveryPage from "./pages/auth/PasswordRecoveryPage";
+import PasswordResetPage from "./pages/auth/PasswordResetPage";
 
 const router = createBrowserRouter([
   {
@@ -24,8 +25,12 @@ const router = createBrowserRouter([
         element: <RegistrationPage/>
       },
       {
+        path: "/recover-password",
+        element: <PasswordRecoveryPage/>
+      },
+      {
         path: "/reset-password",
-        element: <ResetPasswordPage/>
+        element: <PasswordResetPage/>
       }
     ],
   }

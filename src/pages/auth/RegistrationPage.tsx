@@ -90,8 +90,8 @@ const RegistrationPage = () => {
               placeholder="your@email.com"
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => {
-                if (email && errors?.email)
-                  setErrors((prev) => ({ ...prev, email: undefined }));
+                const emailError = validateEmail(email);
+                setErrors((prev) => ({ ...prev, email: emailError }));
               }}
               autoComplete="email"
             />
@@ -115,8 +115,8 @@ const RegistrationPage = () => {
               placeholder="password"
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => {
-                if (password && errors?.password)
-                  setErrors((prev) => ({ ...prev, password: undefined }));
+                const passwordError = validatePassword(password);
+                setErrors((prev) => ({ ...prev, password: passwordError }));
               }}
               autoComplete="new-password"
             />
@@ -143,11 +143,14 @@ const RegistrationPage = () => {
               placeholder="Confirm password..."
               onChange={(e) => setConfirmPassword(e.target.value)}
               onBlur={() => {
-                if (confirmPassword && errors?.confirmPassword)
-                  setErrors((prev) => ({
-                    ...prev,
-                    confirmPassword: undefined,
-                  }));
+                const confirmPasswordError = validateConfirmPassword(
+                  password,
+                  confirmPassword
+                );
+                setErrors((prev) => ({
+                  ...prev,
+                  confirmPassword: confirmPasswordError,
+                }));
               }}
             />
           </label>
@@ -171,8 +174,8 @@ const RegistrationPage = () => {
               placeholder="John"
               onChange={(e) => setFirstName(e.target.value)}
               onBlur={() => {
-                if (firstName && errors?.firstName)
-                  setErrors((prev) => ({ ...prev, firstName: undefined }));
+                const firstNameError = validateName(firstName);
+                setErrors((prev) => ({ ...prev, firstName: firstNameError }));
               }}
               autoComplete="given-name"
             />
@@ -197,8 +200,8 @@ const RegistrationPage = () => {
               placeholder="Doe"
               onChange={(e) => setLastName(e.target.value)}
               onBlur={() => {
-                if (lastName && errors?.lastName)
-                  setErrors((prev) => ({ ...prev, lastName: undefined }));
+                const lastNameError = validateName(lastName);
+                setErrors((prev) => ({ ...prev, lastName: lastNameError }));
               }}
               autoComplete="family-name"
             />
