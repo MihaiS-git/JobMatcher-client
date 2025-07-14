@@ -80,14 +80,14 @@ const RegistrationPage = () => {
             htmlFor="email"
             className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
           >
-            Email
+            E-mail
             <input
               id="email"
               type="email"
               name="email"
               value={email}
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="your@email.com"
+              placeholder="E-mail..."
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => {
                 const emailError = validateEmail(email);
@@ -97,7 +97,7 @@ const RegistrationPage = () => {
             />
           </label>
           {errors?.email && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.email}
             </p>
           )}
@@ -112,7 +112,7 @@ const RegistrationPage = () => {
               name="password"
               value={password}
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="password"
+              placeholder="Password..."
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => {
                 const passwordError = validatePassword(password);
@@ -122,7 +122,7 @@ const RegistrationPage = () => {
             />
           </label>
           {errors?.password && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.password}
             </p>
           )}
@@ -155,7 +155,7 @@ const RegistrationPage = () => {
             />
           </label>
           {errors?.confirmPassword && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.confirmPassword}
             </p>
           )}
@@ -171,7 +171,7 @@ const RegistrationPage = () => {
               name="firstName"
               value={firstName}
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="John"
+              placeholder="First Name..."
               onChange={(e) => setFirstName(e.target.value)}
               onBlur={() => {
                 const firstNameError = validateName(firstName);
@@ -181,7 +181,7 @@ const RegistrationPage = () => {
             />
           </label>
           {errors?.firstName && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.firstName}
             </p>
           )}
@@ -197,7 +197,7 @@ const RegistrationPage = () => {
               name="lastName"
               value={lastName}
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="Doe"
+              placeholder="Last Name..."
               onChange={(e) => setLastName(e.target.value)}
               onBlur={() => {
                 const lastNameError = validateName(lastName);
@@ -207,7 +207,7 @@ const RegistrationPage = () => {
             />
           </label>
           {errors?.lastName && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.lastName}
             </p>
           )}
@@ -226,7 +226,7 @@ const RegistrationPage = () => {
               Do you have an account?{" "}
               <Link
                 to="/auth"
-                className="text-blue-800 underline dark:text-blue-100 hover:text-red-600"
+                className="text-blue-800 underline dark:text-blue-100 hover:text-red-500"
               >
                 Login
               </Link>
@@ -235,7 +235,7 @@ const RegistrationPage = () => {
               Forgot your password?{" "}
               <Link
                 to="/reset-password"
-                className="text-blue-800 underline dark:text-blue-100 hover:text-red-600"
+                className="text-blue-800 underline dark:text-blue-100 hover:text-red-500"
               >
                 Reset Password
               </Link>

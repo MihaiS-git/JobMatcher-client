@@ -3,12 +3,13 @@ import PageContent from "../../components/PageContent";
 import { useState } from "react";
 import { validateEmail } from "../../utils/validation";
 import { useRecoverPasswordMutation } from "../../features/authApi";
-import { isErrorResponse } from "../../utils/apiErrors";
+import { parseApiError } from "../../utils/parseApiError";
 
 const PasswordRecoveryPage = () => {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{ email?: string | null }>({});
   const [message, setMessage] = useState("");
+  const [apiError, setApiError] = useState("");
   const [recoverPassword, { isLoading }] = useRecoverPasswordMutation();
 
   const handlePasswordRecoveryFormSubmit = async (e: React.FormEvent) => {
@@ -26,17 +27,8 @@ const PasswordRecoveryPage = () => {
       setMessage("Check your inbox for a password reset link.");
       setErrors({});
     } catch (err: unknown) {
-      console.log(err);
-      
-      if (isErrorResponse(err)) {
-        if (err.status === 404) {
-          setErrors({ email: "No account found with this email." });
-        } else {
-          setErrors({ email: err.data.message ?? "Something went wrong." });
-        }
-      } else {
-        setErrors({ email: "Unexpected error. Try again later." });
-      }
+      /* console.log(err); */
+      setApiError(parseApiError(err));
     }
   };
 
@@ -61,14 +53,14 @@ const PasswordRecoveryPage = () => {
             htmlFor="email"
             className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
           >
-            Email
+            E-mail
             <input
               id="email"
               type="email"
               name="email"
               value={email}
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="your@email.com"
+              placeholder="E-mail..."
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => {
                 const emailError = validateEmail(email);
@@ -77,7 +69,7 @@ const PasswordRecoveryPage = () => {
             />
           </label>
           {errors?.email && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.email}
             </p>
           )}
@@ -90,12 +82,19 @@ const PasswordRecoveryPage = () => {
               {isLoading ? "Loading..." : "Recover Password"}
             </button>
           </div>
+
+          {apiError && (
+            <p className="text-red-600 dark:text-red-400 text-center text-sm mb-4 px-4">
+              {apiError}
+            </p>
+          )}
+
           <div className="flex flex-col items-center justify-center">
             <p className="text-xs font-extralight">
               Do you have an account?{" "}
               <Link
                 to="/auth"
-                className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
+                className="text-blue-800 underline dark:text-blue-200 hover:text-red-500"
               >
                 Login
               </Link>
@@ -104,7 +103,7 @@ const PasswordRecoveryPage = () => {
               Don't you have an account?{" "}
               <Link
                 to="/register"
-                className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
+                className="text-blue-800 underline dark:text-blue-200 hover:text-red-500"
               >
                 Register
               </Link>

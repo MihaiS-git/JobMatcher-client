@@ -5,7 +5,6 @@ import type {
   AuthResponse,
   RegisterRequest,
 } from "../types/AuthTypes";
-import type { RootState } from "../store";
 import type { ValidateResetTokenResponse } from "../types/ValidateResetTokenResponse";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL!;
@@ -16,18 +15,11 @@ if (!BASE_URL) {
   );
 }
 
+const baseQuery = fetchBaseQuery({ baseUrl: BASE_URL });
+
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: BASE_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     register: builder.mutation<void, RegisterRequest>({
       query: (body) => ({

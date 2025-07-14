@@ -109,7 +109,7 @@ const PasswordResetPage = () => {
               type="password"
               name="password"
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="password"
+              placeholder="New Password..."
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => {
                 const passwordError = validatePassword(password);

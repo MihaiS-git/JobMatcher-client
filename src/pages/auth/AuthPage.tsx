@@ -5,10 +5,16 @@ import { useLoginMutation } from "../../features/authApi";
 import { useAppDispatch } from "../../hooks/hooks";
 import { setCredentials } from "../../features/authSlice";
 import { validateEmail, validatePassword } from "../../utils/validation";
+import { parseApiError } from "../../utils/parseApiError";
+
+const API_ROOT_URL =
+  import.meta.env.VITE_API_ROOT_URL || "http://localhost:8080";
 
 const AuthPage = () => {
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -16,6 +22,11 @@ const AuthPage = () => {
     email?: string | null;
     password?: string | null;
   }>();
+
+  const handleGoogleLogin = () => {
+    setLoading(true);
+    window.location.href = `${API_ROOT_URL}/oauth2/authorization/google`;
+  };
 
   const handleLoginFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,17 +41,21 @@ const AuthPage = () => {
 
     try {
       const result = await login({ email, password }).unwrap();
-      dispatch(
-        setCredentials({
-          user: result.user,
-          token: result.token,
-          refreshToken: result.refreshToken,
-        })
-      );
-      navigate("/");
+      if (result && result.token && result.user && result.refreshToken) {
+        dispatch(
+          setCredentials({
+            user: result.user,
+            token: result.token,
+            refreshToken: result.refreshToken,
+          })
+        );
+        navigate("/");
+      } else {
+        throw new Error("Login failed: Invalid response from server");
+      }
     } catch (err: unknown) {
       console.error("Login failed", err);
-      alert("Login failed. Please try again.");
+      setLoginError(parseApiError(err));
     }
   };
 
@@ -58,14 +73,14 @@ const AuthPage = () => {
             htmlFor="email"
             className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
           >
-            Email
+            E-mail
             <input
               id="email"
               type="email"
               name="email"
               value={email}
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="your@email.com"
+              placeholder="E-mail..."
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => {
                 const emailError = validateEmail(email);
@@ -74,7 +89,7 @@ const AuthPage = () => {
             />
           </label>
           {errors?.email && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.email}
             </p>
           )}
@@ -90,7 +105,7 @@ const AuthPage = () => {
               name="password"
               value={password}
               className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="password"
+              placeholder="Password..."
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => {
                 const passwordError = validatePassword(password);
@@ -99,7 +114,7 @@ const AuthPage = () => {
             />
           </label>
           {errors?.password && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
+            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
               {errors.password}
             </p>
           )}
@@ -112,12 +127,19 @@ const AuthPage = () => {
               {isLoading ? "Logging in..." : "Login"}
             </button>
           </div>
+
+          {loginError && (
+            <p className="text-red-600 dark:text-red-400 text-center text-sm mb-4 px-4">
+              {loginError}
+            </p>
+          )}
+
           <div className="flex flex-col items-center justify-center">
             <p className="text-xs font-extralight">
               Don't you have an account?{" "}
               <Link
                 to="/register"
-                className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
+                className="text-blue-800 underline dark:text-blue-200 hover:text-red-500"
               >
                 Register
               </Link>
@@ -126,13 +148,37 @@ const AuthPage = () => {
               Forgot your password?{" "}
               <Link
                 to="/recover-password"
-                className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
+                className="text-blue-800 underline dark:text-blue-200 hover:text-red-500"
               >
                 Reset Password
               </Link>
             </p>
           </div>
         </form>
+
+        <hr />
+
+        <div className="flex flex-row justify-center py-8">
+          <button
+            onClick={handleGoogleLogin}
+            className="bg-gray-200 text-gray-950 px-6 py-3 rounded-sm
+         hover:bg-gray-300 transition mb-4 max-w-sm flex items-center justify-center border border-gray-950"
+            disabled={loading}
+          >
+            {loading ? (
+              "Loading..."
+            ) : (
+              <div className="flex items-center justify-between space-x-2">
+                <img
+                  src="google-logo.svg"
+                  alt="google logo"
+                  className="w-5 h-5"
+                />
+                <span>Sign in with Google</span>
+              </div>
+            )}
+          </button>
+        </div>
       </div>
     </PageContent>
   );
