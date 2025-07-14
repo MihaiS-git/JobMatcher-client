@@ -190,7 +190,7 @@ const PasswordResetPage = () => {
           <div className="flex flex-col items-center">
             <p className="text-red-600 text-center">{errors.token}</p>
             <Link
-              to="/auth/recover-password"
+              to="/recover-password"
               className="text-blue-600 underline"
             >
               Request a new password reset
