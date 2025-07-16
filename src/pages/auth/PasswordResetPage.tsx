@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import PageContent from "../../components/PageContent";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   validateConfirmPassword,
   validatePassword,
@@ -9,8 +9,12 @@ import {
   useResetPasswordMutation,
   useValidateResetTokenQuery,
 } from "../../features/authApi";
+import { parseApiError } from "../../utils/parseApiError";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const PasswordResetPage = () => {
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
+  const confirmPasswordInputRef = useRef<HTMLInputElement | null>(null);
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
@@ -22,6 +26,7 @@ const PasswordResetPage = () => {
     confirmPassword?: string | null;
     token?: string | null;
   }>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const { error, isLoading: isValidating } = useValidateResetTokenQuery(
     token ?? "",
@@ -29,7 +34,7 @@ const PasswordResetPage = () => {
   );
 
   useEffect(() => {
-    if (!token) {
+    if (!token?.trim()) {
       setErrors({ token: "Invalid or missing reset token." });
       return;
     }
@@ -58,6 +63,9 @@ const PasswordResetPage = () => {
       return;
     }
 
+    setErrors({ password: null, confirmPassword: null, token: null });
+    setApiError(null);
+
     const passwordError = validatePassword(password);
     const confirmPasswordError = validateConfirmPassword(
       password,
@@ -69,135 +77,206 @@ const PasswordResetPage = () => {
         password: passwordError,
         confirmPassword: confirmPasswordError,
       });
+
+      if (passwordError) {
+        passwordInputRef.current?.focus();
+      } else if (confirmPasswordError) {
+        confirmPasswordInputRef.current?.focus();
+      }
+
       return;
     }
 
     try {
       const result = await resetPassword({ password, token });
       if ("data" in result && result?.data?.success) {
+        setErrors({ password: null, confirmPassword: null, token: null });
+        setApiError(null);
         navigate("/auth");
+      } else if ("error" in result) {
+        setApiError(parseApiError(result.error));
+        return;
       } else {
-        const message =
-          "error" in result
-            ? JSON.stringify(result.error)
-            : "Password reset failed.";
-        alert(message);
+        setApiError("Unexpected response.");
+        return;
       }
     } catch (err: unknown) {
-      console.error("Password reset failed", err);
-      alert("Password reset failed. Please try again.");
+      const parsedError = parseApiError(err);
+      setApiError(parsedError);
+      return;
     }
   };
 
   return (
     <PageContent className="flex flex-col items-center justify-center">
-      <div className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg shadow-blue-400">
-        <h1 className="font-semibold text-lg xl:text-2xl text-center m-8 mx-auto">
+      <section
+        aria-labelledby="reset-password-heading"
+        className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg shadow-blue-400"
+      >
+        <h1
+          id="reset-password-heading"
+          className="font-semibold text-lg xl:text-2xl text-center m-8 mx-auto"
+        >
           Reset Password Form
         </h1>
-        <form
-          className="flex flex-col items-stretch p-4"
-          onSubmit={handleResetPasswordSubmit}
-        >
-          <label
-            htmlFor="password"
-            className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
-          >
-            New Password
-            <input
-              id="password"
-              type="password"
-              name="password"
-              className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="New Password..."
-              onChange={(e) => setPassword(e.target.value)}
-              onBlur={() => {
-                const passwordError = validatePassword(password);
-                setErrors((prev) => ({ ...prev, password: passwordError }));
-              }}
-              autoComplete="new-password"
-            />
-          </label>
-          {errors?.password && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
-              {errors.password}
-            </p>
-          )}
 
-          <label
-            htmlFor="confirmPassword"
-            className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
-          >
-            Confirm
-            <br />
-            Password
-            <input
-              id="confirmPassword"
-              type="password"
-              name="confirmPassword"
-              className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
-              placeholder="Confirm password..."
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              onBlur={() => {
-                const confirmPasswordError = validateConfirmPassword(
-                  password,
-                  confirmPassword
-                );
-                setErrors((prev) => ({
-                  ...prev,
-                  confirmPassword: confirmPasswordError,
-                }));
-              }}
-            />
-          </label>
-          {errors?.confirmPassword && (
-            <p className="text-red-600 text-xs px-4 mt-[-8px] mb-2">
-              {errors.confirmPassword}
-            </p>
-          )}
-
-          <div className="w-full text-center py-8">
-            <button
-              type="submit"
-              disabled={isLoading || isValidating}
-              className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 px-12 py-1 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Loading..." : "Reset"}
-            </button>
-          </div>
-          <div className="flex flex-col items-center justify-center">
-            <p className="text-xs font-extralight">
-              Do you have an account?{" "}
-              <Link
-                to="/auth"
-                className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
-              >
-                Login
-              </Link>
-            </p>
-            <p className="text-xs font-extralight">
-              Don't you have an account?{" "}
-              <Link
-                to="/register"
-                className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
-              >
-                Register
-              </Link>
-            </p>
-          </div>
-        </form>
-        {!isValidating && errors?.token && (
+        {!isValidating && errors?.token ? (
           <div className="flex flex-col items-center">
             <p className="text-red-600 text-center">{errors.token}</p>
-            <Link
-              to="/recover-password"
-              className="text-blue-600 underline"
-            >
+            <Link to="/recover-password" className="text-blue-600 underline">
               Request a new password reset
             </Link>
           </div>
+        ) : (
+          <form
+            className="flex flex-col p-4"
+            onSubmit={handleResetPasswordSubmit}
+            aria-invalid={!!apiError}
+            aria-labelledby="reset-password-heading"
+            aria-describedby={apiError ? "api-error" : undefined}
+          >
+            <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
+              <label
+                htmlFor="password"
+                className="font-semibold text-sm xl:text-base"
+              >
+                New Password:
+              </label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
+                placeholder="New Password..."
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setErrors((prev) => ({ ...prev, password: null }));
+                }}
+                onBlur={() => {
+                  const passwordError = validatePassword(password);
+                  setErrors((prev) => ({ ...prev, password: passwordError }));
+                }}
+                autoComplete="new-password"
+                aria-invalid={!!errors.password}
+                aria-describedby={
+                  errors.password ? "password-error" : undefined
+                }
+                aria-required="true"
+                ref={passwordInputRef}
+                disabled={isLoading || isValidating}
+              />
+            </div>
+
+            {errors?.password && (
+              <p
+                id="password-error"
+                className="text-red-600 text-xs px-16 mt-0.25 mb-2"
+              >
+                {errors.password}
+              </p>
+            )}
+
+            <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
+              <label
+                htmlFor="confirmPassword"
+                className="font-semibold text-sm xl:text-base"
+              >
+                Confirm Password:
+              </label>
+
+              <input
+                id="confirmPassword"
+                type="password"
+                name="confirmPassword"
+                className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
+                placeholder="Confirm password..."
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setErrors((prev) => ({ ...prev, confirmPassword: null }));
+                }}
+                onBlur={() => {
+                  const confirmPasswordError = validateConfirmPassword(
+                    password,
+                    confirmPassword
+                  );
+                  setErrors((prev) => ({
+                    ...prev,
+                    confirmPassword: confirmPasswordError,
+                  }));
+                }}
+                aria-invalid={!!errors.confirmPassword}
+                aria-describedby={
+                  errors.confirmPassword ? "confirm-password-error" : undefined
+                }
+                aria-required="true"
+                ref={confirmPasswordInputRef}
+                disabled={isLoading || isValidating}
+              />
+            </div>
+
+            {errors?.confirmPassword && (
+              <p
+                id="confirm-password-error"
+                className="text-red-600 text-xs px-16 mt-0.25 mb-2"
+              >
+                {errors.confirmPassword}
+              </p>
+            )}
+
+            <div className="w-full text-center py-8 px-16">
+              <button
+                type="submit"
+                disabled={isLoading || isValidating}
+                className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 w-full py-2 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Loading..." : "Reset"}
+              </button>
+            </div>
+
+            {apiError && (
+              <p
+                id="api-error"
+                className="text-red-600 dark:text-red-400 text-center mb-4"
+                role="alert"
+                aria-live="assertive"
+              >
+                {apiError}
+              </p>
+            )}
+
+            {(isValidating || isLoading) && (
+              <div
+                role="status"
+                aria-live="polite"
+                className="spinner w-full flex flex-row align-middle justify-center items-center text-center pb-4"
+              >
+                <LoadingSpinner />
+              </div>
+            )}
+
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-xs font-extralight">
+                Do you have an account?{" "}
+                <Link
+                  to="/auth"
+                  className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
+                >
+                  Login
+                </Link>
+              </p>
+              <p className="text-xs font-extralight">
+                Don't you have an account?{" "}
+                <Link
+                  to="/register"
+                  className="text-blue-800 underline dark:text-blue-200 hover:text-red-600"
+                >
+                  Register
+                </Link>
+              </p>
+            </div>
+          </form>
         )}
-      </div>
+      </section>
     </PageContent>
   );
 };

@@ -6,6 +6,7 @@ import type {
   RegisterRequest,
 } from "../types/AuthTypes";
 import type { ValidateResetTokenResponse } from "../types/ValidateResetTokenResponse";
+import type { SuccessResponse } from "../types/SuccessResponse";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL!;
 
@@ -21,7 +22,7 @@ export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery,
   endpoints: (builder) => ({
-    register: builder.mutation<void, RegisterRequest>({
+    register: builder.mutation<SuccessResponse | void, RegisterRequest>({
       query: (body) => ({
         url: "/auth/register",
         method: "POST",
@@ -35,7 +36,7 @@ export const authApi = createApi({
         body,
       }),
     }),
-    recoverPassword: builder.mutation<{ success: boolean }, { email: string }>({
+    recoverPassword: builder.mutation<SuccessResponse, { email: string }>({
       query: ({ email }) => ({
         url: "/auth/recover-password",
         method: "POST",
@@ -49,7 +50,7 @@ export const authApi = createApi({
       }),
       keepUnusedDataFor: 0,
     }),
-    resetPassword: builder.mutation<{success: boolean}, {password: string, token: string}>({
+    resetPassword: builder.mutation<SuccessResponse, {password: string, token: string}>({
       query: ({password, token}) => ({
         url: "/auth/reset-password",
         method: "PUT",

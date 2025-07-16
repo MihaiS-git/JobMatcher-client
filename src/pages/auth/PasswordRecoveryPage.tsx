@@ -4,16 +4,21 @@ import { useState } from "react";
 import { validateEmail } from "../../utils/validation";
 import { useRecoverPasswordMutation } from "../../features/authApi";
 import { parseApiError } from "../../utils/parseApiError";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const PasswordRecoveryPage = () => {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{ email?: string | null }>({});
   const [message, setMessage] = useState("");
-  const [apiError, setApiError] = useState("");
+  const isSuccess = Boolean(message);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [recoverPassword, { isLoading }] = useRecoverPasswordMutation();
 
   const handlePasswordRecoveryFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setErrors({ email: null });
+    setApiError(null);
 
     const emailError = validateEmail(email);
 
@@ -26,16 +31,24 @@ const PasswordRecoveryPage = () => {
       await recoverPassword({ email }).unwrap();
       setMessage("Check your inbox for a password reset link.");
       setErrors({});
+      setApiError(null);
     } catch (err: unknown) {
-      /* console.log(err); */
-      setApiError(parseApiError(err));
+      console.error(err);
+      const parsedError = parseApiError(err);
+      setApiError(parsedError);
     }
   };
 
   return (
     <PageContent className="flex flex-col items-center justify-center">
-      <div className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg shadow-blue-400">
-        <h1 className="font-semibold text-lg xl:text-2xl text-center m-8 mx-auto">
+      <section
+        aria-labelledby="recover-password-heading"
+        className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg shadow-blue-400"
+      >
+        <h1
+          id="recover-password-heading"
+          className="font-semibold text-lg xl:text-2xl text-center m-8 mx-auto"
+        >
           Recover Password Form
         </h1>
 
@@ -46,47 +59,81 @@ const PasswordRecoveryPage = () => {
         )}
 
         <form
-          className="flex flex-col items-stretch p-4"
+          className="flex flex-col p-4"
           onSubmit={handlePasswordRecoveryFormSubmit}
         >
-          <label
-            htmlFor="email"
-            className="font-light text-sm xl:text-base px-4 w-full flex flex-row items-center justify-between"
-          >
-            E-mail
+          <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
+            <label
+              htmlFor="email"
+              className="font-semibold text-sm xl:text-base"
+            >
+              E-mail:
+            </label>
+
             <input
               id="email"
               type="email"
               name="email"
               value={email}
-              className="bg-gray-200 text-gray-950 px-2 py-0.5 m-2 w-4/6 rounded-sm border border-gray-950 text-sm xl:text-base"
+              className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
               placeholder="E-mail..."
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setApiError("");
+                setMessage("");
+                setErrors((prev) => ({ ...prev, email: null }));
+              }}
               onBlur={() => {
                 const emailError = validateEmail(email);
                 setErrors((prev) => ({ ...prev, email: emailError }));
               }}
+              disabled={isSuccess}
+              autoFocus
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
+              aria-required="true"
             />
-          </label>
+          </div>
           {errors?.email && (
-            <p className="text-red-600 dark:text-red-400 text-xs px-4 mt-[-8px] mb-2">
+            <p
+              id="email-error"
+              role="alert"
+              className="text-red-600 dark:text-red-400 text-xs px-16 mt-0.25 mb-2"
+            >
               {errors.email}
             </p>
           )}
 
-          <div className="w-full text-center py-8">
+          <div className="w-full text-center py-8 px-16">
             <button
               type="submit"
-              className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 px-12 py-1 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base"
+              className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 w-full py-2 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base"
+              disabled={isLoading || isSuccess}
             >
               {isLoading ? "Loading..." : "Recover Password"}
             </button>
           </div>
 
           {apiError && (
-            <p className="text-red-600 dark:text-red-400 text-center text-sm mb-4 px-4">
+            <p
+              id="api-error"
+              role="alert"
+              tabIndex={-1}
+              aria-live="assertive"
+              className="text-red-600 dark:text-red-400 text-center mb-4"
+            >
               {apiError}
             </p>
+          )}
+
+          {isLoading && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="spinner w-full flex flex-row align-middle justify-center items-center text-center pb-4"
+            >
+              <LoadingSpinner />
+            </div>
           )}
 
           <div className="flex flex-col items-center justify-center">
@@ -110,7 +157,7 @@ const PasswordRecoveryPage = () => {
             </p>
           </div>
         </form>
-      </div>
+      </section>
     </PageContent>
   );
 };

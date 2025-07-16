@@ -42,7 +42,7 @@ export function parseApiError(err: unknown): string {
     }
 
     if (typeof e.status === "number") {
-      if (isErrorResponse(e.data)) {
+      if (typeof e.data === "object" && e.data !== null && isErrorResponse(e.data)) {
         return e.data.message || e.data.error || `Error ${e.status}`;
       }
       // fallback
@@ -61,5 +61,9 @@ export function parseApiError(err: unknown): string {
     return err.message;
   }
 
-  return "An unknown error occurred. Please try again later.";
+  if (import.meta.env.DEV) {
+    console.error("Unhandled API error:", err);
+  }
+
+  return "An unexpected error occurred. Please try again later or contact support if the problem persists.";
 }
