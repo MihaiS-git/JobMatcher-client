@@ -7,6 +7,7 @@ import { setCredentials } from "../../features/authSlice";
 import { validateEmail, validatePassword } from "../../utils/validation";
 import { parseApiError } from "../../utils/parseApiError";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { BiHide, BiShow } from "react-icons/bi";
 
 if (!import.meta.env.VITE_API_ROOT_URL) {
   throw new Error("VITE_API_ROOT_URL is not defined.");
@@ -152,17 +153,17 @@ const AuthPage = () => {
           <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
             <label
               htmlFor="password"
-              className="font-semibold text-sm xl:text-base"
+              className="font-semibold text-sm xl:text-base mb-1"
             >
               Password:
             </label>
-            <div className="flex flex-row w-full justify-end relative">
+            <div className="flex items-center w-full bg-gray-200 text-gray-950 rounded-sm border border-gray-950 h-10 px-4">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 name="password"
                 value={password}
-                className="bg-gray-200 text-gray-950 p-4 pr-6 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
+                className="flex-1 bg-transparent outline-none text-sm xl:text-base"
                 placeholder="Password..."
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -184,10 +185,10 @@ const AuthPage = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-4 flex items-center text-sm text-gray-600"
+                className="ml-2 text-sm text-gray-800"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? <BiHide className="w-5 h-5"/> : <BiShow className="w-5 h-5"/>}
               </button>
             </div>
           </div>
@@ -258,7 +259,7 @@ const AuthPage = () => {
 
         <hr />
 
-        <div className="flex flex-row justify-center py-8 px-20">
+        <div className="flex flex-row justify-center py-8 px-20 text-sm lg:text-base">
           <button
             onClick={handleGoogleLogin}
             className="bg-gray-200 text-gray-950 px-6 py-2 rounded-sm

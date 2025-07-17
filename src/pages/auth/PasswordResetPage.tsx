@@ -11,6 +11,7 @@ import {
 } from "../../features/authApi";
 import { parseApiError } from "../../utils/parseApiError";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { BiHide, BiShow } from "react-icons/bi";
 
 const PasswordResetPage = () => {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
@@ -27,6 +28,8 @@ const PasswordResetPage = () => {
     token?: string | null;
   }>({});
   const [apiError, setApiError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { error, isLoading: isValidating } = useValidateResetTokenQuery(
     token ?? "",
@@ -142,29 +145,43 @@ const PasswordResetPage = () => {
               >
                 New Password:
               </label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
-                placeholder="New Password..."
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setErrors((prev) => ({ ...prev, password: null }));
-                }}
-                onBlur={() => {
-                  const passwordError = validatePassword(password);
-                  setErrors((prev) => ({ ...prev, password: passwordError }));
-                }}
-                autoComplete="new-password"
-                aria-invalid={!!errors.password}
-                aria-describedby={
-                  errors.password ? "password-error" : undefined
-                }
-                aria-required="true"
-                ref={passwordInputRef}
-                disabled={isLoading || isValidating}
-              />
+              <div className="flex items-center w-full bg-gray-200 text-gray-950 rounded-sm border border-gray-950 h-10 px-4">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className="flex-1 bg-transparent outline-none text-sm xl:text-base"
+                  placeholder="New Password..."
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors((prev) => ({ ...prev, password: null }));
+                  }}
+                  onBlur={() => {
+                    const passwordError = validatePassword(password);
+                    setErrors((prev) => ({ ...prev, password: passwordError }));
+                  }}
+                  autoComplete="new-password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={
+                    errors.password ? "password-error" : undefined
+                  }
+                  aria-required="true"
+                  ref={passwordInputRef}
+                  disabled={isLoading || isValidating}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="ml-2 text-sm text-gray-800"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <BiHide className="w-5 h-5" />
+                  ) : (
+                    <BiShow className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {errors?.password && (
@@ -184,34 +201,50 @@ const PasswordResetPage = () => {
                 Confirm Password:
               </label>
 
-              <input
-                id="confirmPassword"
-                type="password"
-                name="confirmPassword"
-                className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
-                placeholder="Confirm password..."
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  setErrors((prev) => ({ ...prev, confirmPassword: null }));
-                }}
-                onBlur={() => {
-                  const confirmPasswordError = validateConfirmPassword(
-                    password,
-                    confirmPassword
-                  );
-                  setErrors((prev) => ({
-                    ...prev,
-                    confirmPassword: confirmPasswordError,
-                  }));
-                }}
-                aria-invalid={!!errors.confirmPassword}
-                aria-describedby={
-                  errors.confirmPassword ? "confirm-password-error" : undefined
-                }
-                aria-required="true"
-                ref={confirmPasswordInputRef}
-                disabled={isLoading || isValidating}
-              />
+              <div className="flex items-center w-full bg-gray-200 text-gray-950 rounded-sm border border-gray-950 h-10 px-4">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  className="flex-1 bg-transparent outline-none text-sm xl:text-base"
+                  placeholder="Confirm password..."
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setErrors((prev) => ({ ...prev, confirmPassword: null }));
+                  }}
+                  onBlur={() => {
+                    const confirmPasswordError = validateConfirmPassword(
+                      password,
+                      confirmPassword
+                    );
+                    setErrors((prev) => ({
+                      ...prev,
+                      confirmPassword: confirmPasswordError,
+                    }));
+                  }}
+                  aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={
+                    errors.confirmPassword
+                      ? "confirm-password-error"
+                      : undefined
+                  }
+                  aria-required="true"
+                  ref={confirmPasswordInputRef}
+                  disabled={isLoading || isValidating}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="ml-2 text-sm text-gray-800"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? (
+                    <BiHide className="w-5 h-5" />
+                  ) : (
+                    <BiShow className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {errors?.confirmPassword && (
