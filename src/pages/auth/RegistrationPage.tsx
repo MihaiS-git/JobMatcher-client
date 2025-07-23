@@ -10,6 +10,7 @@ import {
 import { useRef, useState } from "react";
 import { parseApiError } from "../../utils/parseApiError";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { BiHide, BiShow } from "react-icons/bi";
 
 const RegistrationPage = () => {
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -23,6 +24,8 @@ const RegistrationPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const [register, { isLoading }] = useRegisterMutation();
   const [errors, setErrors] = useState<{
@@ -139,34 +142,34 @@ const RegistrationPage = () => {
           aria-describedby={apiError ? "api-error" : undefined}
         >
           <div className="flex flex-col px-8 xl:px-16 items-start w-full my-1">
-          <label
-            htmlFor="email"
-            className="font-semibold text-sm xl:text-base"
-          >
-            E-mail:
-          </label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            value={email}
-            className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
-            placeholder="E-mail..."
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrors((prev) => ({ ...prev, email: null }));
-            }}
-            onBlur={() => {
-              const emailError = validateEmail(email);
-              setErrors((prev) => ({ ...prev, email: emailError }));
-            }}
-            autoComplete="email"
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? "email-error" : undefined}
-            aria-required="true"
-            ref={emailInputRef}
-            disabled={isLoading}
-          />
+            <label
+              htmlFor="email"
+              className="font-semibold text-sm xl:text-base"
+            >
+              E-mail:
+            </label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              value={email}
+              className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
+              placeholder="E-mail..."
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrors((prev) => ({ ...prev, email: null }));
+              }}
+              onBlur={() => {
+                const emailError = validateEmail(email);
+                setErrors((prev) => ({ ...prev, email: emailError }));
+              }}
+              autoComplete="email"
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
+              aria-required="true"
+              ref={emailInputRef}
+              disabled={isLoading}
+            />
           </div>
           {errors?.email && (
             <p
@@ -178,40 +181,56 @@ const RegistrationPage = () => {
           )}
 
           <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
-          <label
-            htmlFor="password"
-            className="font-semibold text-sm xl:text-base"
-          >
-            Password:
-          </label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            value={password}
-            className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
-            placeholder="Password..."
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setErrors((prev) => ({ ...prev, password: null }));
-            }}
-            onBlur={() => {
-              const passwordError = validatePassword(password);
-              setErrors((prev) => ({ ...prev, password: passwordError }));
-            }}
-            autoComplete="new-password"
-            aria-invalid={!!errors.password}
-            aria-describedby={
-              errors.confirmPassword ? "password-error" : undefined
-            }
-            aria-required="true"
-            ref={passwordInputRef}
-            disabled={isLoading}
-          />
+            <label
+              htmlFor="password"
+              className="font-semibold text-sm xl:text-base"
+            >
+              Password:
+            </label>
+            <div className="flex items-center w-full bg-gray-200 text-gray-950 rounded-sm border border-gray-950 h-10 px-4">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={password}
+                className="flex-1 bg-transparent outline-none text-sm xl:text-base"
+                placeholder="Password..."
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setApiError(null);
+                  setErrors((prev) => ({ ...prev, password: null }));
+                }}
+                onBlur={() => {
+                  const passwordError = validatePassword(password);
+                  setErrors((prev) => ({ ...prev, password: passwordError }));
+                }}
+                aria-invalid={!!errors.password}
+                aria-describedby={
+                  errors.password ? "password-error" : undefined
+                }
+                aria-required="true"
+                ref={passwordInputRef}
+                disabled={isLoading}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="ml-2 text-sm text-gray-800"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <BiHide className="w-5 h-5" />
+                ) : (
+                  <BiShow className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
           {errors?.password && (
             <p
               id="password-error"
+              role="alert"
               className="text-red-600 dark:text-red-400 text-xs px-16 mt-0.25 mb-2"
             >
               {errors.password}
@@ -219,41 +238,57 @@ const RegistrationPage = () => {
           )}
 
           <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
-          <label
-            htmlFor="confirmPassword"
-            className="font-semibold text-sm xl:text-base"
-          >
-            Confirm Password:
-          </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            name="confirmPassword"
-            value={confirmPassword}
-            className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
-            placeholder="Confirm password..."
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              setErrors((prev) => ({ ...prev, confirmPassword: null }));
-            }}
-            onBlur={() => {
-              const confirmPasswordError = validateConfirmPassword(
-                password,
-                confirmPassword
-              );
-              setErrors((prev) => ({
-                ...prev,
-                confirmPassword: confirmPasswordError,
-              }));
-            }}
-            aria-invalid={!!errors.confirmPassword}
-            aria-describedby={
-              errors.confirmPassword ? "confirm-password-error" : undefined
-            }
-            aria-required="true"
-            ref={confirmPasswordInputRef}
-            disabled={isLoading}
-          />
+            <label
+              htmlFor="confirmPassword"
+              className="font-semibold text-sm xl:text-base"
+            >
+              Confirm Password:
+            </label>
+            <div className="flex items-center w-full bg-gray-200 text-gray-950 rounded-sm border border-gray-950 h-10 px-4">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={confirmPassword}
+                className="flex-1 bg-transparent outline-none text-sm xl:text-base"
+                placeholder="Confirm password..."
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setApiError(null);
+                  setErrors((prev) => ({ ...prev, confirmPassword: null }));
+                }}
+                onBlur={() => {
+                  const confirmPasswordError = validateConfirmPassword(
+                    password,
+                    confirmPassword
+                  );
+                  setErrors((prev) => ({
+                    ...prev,
+                    confirmPassword: confirmPasswordError,
+                  }));
+                }}
+                aria-invalid={!!errors.confirmPassword}
+                aria-describedby={
+                  errors.confirmPassword ? "confirm-password-error" : undefined
+                }
+                aria-required="true"
+                ref={confirmPasswordInputRef}
+                disabled={isLoading}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="ml-2 text-sm text-gray-800"
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showConfirmPassword ? (
+                  <BiHide className="w-5 h-5" />
+                ) : (
+                  <BiShow className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
           {errors?.confirmPassword && (
             <p
@@ -265,34 +300,36 @@ const RegistrationPage = () => {
           )}
 
           <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
-          <label
-            htmlFor="firstName"
-            className="font-semibold text-sm xl:text-base"
-          >
-            First Name:
-          </label>
-          <input
-            id="firstName"
-            type="text"
-            name="firstName"
-            value={firstName}
-            className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
-            placeholder="First Name..."
-            onChange={(e) => {
-              setFirstName(e.target.value);
-              setErrors((prev) => ({ ...prev, firstName: null }));
-            }}
-            onBlur={() => {
-              const firstNameError = validateName(firstName);
-              setErrors((prev) => ({ ...prev, firstName: firstNameError }));
-            }}
-            autoComplete="given-name"
-            aria-invalid={!!errors.firstName}
-            aria-describedby={errors.firstName ? "first-name-error" : undefined}
-            aria-required="true"
-            ref={firstNameInputRef}
-            disabled={isLoading}
-          />
+            <label
+              htmlFor="firstName"
+              className="font-semibold text-sm xl:text-base"
+            >
+              First Name:
+            </label>
+            <input
+              id="firstName"
+              type="text"
+              name="firstName"
+              value={firstName}
+              className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
+              placeholder="First Name..."
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                setErrors((prev) => ({ ...prev, firstName: null }));
+              }}
+              onBlur={() => {
+                const firstNameError = validateName(firstName);
+                setErrors((prev) => ({ ...prev, firstName: firstNameError }));
+              }}
+              autoComplete="given-name"
+              aria-invalid={!!errors.firstName}
+              aria-describedby={
+                errors.firstName ? "first-name-error" : undefined
+              }
+              aria-required="true"
+              ref={firstNameInputRef}
+              disabled={isLoading}
+            />
           </div>
           {errors?.firstName && (
             <p
@@ -304,36 +341,36 @@ const RegistrationPage = () => {
           )}
 
           <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
-          <label
-            htmlFor="lastName"
-            className="font-semibold text-sm xl:text-base"
-          >
-            Last Name:
-          </label>
-          <input
-            id="lastName"
-            type="text"
-            name="lastName"
-            value={lastName}
-            className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
-            placeholder="Last Name..."
-            onChange={(e) => {
-              setLastName(e.target.value);
-              setErrors((prev) => ({ ...prev, lastName: null }));
-            }}
-            onBlur={() => {
-              const lastNameError = validateName(lastName);
-              setErrors((prev) => ({ ...prev, lastName: lastNameError }));
-            }}
-            autoComplete="family-name"
-            aria-invalid={!!errors.lastName}
-            aria-describedby={
-              errors.confirmPassword ? "last-name-error" : undefined
-            }
-            aria-required="true"
-            ref={lastNameInputRef}
-            disabled={isLoading}
-          />
+            <label
+              htmlFor="lastName"
+              className="font-semibold text-sm xl:text-base"
+            >
+              Last Name:
+            </label>
+            <input
+              id="lastName"
+              type="text"
+              name="lastName"
+              value={lastName}
+              className="bg-gray-200 text-gray-950 p-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base h-10"
+              placeholder="Last Name..."
+              onChange={(e) => {
+                setLastName(e.target.value);
+                setErrors((prev) => ({ ...prev, lastName: null }));
+              }}
+              onBlur={() => {
+                const lastNameError = validateName(lastName);
+                setErrors((prev) => ({ ...prev, lastName: lastNameError }));
+              }}
+              autoComplete="family-name"
+              aria-invalid={!!errors.lastName}
+              aria-describedby={
+                errors.confirmPassword ? "last-name-error" : undefined
+              }
+              aria-required="true"
+              ref={lastNameInputRef}
+              disabled={isLoading}
+            />
           </div>
           {errors?.lastName && (
             <p
