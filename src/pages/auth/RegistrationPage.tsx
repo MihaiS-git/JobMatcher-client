@@ -280,7 +280,11 @@ const RegistrationPage = () => {
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 className="ml-2 text-sm text-gray-800"
-                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                aria-label={
+                  showConfirmPassword
+                    ? "Hide confirm password"
+                    : "Show confirm password"
+                }
               >
                 {showConfirmPassword ? (
                   <BiHide className="w-5 h-5" />
@@ -364,9 +368,7 @@ const RegistrationPage = () => {
               }}
               autoComplete="family-name"
               aria-invalid={!!errors.lastName}
-              aria-describedby={
-                errors.confirmPassword ? "last-name-error" : undefined
-              }
+              aria-describedby={errors.lastName ? "last-name-error" : undefined}
               aria-required="true"
               ref={lastNameInputRef}
               disabled={isLoading}

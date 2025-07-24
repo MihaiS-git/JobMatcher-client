@@ -1,7 +1,7 @@
-import { IoMdCloseCircle } from "react-icons/io";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { clearCredentials } from "../features/authSlice";
+import CloseButton from "./CloseButton";
 
 interface HamburgerMenuProps {
   openState: boolean;
@@ -33,7 +33,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
         }`}
       >
         <div className="grid grid-cols-12">
-          <ul className="col-start-3 col-end-11 flex flex-col items-center space-y-8 overflow-auto mt-32 mb-32">
+          <ul className="col-span-12 mx-auto flex flex-col items-center space-y-8 overflow-auto mt-32 mb-32">
             <li>
               <NavLink
                 to="/"
@@ -63,12 +63,9 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
               )}
             </li>
           </ul>
-          <button
-            className="fixed bottom-24 right-6 bg-gray-300 text-gray-950 rounded-full"
-            onClick={handleClose}
-          >
-            <IoMdCloseCircle className="w-6 h-6" />
-          </button>
+          <div className="col-start-12 col-end-12 flex flex-col justify-end items-end">
+            <CloseButton handleClose={handleClose} />
+          </div>
         </div>
       </div>
     </>

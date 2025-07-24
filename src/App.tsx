@@ -7,44 +7,47 @@ import RegistrationPage from "./pages/auth/RegistrationPage";
 import PasswordRecoveryPage from "./pages/auth/PasswordRecoveryPage";
 import PasswordResetPage from "./pages/auth/PasswordResetPage";
 import OAuthRedirectHandler from "./pages/auth/OAuthRedirectHandler";
+import ProfilePage from "./pages/profile/ProfilePage";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout/>,
+    element: <RootLayout />,
     children: [
       {
         index: true,
-        element: <HomePage/>
+        element: <HomePage />,
       },
       {
         path: "/auth",
-        element: <AuthPage/>
+        element: <AuthPage />,
       },
       {
         path: "/register",
-        element: <RegistrationPage/>
+        element: <RegistrationPage />,
       },
       {
         path: "/recover-password",
-        element: <PasswordRecoveryPage/>
+        element: <PasswordRecoveryPage />,
       },
       {
         path: "/reset-password",
-        element: <PasswordResetPage/>
+        element: <PasswordResetPage />,
       },
       {
         path: "/oauth2/redirect",
-        element: <OAuthRedirectHandler/>
+        element: <OAuthRedirectHandler />,
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
     ],
-  }
+  },
 ]);
 
 function App() {
-  return (
-    <RouterProvider router={router}/>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
