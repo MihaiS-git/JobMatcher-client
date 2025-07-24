@@ -328,7 +328,7 @@ const RegistrationPage = () => {
             autoComplete="family-name"
             aria-invalid={!!errors.lastName}
             aria-describedby={
-              errors.confirmPassword ? "last-name-error" : undefined
+              errors.lastName ? "last-name-error" : undefined
             }
             aria-required="true"
             ref={lastNameInputRef}

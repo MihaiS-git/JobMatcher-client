@@ -3,13 +3,13 @@ export function validateEmail(email: string): string | null {
   if (!trimmedEmail) {
     return "Email is required.";
   }
-  const emailRegex = /^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$/;
+  const emailRegex =
+    /^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$/;
   if (!emailRegex.test(trimmedEmail)) {
     return "Please enter a valid email.";
   }
   return null;
 }
-
 
 export function validatePassword(password: string): string | null {
   const trimmedPassword = password.trim();
@@ -17,7 +17,9 @@ export function validatePassword(password: string): string | null {
   const hasLowercase = /[a-z]/.test(trimmedPassword);
   const hasUppercase = /[A-Z]/.test(trimmedPassword);
   const hasNumber = /\d/.test(trimmedPassword);
-  const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(trimmedPassword);
+  const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(
+    trimmedPassword
+  );
   const isLongEnough = trimmedPassword.length >= 10;
 
   if (!trimmedPassword) {
@@ -41,12 +43,15 @@ export function validatePassword(password: string): string | null {
   return null;
 }
 
-export function validateConfirmPassword(password: string, confirmPassword: string): string | null {
-  if(!confirmPassword.trim()){
-    return "Confirm password is required."
+export function validateConfirmPassword(
+  password: string,
+  confirmPassword: string
+): string | null {
+  if (!confirmPassword.trim()) {
+    return "Confirm password is required.";
   }
-  if(password.trim() !== confirmPassword.trim()){
-    return "Passwords must match."
+  if (password.trim() !== confirmPassword.trim()) {
+    return "Passwords must match.";
   }
   return null;
 }
@@ -54,16 +59,72 @@ export function validateConfirmPassword(password: string, confirmPassword: strin
 export function validateName(name: string): string | null {
   const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,}$/;
 
-  if(!name.trim()){
-    return "Name field is required."
+  if (!name.trim()) {
+    return "Name field is required.";
   }
 
-  if(name.trim().length < 2){
-    return "Name must be at least 2 characters long."
+  if (name.trim().length < 2) {
+    return "Name must be at least 2 characters long.";
   }
 
-  if(!nameRegex.test(name)){
-    return "Name must be at least 2 characters and contain only letters, spaces, hyphens or apostrophes."
+  if (!nameRegex.test(name)) {
+    return "Name must be at least 2 characters and contain only letters, spaces, hyphens or apostrophes.";
   }
   return null;
 }
+
+export function validatePhone(phone: string): string | null {
+  const trimmedPhone = phone.trim();
+
+  const phoneRegex =
+    /^(\+?\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}$/;
+
+  if (!trimmedPhone) {
+    return "Phone is required.";
+  }
+  if (!phoneRegex.test(trimmedPhone)) {
+    return "Invalid phone number format.";
+  }
+
+  return null;
+}
+
+export function validatePostalCode(postalCode: string): string | null {
+  const trimmed = postalCode.trim();
+
+  if (!trimmed) {
+    return "Postal code is required.";
+  }
+
+  // Generic: at least 4 characters, alphanumeric, allows space or dash
+  const postalRegex = /^[A-Za-z0-9][A-Za-z0-9\s-]{3,}$/;
+
+  if (!postalRegex.test(trimmed)) {
+    return "Invalid postal code format.";
+  }
+
+  return null;
+}
+
+export function validateStreet(street: string): string | null {
+  const trimmed = street.trim();
+
+  if (!trimmed) {
+    return "Street is required.";
+  }
+
+  // Minimum length check
+  if (trimmed.length < 3) {
+    return "Street must be at least 3 characters long.";
+  }
+
+  // Only allow letters, numbers, commas, dots, dashes and spaces
+  const streetRegex = /^[A-Za-z0-9șȘțȚăĂâÂîÎéè.,\- ]+$/u;
+
+  if (!streetRegex.test(trimmed)) {
+    return "Street contains invalid characters.";
+  }
+
+  return null;
+}
+
