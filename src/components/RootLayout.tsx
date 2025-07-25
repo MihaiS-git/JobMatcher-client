@@ -6,16 +6,22 @@ import { useAppDispatch } from "../hooks/hooks";
 import { loadCredentialsFromStorage } from "../features/authSlice";
 import DashboardDrawer from "./DashboardDrawer";
 import { useDashboardDrawer } from "../hooks/useDashboardDrawer";
+import useAuth from "../hooks/useAuth";
 
 const RootLayout = () => {
   const dispatch = useAppDispatch();
-  const { isDashboardDrawerOpen } = useDashboardDrawer();
+  const { isDashboardDrawerOpen, close } = useDashboardDrawer();
+  const auth = useAuth();
 
   useEffect(() => {
     if (localStorage.getItem("auth")) {
       dispatch(loadCredentialsFromStorage());
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    if(!auth.user) close();
+  },[auth, close])
 
   return (
     <div className="flex flex-col min-h-screen">
