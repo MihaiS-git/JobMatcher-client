@@ -114,7 +114,7 @@ const PasswordResetPage = () => {
     <PageContent className="flex flex-col items-center justify-center">
       <section
         aria-labelledby="reset-password-heading"
-        className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg shadow-blue-400"
+        className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg"
       >
         <h1
           id="reset-password-heading"

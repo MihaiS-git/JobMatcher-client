@@ -126,7 +126,7 @@ const RegistrationPage = () => {
     <PageContent className="flex flex-col items-center justify-center">
       <section
         aria-labelledby="register-heading"
-        className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg shadow-blue-400 my-16 overflow-y-auto"
+        className="w-full md:w-160 border border-blue-950 bg-blue-200 dark:bg-blue-900 shadow-lg my-16 overflow-y-auto"
       >
         <h1
           id="register-heading"

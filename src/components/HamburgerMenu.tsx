@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { clearCredentials } from "../features/authSlice";
 import CloseButton from "./CloseButton";
+import DashboardDrawerToggleButton from "./DashboardDrawerToggleButton";
 
 interface HamburgerMenuProps {
   openState: boolean;
@@ -43,16 +44,30 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 Home
               </NavLink>
             </li>
-            <li>
-              {isAuth ? (
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="hover:text-blue-950 dark:hover:text-blue-400"
-                >
-                  Logout
-                </button>
-              ) : (
+            {isAuth && (
+              <>
+                <li onClick={handleClose}>
+                  <DashboardDrawerToggleButton />
+                </li>
+                <li onClick={handleClose}>
+                  <button>Job Feed</button>
+                </li>
+                <li onClick={handleClose}>
+                  <button>Chat</button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="hover:text-blue-950 dark:hover:text-blue-400"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            )}
+            {!isAuth && (
+              <li>
                 <NavLink
                   to="/auth"
                   className="hover:text-blue-950 dark:hover:text-blue-400"
@@ -60,8 +75,8 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 >
                   Sign In
                 </NavLink>
-              )}
-            </li>
+              </li>
+            )}
           </ul>
           <div className="col-start-12 col-end-12 flex flex-col justify-end items-end">
             <CloseButton handleClose={handleClose} />

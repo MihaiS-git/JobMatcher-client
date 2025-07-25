@@ -15,7 +15,7 @@ const MainNavigation = () => {
 
   return (
     <nav className="hidden xl:flex items-center justify-end w-full p-4 text-base">
-      <div className="flex flex-row xl:flex-1">
+      <div className="flex flex-row xl:flex-1 justify-end">
         {isAuth ? (
           <ul className="flex flex-row w-full justify-around">
             <li>

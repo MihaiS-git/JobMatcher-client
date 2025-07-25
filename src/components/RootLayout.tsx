@@ -22,7 +22,6 @@ const RootLayout = () => {
       <Header />
       
       <div className="flex flex-1 pt-16">
-        {isDashboardDrawerOpen && <DashboardDrawer />}
         <main
           className={`flex-1 overflow-y-auto transition-all duration-300 ${
             isDashboardDrawerOpen ? "ml-80" : ""
@@ -30,6 +29,7 @@ const RootLayout = () => {
         >
           <Outlet />
         </main>
+        {isDashboardDrawerOpen && <DashboardDrawer />}
       </div>
 
       <Footer />
