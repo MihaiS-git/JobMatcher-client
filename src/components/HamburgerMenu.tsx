@@ -38,7 +38,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             <li>
               <NavLink
                 to="/"
-                className="hover:text-blue-950 dark:hover:text-blue-400"
+                className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
                 onClick={handleClose}
               >
                 Home
@@ -50,16 +50,16 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                   <DashboardDrawerToggleButton />
                 </li>
                 <li onClick={handleClose}>
-                  <button>Job Feed</button>
+                  <button className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer">Job Feed</button>
                 </li>
                 <li onClick={handleClose}>
-                  <button>Chat</button>
+                  <button className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer">Chat</button>
                 </li>
                 <li>
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="hover:text-blue-950 dark:hover:text-blue-400"
+                    className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
                   >
                     Logout
                   </button>
@@ -70,7 +70,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
               <li>
                 <NavLink
                   to="/auth"
-                  className="hover:text-blue-950 dark:hover:text-blue-400"
+                  className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
                   onClick={handleClose}
                 >
                   Sign In

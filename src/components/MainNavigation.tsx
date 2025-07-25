@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { clearCredentials } from "../features/authSlice";
 import DashboardDrawerToggleButton from "./DashboardDrawerToggleButton";
@@ -19,19 +19,29 @@ const MainNavigation = () => {
         {isAuth ? (
           <ul className="flex flex-row w-full justify-around">
             <li>
-              <DashboardDrawerToggleButton/>
+              <DashboardDrawerToggleButton />
             </li>
             <li>
-              <button>Job Feed</button>
+              <NavLink
+                to="/"
+                className="text-blue-100 hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
+              >
+                Job Feed
+              </NavLink>
             </li>
             <li>
-              <button>Chat</button>
+              <NavLink
+                to="/"
+                className="text-blue-100 hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
+              >
+                Chat
+              </NavLink>
             </li>
             <li>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="hover:text-blue-950 dark:hover:text-blue-400"
+                className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
               >
                 Logout
               </button>

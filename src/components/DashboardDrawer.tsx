@@ -33,7 +33,7 @@ const DashboardDrawer = () => {
         <aside
           className={`fixed top-0 left-0 w-full h-screen 
           md:top-16 md:left-0 md:w-80 md:h-[calc(100%-4rem)] p-4
-          bg-blue-200 dark:bg-gray-800 z-40 shadow-lg overflow-auto 
+          bg-blue-500 dark:bg-gray-800 z-40 overflow-auto 
           transition-transform duration-300 ease-in-out 
           ${isDashboardDrawerOpen ? "translate-x-0" : "-translate-x-full"}
           `}
@@ -45,18 +45,18 @@ const DashboardDrawer = () => {
               <CloseButton handleClose={close} />
             </div>
             <h2 className="text-xl font-bold my-8 dark:text-gray-300">Dashboard</h2>
-            <ul className="text-base font-medium text-gray-800 dark:text-gray-300">
+            <ul className="text-base font-medium text-blue-100 dark:text-gray-300">
               <li onClick={handleItemClick}>
-                <NavLink to="/">Projects</NavLink>
+                <NavLink to="/projects" className={({isActive}) => isActive ? "text-blue-950 dark:text-blue-400" : "text-blue-100 hover:text-blue-950 dark:text-blue-100 dark:hover:text-blue-400"}>Projects</NavLink>
               </li>
               <li onClick={handleItemClick}>
-                <NavLink to="/">Financial</NavLink>
+                <NavLink to="/financial" className={({isActive}) => isActive ? "text-blue-950 dark:text-blue-400" : "text-blue-100 hover:text-blue-950 dark:text-blue-100 dark:hover:text-blue-400"}>Financial</NavLink>
               </li>
               <li onClick={handleItemClick}>
-                <NavLink to="/profile">Profile</NavLink>
+                <NavLink to="/profile" className={({isActive}) => isActive ? "text-blue-950 dark:text-blue-400" : "text-blue-100 hover:text-blue-950 dark:text-blue-100 dark:hover:text-blue-400"}>Profile</NavLink>
               </li>
               <li onClick={handleItemClick}>
-                <NavLink to="/">Settings</NavLink>
+                <NavLink to="/settings" className={({isActive}) => isActive ? "text-blue-950 dark:text-blue-400" : "text-blue-100 hover:text-blue-950 dark:text-blue-100 dark:hover:text-blue-400"}>Settings</NavLink>
               </li>
             </ul>
           </div>

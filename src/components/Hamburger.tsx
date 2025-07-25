@@ -16,7 +16,7 @@ const Hamburger = () => {
     <>
       {!isOpen && (
         <div
-          className="p-2 w-8 h-8 space-y-1 bg-gray-200 rounded xl:hidden"
+          className="p-2 w-8 h-8 space-y-1 bg-gray-200 hover:bg-gray-400 rounded xl:hidden"
           onClick={toggleMenu}
         >
           <span className="block w-4 h-0.5 bg-gray-900 animate-pulse"></span>
