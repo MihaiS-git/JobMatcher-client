@@ -1,11 +1,14 @@
 import PageContent from "../../components/PageContent";
-import { useGetUserByIdQuery } from "../../features/user/userApi";
+import {
+  useGetUserByIdQuery,
+} from "../../features/user/userApi";
 import useAuth from "../../hooks/useAuth";
 import UserGeneralForm from "../../components/user/UserGeneralForm";
 import UserAddressForm from "../../components/user/UserAddressForm";
 import { useMemo } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
 import UserImmutableData from "../../components/user/UserImmutableData";
+import UploadPictureForm from "../../components/user/UploadPictureForm";
 
 const ProfilePage = () => {
   const auth = useAuth();
@@ -32,9 +35,11 @@ const ProfilePage = () => {
         </h1>
         <img
           className="text-xs font-light m-4 w-40 h-40"
-          src="user_icon.png"
-          alt="User picture"
+          src={user.pictureUrl || "user_icon.png"}
+          alt="User profile picture"
         />
+
+        <UploadPictureForm user={user} />
         <UserImmutableData user={user} />
         <UserGeneralForm user={user} />
         <UserAddressForm user={user} />

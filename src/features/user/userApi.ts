@@ -43,10 +43,22 @@ export const userApi = createApi({
         {type: 'User', id},
         {type: 'User', id: "LIST"},
       ],
+    }),
+    uploadProfilePicture: builder.mutation<{ imageUrl: string }, { id: string; file: File }>({
+      query: ({id, file}) => {
+        const formData = new FormData();
+        formData.append("file", file);
 
+        return {
+          url: `users/${id}/profile_picture`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      invalidatesTags: (_result, _error, { id }) => [{ type: "User", id }],
     }),
   }),
 });
 
 
-export const {useGetUserByIdQuery, useUpdateUserByIdMutation, useUpdateAddressByUserIdMutation } = userApi;
+export const {useGetUserByIdQuery, useUpdateUserByIdMutation, useUpdateAddressByUserIdMutation, useUploadProfilePictureMutation } = userApi;

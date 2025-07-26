@@ -128,3 +128,17 @@ export function validateStreet(street: string): string | null {
   return null;
 }
 
+export function validateImageFile(file: File){
+  const allowedTypes = ["image/jpg", "image/png", "image/webp"];
+  const maxSize = 10 * 1024 * 1024; // 10MB
+
+  if(!allowedTypes.includes(file.type)){
+    return "Only JPEG, PNG or WEBP images are allowed.";
+  }
+
+  if(file.size > maxSize){
+    return "File size must be less than 10MB.";
+  }
+
+  return null;
+}

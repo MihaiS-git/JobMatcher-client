@@ -70,7 +70,8 @@ const UserGeneralForm = ({ user }: { user: UserResponseDTO }) => {
     }
   };
 
-  if (isLoading) return <div className="pt-4">Loading general info data...</div>;
+  if (isLoading)
+    return <div className="pt-4">Loading general info data...</div>;
   if (error) return <div className="pt-4">Error loading profile.</div>;
   if (!user) return <div className="pt-4">No user data found.</div>;
 
@@ -164,7 +165,7 @@ const UserGeneralForm = ({ user }: { user: UserResponseDTO }) => {
             {apiErrorGeneral}
           </p>
         )}
-                {successMessage && (
+        {successMessage && (
           <p
             id="api-error-address"
             className="text-green-400 text-center my-4"

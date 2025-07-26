@@ -22,6 +22,11 @@ function hasErrorField(data: unknown): data is { error: string } {
 }
 
 export function parseApiError(err: unknown): string {
+  if (import.meta.env.DEV) {
+    console.log("parseApiError got error:", err);
+  }
+
+  
   if (typeof err === "object" && err !== null && "status" in err) {
     const e = err as FetchBaseQueryError;
 
