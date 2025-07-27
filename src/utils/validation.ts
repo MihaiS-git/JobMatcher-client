@@ -133,7 +133,7 @@ export function validateImageFile(file: File){
   const maxSize = 10 * 1024 * 1024; // 10MB
 
   if(!allowedTypes.includes(file.type)){
-    return "Only JPEG, PNG or WEBP images are allowed.";
+    return "Image file extensions allowed: tiff, bmp, avif, gif, jpeg, jpg, png, webp";
   }
 
   if(file.size > maxSize){
