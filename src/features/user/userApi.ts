@@ -51,7 +51,7 @@ export const userApi = createApi({
 
         return {
           url: `users/${id}/profile_picture`,
-          method: 'POST',
+          method: 'PATCH',
           body: formData,
         };
       },

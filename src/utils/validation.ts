@@ -129,7 +129,7 @@ export function validateStreet(street: string): string | null {
 }
 
 export function validateImageFile(file: File){
-  const allowedTypes = ["image/jpg", "image/png", "image/webp"];
+  const allowedTypes = ["image/tiff", "image/bmp", "image/avif", "image/heic", "image/gif", "image/jpeg", "image/jpg", "image/png", "image/webp"];
   const maxSize = 10 * 1024 * 1024; // 10MB
 
   if(!allowedTypes.includes(file.type)){
