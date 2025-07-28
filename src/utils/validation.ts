@@ -128,15 +128,40 @@ export function validateStreet(street: string): string | null {
   return null;
 }
 
-export function validateImageFile(file: File){
-  const allowedTypes = ["image/tiff", "image/bmp", "image/avif", "image/heic", "image/gif", "image/jpeg", "image/jpg", "image/png", "image/webp"];
+export function validateImageFile(file: File) {
+  const allowedTypes = [
+    "image/tiff",
+    "image/bmp",
+    "image/avif",
+    "image/gif",
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ];
+  const allowedExtensions = [
+    ".tiff",
+    ".bmp",
+    ".avif",
+    ".gif",
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".webp",
+  ];
   const maxSize = 10 * 1024 * 1024; // 10MB
 
-  if(!allowedTypes.includes(file.type)){
-    return "Image file extensions allowed: tiff, bmp, avif, gif, jpeg, jpg, png, webp";
+  const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+
+  if (!allowedExtensions.includes(extension)) {
+    return "Unsupported file extension. Allowed: tiff, bmp, avif, gif, jpeg, jpg, png, webp";
   }
 
-  if(file.size > maxSize){
+  if (!allowedTypes.includes(file.type)) {
+    return "Unsupported media format. Allowed: tiff, bmp, avif, gif, jpeg, jpg, png, webp";
+  }
+
+  if (file.size > maxSize) {
     return "File size must be less than 10MB.";
   }
 
