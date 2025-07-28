@@ -4,9 +4,9 @@ import Header from "./Header";
 import { useEffect } from "react";
 import { useAppDispatch } from "../hooks/hooks";
 import { loadCredentialsFromStorage } from "../features/authSlice";
-import DashboardDrawer from "./DashboardDrawer";
 import { useDashboardDrawer } from "../hooks/useDashboardDrawer";
 import useAuth from "../hooks/useAuth";
+import DashboardDrawer from "./DashboardDrawer/DashboardDrawer";
 
 const RootLayout = () => {
   const dispatch = useAppDispatch();

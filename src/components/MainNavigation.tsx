@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { clearCredentials } from "../features/authSlice";
-import DashboardDrawerToggleButton from "./DashboardDrawerToggleButton";
+import DashboardDrawerToggleButton from "./DashboardDrawer/DashboardDrawerToggleButton";
 
 const MainNavigation = () => {
   const dispatch = useAppDispatch();

@@ -1,4 +1,4 @@
-import { useDashboardDrawer } from "../hooks/useDashboardDrawer";
+import { useDashboardDrawer } from "@/hooks/useDashboardDrawer";
 
 const DashboardDrawerToggleButton = () => {
   const { toggle, isDashboardDrawerOpen } = useDashboardDrawer();

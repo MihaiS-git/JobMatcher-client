@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { clearCredentials } from "../features/authSlice";
 import CloseButton from "./CloseButton";
-import DashboardDrawerToggleButton from "./DashboardDrawerToggleButton";
+import DashboardDrawerToggleButton from "./DashboardDrawer/DashboardDrawerToggleButton";
 
 interface HamburgerMenuProps {
   openState: boolean;
