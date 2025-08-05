@@ -20,7 +20,7 @@ createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
       <ThemeProvider>
         <DashboardDrawerProvider>
-          <App />
+          <App/>
         </DashboardDrawerProvider>
       </ThemeProvider>
     </Provider>

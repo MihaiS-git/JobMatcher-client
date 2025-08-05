@@ -25,8 +25,9 @@ const DrawerAccordion = () => {
         value="item-3"
         label="Profile"
         items={[
-          { targetUrl: "/profile", itemTag: "Edit Profile" },
-          { targetUrl: "/portfolio", itemTag: "Edit Portfolio" },
+          { targetUrl: "/profile", itemTag: "Profile" },
+          { targetUrl: "/public_profile", itemTag: "Public Profile" },
+          { targetUrl: "/portfolio", itemTag: "Portfolio" },
         ]}
       />
 

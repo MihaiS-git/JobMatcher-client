@@ -8,6 +8,7 @@ import PasswordRecoveryPage from "./pages/auth/PasswordRecoveryPage";
 import PasswordResetPage from "./pages/auth/PasswordResetPage";
 import OAuthRedirectHandler from "./pages/auth/OAuthRedirectHandler";
 import ProfilePage from "./pages/profile/ProfilePage";
+import PublicProfilePage from "./pages/profile/PublicProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <ProfilePage />,
+      },
+      {
+        path: "/public_profile",
+        element: <PublicProfilePage />,
       },
     ],
   },

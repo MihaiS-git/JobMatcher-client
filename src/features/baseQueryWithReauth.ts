@@ -33,7 +33,7 @@ export const baseQueryWithReauth: BaseQueryFn<
     if (!refreshToken) {
       api.dispatch(clearCredentials());
       window.location.href = "/auth";
-      return { error: { status: 401, data: "Unauthorized" } };
+      return { error: { status: 401, data: "No refresh token - logged out" } };
     }
 
     const refreshResult = await baseQuery(
@@ -67,7 +67,7 @@ export const baseQueryWithReauth: BaseQueryFn<
     } else {
       // Refresh failed – force logout
       api.dispatch(clearCredentials());
-      window.location.href = "/signin";
+      window.location.href = "/auth";
     }
   }
 
