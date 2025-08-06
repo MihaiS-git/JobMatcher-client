@@ -72,3 +72,39 @@ export function parseApiError(err: unknown): string {
 
   return "An unexpected error occurred. Please try again later or contact support if the problem persists.";
 }
+
+interface ValidationErrorResponse extends ErrorResponse {
+  validationErrors?: Record<string, string>;
+}
+
+export function parseValidationErrors(
+  err: unknown
+): { message: string; validationErrors?: Record<string, string> } {
+  if (typeof err === "object" && err !== null && "status" in err) {
+    const e = err as FetchBaseQueryError & { data?: unknown };
+
+    if (typeof e.status === "number" && e.data && typeof e.data === "object") {
+      // Narrow down the data type safely
+      const data = e.data as ValidationErrorResponse;
+
+      if (
+        data.validationErrors &&
+        typeof data.validationErrors === "object" &&
+        !Array.isArray(data.validationErrors)
+      ) {
+        return {
+          message: data.message ?? `Error ${e.status}`,
+          validationErrors: data.validationErrors,
+        };
+      }
+
+      if (typeof data.message === "string") {
+        return { message: data.message };
+      }
+
+      return { message: `Error ${e.status}` };
+    }
+  }
+
+  return { message: "An unexpected error occurred." };
+}

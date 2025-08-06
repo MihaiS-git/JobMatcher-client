@@ -68,7 +68,39 @@ export function validateName(name: string): string | null {
   }
 
   if (!nameRegex.test(name)) {
+    return "Name contains invalid characters.";
+  }
+  return null;
+}
+
+export function validateNotRequiredName(name: string): string | null {
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,}$/;
+
+  if (!name.trim()) return null;
+
+  if (name.trim().length < 2) {
+    return "Name must be at least 2 characters long.";
+  }
+
+  if (!nameRegex.test(name)) {
     return "Name must be at least 2 characters and contain only letters, spaces, hyphens or apostrophes.";
+  }
+  return null;
+}
+
+
+export function validateHeadline(headline: string): string | null {
+  // Allows letters, numbers, space, underscore, dot, comma, exclamation, question mark, single/double quotes, hyphen
+  const headlineRegex = /^[a-zA-Z0-9 _.,!?'"-]+$/;
+
+  if (!headline.trim()) return null;
+
+  if (headline.trim().length < 2 || headline.trim().length > 50) {
+    return "Headline must be between 2 and 50 characters.";
+  }
+
+  if (!headlineRegex.test(headline)) {
+    return "Headline contains invalid characters.";
   }
   return null;
 }
@@ -167,3 +199,96 @@ export function validateImageFile(file: File) {
 
   return null;
 }
+
+export function validateHourlyRate(hourlyRate: number) {
+  if (isNaN(hourlyRate)) return "Hourly rate must be a number.";
+
+  if (hourlyRate < 0) return "Hourly rate must be greater than 0.";
+
+  /* if (hourlyRate < 5) return "Hourly rate must be at least $5."; */
+
+  if (hourlyRate > 1000)
+    return "Hourly rate seems too high. Must be under $1000.";
+
+  const decimalPlaces = hourlyRate.toString().split(".")[1];
+  if (decimalPlaces && decimalPlaces.length > 2) {
+    return "Hourly rate can have up to two decimal places.";
+  }
+
+  return null;
+}
+
+export function validateUrl(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  try {
+    const url = new URL(trimmed);
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return "URL must start with http:// or https://";
+    }
+    return null;
+  } catch {
+    return "Invalid URL format.";
+  }
+}
+
+export function validateSocialLinks(links: string[]): (string | null)[] {
+  const urlRegex = /^(https?:\/\/)?([\w.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/i;
+
+  return links.map(link => {
+    if (!link.trim()) return null; // empty is valid (or change if not)
+    return urlRegex.test(link.trim())
+      ? null
+      : "Invalid social media URL.";
+  });
+}
+
+
+export function validateSkills(value: string): string | null {
+  const trimmed = value.trim();
+
+  if (!trimmed) return null;
+
+  const allowedCharsRegex = /^[A-Za-z0-9șȘțȚăĂâÂîÎéè.\-+# ]+$/u;
+  const skills = trimmed.split(",").map((s) => s.trim());
+
+  if (skills.some((skill) => skill.length === 0)) {
+    return "Skills must not contain empty entries.";
+  }
+
+  for (const skill of skills) {
+    if (!allowedCharsRegex.test(skill)) {
+      return `Skill '${skill}' contains invalid characters.`;
+    }
+    if (skill.length < 1) {
+      return `Skill '${skill}' is too short.`;
+    }
+  }
+
+  return null;
+}
+
+export function validateAboutText(value: string): string | null {
+  const trimmed = value.trim();
+
+  if (!trimmed) return null;
+
+/*   if (trimmed.length < 30) {
+    return "About section must be at least 30 characters.";
+  } */
+ 
+  if (trimmed.length > 1000) {
+    return "About section must be under 1000 characters.";
+  }
+
+  // Accept only common text characters
+  const allowedCharsRegex = /^[\p{L}\p{N}\p{P}\p{Zs}\n\r]+$/u;
+
+  if (!allowedCharsRegex.test(trimmed)) {
+    return "About section contains invalid characters.";
+  }
+
+  return null;
+}
+
