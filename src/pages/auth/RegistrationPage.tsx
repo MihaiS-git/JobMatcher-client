@@ -18,14 +18,17 @@ const RegistrationPage = () => {
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
   const firstNameInputRef = useRef<HTMLInputElement>(null);
   const lastNameInputRef = useRef<HTMLInputElement>(null);
+  const roleSelectRef = useRef<HTMLFieldSetElement>(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [role, setRole] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const navigate = useNavigate();
   const [register, { isLoading }] = useRegisterMutation();
   const [errors, setErrors] = useState<{
@@ -34,6 +37,7 @@ const RegistrationPage = () => {
     confirmPassword?: string | null;
     firstName?: string | null;
     lastName?: string | null;
+    role?: string | null;
   }>({});
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -46,12 +50,14 @@ const RegistrationPage = () => {
     );
     const firstNameError = validateName(firstName);
     const lastNameError = validateName(lastName);
+    const roleError = !role ? "You must select a role." : null;
     const newErrors = {
       email: emailError,
       password: passwordError,
       confirmPassword: confirmPasswordError,
       firstName: firstNameError,
       lastName: lastNameError,
+      role: roleError,
     };
     setErrors(newErrors);
     return newErrors;
@@ -66,6 +72,7 @@ const RegistrationPage = () => {
       confirmPassword: null,
       firstName: null,
       lastName: null,
+      role: null,
     });
     setApiError(null);
 
@@ -96,8 +103,19 @@ const RegistrationPage = () => {
       return;
     }
 
+    if (currentErrors.role) {
+      roleSelectRef.current?.focus();
+      return;
+    }
+
     try {
-      const result = await register({ email, password, firstName, lastName });
+      const result = await register({
+        email,
+        password,
+        firstName,
+        lastName,
+        role,
+      });
       if ("data" in result && result?.data?.success) {
         setErrors({
           email: null,
@@ -105,6 +123,7 @@ const RegistrationPage = () => {
           confirmPassword: null,
           firstName: null,
           lastName: null,
+          role: null,
         });
         setApiError(null);
         navigate("/auth");
@@ -382,6 +401,48 @@ const RegistrationPage = () => {
               {errors.lastName}
             </p>
           )}
+
+          <div className="flex flex-col px-8 xl:px-16 items-start w-full my-2">
+            <fieldset
+              className="flex flex-row justify-evenly w-full mt-2"
+              ref={roleSelectRef}
+              aria-required="true"
+              aria-invalid={!!errors.role}
+              aria-describedby={errors.role ? "role-error" : undefined}
+            >
+              <legend className="font-semibold text-sm xl:text-base">
+                Choose the desired role:
+              </legend>
+              <div className="flex flex-row items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="CUSTOMER"
+                  checked={role === "CUSTOMER"}
+                  onChange={() => setRole("CUSTOMER")}
+                />
+                <legend className="mx-4">Customer</legend>
+              </div>
+              <div className="flex flex-row items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="STAFF"
+                  checked={role === "STAFF"}
+                  onChange={() => setRole("STAFF")}
+                />
+                <legend className="mx-4">Freelancer</legend>
+              </div>
+            </fieldset>
+            {errors.role && (
+              <p
+                id="role-error"
+                className="text-red-600 dark:text-red-400 text-xs px-16 mt-0.25 mb-2 w-full text-center"
+              >
+                {errors.role}
+              </p>
+            )}
+          </div>
 
           <div className="w-full px-16 text-center py-4">
             <button

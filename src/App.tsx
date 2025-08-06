@@ -7,7 +7,6 @@ import RegistrationPage from "./pages/auth/RegistrationPage";
 import PasswordRecoveryPage from "./pages/auth/PasswordRecoveryPage";
 import PasswordResetPage from "./pages/auth/PasswordResetPage";
 import OAuthRedirectHandler from "./pages/auth/OAuthRedirectHandler";
-import ProfilePage from "./pages/profile/ProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -37,11 +36,7 @@ const router = createBrowserRouter([
       {
         path: "/oauth2/redirect",
         element: <OAuthRedirectHandler />,
-      },
-      {
-        path: "/profile",
-        element: <ProfilePage />,
-      },
+      }
     ],
   },
 ]);
