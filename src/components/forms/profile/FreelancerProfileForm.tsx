@@ -349,7 +349,7 @@ const FreelancerProfileForm = ({ userId }: Props) => {
           )}
         />
 
-        <div className="flex flex-col items-left w-full my-2 px-2 xl:px-16">
+        <div className="flex flex-col items-left w-full my-2 mt-8 px-2 xl:px-16">
           <label
             htmlFor="availableForHire"
             className="font-semibold text-sm xl:text-base ms-2 mb-2"
