@@ -1,6 +1,6 @@
 import PageContent from "@/components/PageContent";
 import useAuth from "@/hooks/useAuth";
-import FreelancerForm from "@/components/forms/profile/FreelancerForm";
+import FreelancerProfileForm from "@/components/forms/profile/FreelancerProfileForm";
 
 const PublicProfilePage = () => {
   const auth = useAuth();
@@ -27,7 +27,7 @@ const PublicProfilePage = () => {
           aria-label="user-profile-picture"
         />
 
-        {role === "STAFF" && <FreelancerForm userId={userId} />}
+        {role === "STAFF" && <FreelancerProfileForm userId={userId} />}
 
       </section>
     </PageContent>

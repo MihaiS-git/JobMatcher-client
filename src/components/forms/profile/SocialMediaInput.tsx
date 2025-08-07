@@ -1,45 +1,33 @@
 import type { RefObject } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import InputErrorMessage from "../InputErrorMessage";
-import { validateSocialLinks } from "@/utils/validation";
 
 type Props = {
   socialLinks: string[];
   setSocialLinks: (links: string[]) => void;
-  errors: (string | null)[];
-  setErrors: (errors: (string | null)[]) => void;
+  error: string | null;
   refs?: RefObject<HTMLInputElement>[];
 };
 
 const SocialMediaInput = ({
   socialLinks,
   setSocialLinks,
-  errors,
-  setErrors,
+  error,
   refs,
 }: Props) => {
   const handleChange = (index: number, value: string) => {
     const updatedLinks = [...socialLinks];
     updatedLinks[index] = value;
     setSocialLinks(updatedLinks);
-    setErrors(errors.map((e, i) => (i === index ? null : e)));
-  };
-
-  const handleBlur = () => {
-    const error = validateSocialLinks(socialLinks);
-    setErrors(error);
-  };
-
-  const handleRemoveLink = (index: number) => {
-    const updatedLinks = socialLinks.filter((_, i) => i !== index);
-    const updatedErrors = errors.filter((_, i) => i !== index);
-    setSocialLinks(updatedLinks);
-    setErrors(updatedErrors);
   };
 
   const handleAddLink = () => {
     setSocialLinks([...socialLinks, ""]);
-    setErrors([...errors, null]);
+  };
+
+  const handleRemoveLink = (index: number) => {
+    const updatedLinks = socialLinks.filter((_, i) => i !== index);
+    setSocialLinks(updatedLinks);
   };
 
   return (
@@ -55,9 +43,10 @@ const SocialMediaInput = ({
             className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
             value={url}
             onChange={(e) => handleChange(index, e.target.value)}
-            onBlur={handleBlur}
-            aria-invalid={!!errors[index]}
-            aria-describedby={errors[index] ? `social-url-error-${index}` : undefined}
+            aria-invalid={!!error}
+            aria-describedby={
+              error ? "social-url-error" : undefined
+            }
             ref={refs?.[index] || null}
           />
           {url && (
@@ -70,10 +59,10 @@ const SocialMediaInput = ({
               <RiDeleteBin6Line className="w-7 h-7 text-gray-800 dark:text-red-600 hover:text-red-700 rounded-xs border border-gray-800 dark:border-red-600 hover:border-red-700 p-1" />
             </button>
           )}
-          {errors[index] && (
+          {error && (
             <InputErrorMessage
-              message={errors[index]!}
-              label={`social-url-${index}`}
+              message={error}
+              label="social-url"
             />
           )}
         </div>

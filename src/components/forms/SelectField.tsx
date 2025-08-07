@@ -7,13 +7,13 @@ type Option<T extends string | number> = {
 
 type Props<T extends string | number> = {
   id: string;
-  label: string;
+  label?: string;
   name: string;
   value: T;
   options: Option<T>[];
   onChange: (value: T) => void;
-  selectRef: RefObject<HTMLSelectElement | null>;
-  disabled: boolean;
+  selectRef?: RefObject<HTMLSelectElement | null>;
+  disabled?: boolean;
 };
 const SelectField = <T extends string | number>({
   id,
