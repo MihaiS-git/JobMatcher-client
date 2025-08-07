@@ -8,7 +8,7 @@ import {
 } from "../../utils/validation";
 import focusFirstError from "../../utils/focusFirstError";
 import { parseApiError } from "../../utils/parseApiError";
-import FormInput from "../../pages/profile/FormInput";
+import FormInput from "../forms/FormInput";
 
 const UserAddressForm = ({ user }: { user: UserResponseDTO }) => {
   const [successMessage, setSuccessMessage] = useState("");

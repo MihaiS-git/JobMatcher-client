@@ -4,7 +4,7 @@ import focusFirstError from "../../utils/focusFirstError";
 import { validateName, validatePhone } from "../../utils/validation";
 import { useUpdateUserByIdMutation } from "../../features/user/userApi";
 import { parseApiError } from "../../utils/parseApiError";
-import FormInput from "../../pages/profile/FormInput";
+import FormInput from "../forms/FormInput";
 
 const UserGeneralForm = ({ user }: { user: UserResponseDTO }) => {
   const [successMessage, setSuccessMessage] = useState("");

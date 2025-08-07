@@ -1,6 +1,6 @@
 import Select, { type MultiValue } from "react-select";
 import classNames from "classnames";
-import InputErrorMessage from "./forms/InputErrorMessage";
+import InputErrorMessage from "./InputErrorMessage";
 import { forwardRef } from "react";
 
 interface Option {
@@ -19,7 +19,6 @@ interface MultiSelectProps {
   error?: string | null;
   isLoading?: boolean;
 }
-
 
 const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps>(({
   id,
