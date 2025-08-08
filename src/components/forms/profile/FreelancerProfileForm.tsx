@@ -14,7 +14,6 @@ import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
 import MultiSelect from "../MultiSelect";
 import SelectField from "../SelectField";
 import TextareaInput from "../TextareaInput";
-import SocialMediaInput from "./SocialMediaInput";
 import type {
   ExperienceLevel,
   FreelancerDetailDTO,
@@ -27,6 +26,9 @@ import useLanguages from "@/hooks/useLanguages";
 import InputErrorMessage from "../InputErrorMessage";
 import type { JobSubcategoryDTO } from "@/types/JobCategoryDTO";
 import type { LanguageDTO } from "@/types/LanguageDTO";
+import SuccessMessage from "../SuccessMessage";
+import ErrorMessage from "../ErrorMessage";
+import CheckboxInput from "../CheckboxInput";
 
 type FreelancerProfileFormData = z.output<typeof freelancerProfileSchema>;
 
@@ -81,7 +83,9 @@ const FreelancerProfileForm = ({ userId }: Props) => {
         ? profile.languages.map((l: LanguageDTO) => l.id)
         : [],
       about: profile.about || "",
-      socialMedia: profile.socialMedia || [""],
+      socialMedia1: profile.socialMedia[0] || "",
+      socialMedia2: profile.socialMedia[1] || "",
+      socialMedia3: profile.socialMedia[2] || "",
       availableForHire: profile.availableForHire ?? false,
     };
   };
@@ -143,6 +147,11 @@ const FreelancerProfileForm = ({ userId }: Props) => {
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
 
+    const socialMediaLinks = [];
+    if (data.socialMedia1) socialMediaLinks.push(data.socialMedia1);
+    if (data.socialMedia2) socialMediaLinks.push(data.socialMedia2);
+    if (data.socialMedia3) socialMediaLinks.push(data.socialMedia3);
+
     const payload: FreelancerProfileRequestDTO = {
       userId,
       username: data.username,
@@ -154,7 +163,7 @@ const FreelancerProfileForm = ({ userId }: Props) => {
       skills: skillsArray || [],
       languageIds: data.languageIds || [],
       about: data.about || "",
-      socialMedia: data.socialMedia || [],
+      socialMedia: socialMediaLinks,
       websiteUrl: data.websiteUrl || "",
     };
 
@@ -223,29 +232,6 @@ const FreelancerProfileForm = ({ userId }: Props) => {
           {...register("headline")}
         />
 
-        <FormInput
-          id="hourlyRate"
-          label="Hourly rate"
-          type="number"
-          step="0.01"
-          error={errors.hourlyRate?.message}
-          {...register("hourlyRate", { valueAsNumber: true })}
-        />
-
-        <FormInput
-          id="websiteUrl"
-          label="Website URL"
-          error={errors.websiteUrl?.message}
-          {...register("websiteUrl")}
-        />
-
-        <FormInput
-          id="skills"
-          label="Skills"
-          error={errors.skills?.message}
-          {...register("skills")}
-        />
-
         {jobCategoriesApiError && (
           <InputErrorMessage
             message={"Failed to load job categories. Try again later."}
@@ -298,6 +284,13 @@ const FreelancerProfileForm = ({ userId }: Props) => {
           />
         )}
 
+        <FormInput
+          id="skills"
+          label="Skills"
+          error={errors.skills?.message}
+          {...register("skills")}
+        />
+
         <Controller
           name="experienceLevel"
           control={control}
@@ -306,7 +299,7 @@ const FreelancerProfileForm = ({ userId }: Props) => {
               id="experienceLevel"
               name={field.name}
               label="Experience Level"
-              value={field.value}
+              value={field.value ? field.value : ""}
               onChange={field.onChange}
               disabled={isLoading}
               options={[
@@ -316,6 +309,15 @@ const FreelancerProfileForm = ({ userId }: Props) => {
               ]}
             />
           )}
+        />
+
+        <FormInput
+          id="hourlyRate"
+          label="Hourly rate"
+          type="number"
+          step="0.01"
+          error={errors.hourlyRate?.message}
+          {...register("hourlyRate", { valueAsNumber: true })}
         />
 
         <Controller
@@ -337,38 +339,40 @@ const FreelancerProfileForm = ({ userId }: Props) => {
           )}
         />
 
-        <Controller
-          name="socialMedia"
-          control={control}
-          render={({ field, fieldState }) => (
-            <SocialMediaInput
-              socialLinks={field.value || [""]}
-              setSocialLinks={field.onChange}
-              error={fieldState.error?.message ?? null}
-            />
-          )}
+        <FormInput
+          id="websiteUrl"
+          label="Website URL"
+          error={errors.websiteUrl?.message}
+          {...register("websiteUrl")}
         />
 
-        <div className="flex flex-col items-left w-full my-2 mt-8 px-2 xl:px-16">
-          <label
-            htmlFor="availableForHire"
-            className="font-semibold text-sm xl:text-base ms-2 mb-2"
-          >
-            <input
-              className="me-2"
-              type="checkbox"
-              id="availableForHire"
-              {...register("availableForHire")}
-            />
-            Available for hire
-          </label>
-          {errors.availableForHire && (
-            <InputErrorMessage
-              message={errors.availableForHire.message!}
-              label={"availableForHire"}
-            />
-          )}
-        </div>
+        <FormInput
+          id="socialMedia1"
+          label="Social Media Link 1"
+          error={errors.socialMedia1?.message}
+          {...register("socialMedia1")}
+        />
+
+        <FormInput
+          id="socialMedia2"
+          label="Social Media Link 2"
+          error={errors.socialMedia2?.message}
+          {...register("socialMedia2")}
+        />
+
+        <FormInput
+          id="socialMedia3"
+          label="Social Media Link 3"
+          error={errors.socialMedia3?.message}
+          {...register("socialMedia3")}
+        />
+
+        <CheckboxInput
+          id="availableForHire"
+          label="Available for hire"
+          error={errors.availableForHire?.message}
+          {...register("availableForHire")}
+        />
 
         <div className="flex flex-col items-left w-full my-2 px-2 xl:px-16">
           <button
@@ -379,7 +383,9 @@ const FreelancerProfileForm = ({ userId }: Props) => {
               isLoading ||
               saveLoading ||
               updateLoading ||
-              isSubmitting
+              isSubmitting ||
+              Object.keys(errors).length > 0 ||
+              hasServerValidationErrors
             }
           >
             {submitButtonText}
@@ -387,38 +393,8 @@ const FreelancerProfileForm = ({ userId }: Props) => {
         </div>
       </section>
       <section className="mx-auto">
-        {successMessage && (
-          <p
-            id="api-error-address"
-            className="text-green-400 text-center my-4"
-            role="alert"
-            aria-live="assertive"
-          >
-            {successMessage}
-          </p>
-        )}
-        {errorMessage && (
-          <p
-            id="api-error-general"
-            className="text-red-600 dark:text-red-400 text-center my-4"
-            role="alert"
-            aria-live="assertive"
-          >
-            {errorMessage}
-          </p>
-        )}
-        {/* {validationErrors && (
-          <div
-            id="api-error-validation"
-            className="text-red-600 dark:text-red-400 text-center my-4"
-            role="alert"
-            aria-live="assertive"
-          >
-            {Object.values(validationErrors).map((msg, idx) => (
-              <p key={idx}>{msg}</p>
-            ))}
-          </div>
-        )} */}
+        {successMessage && <SuccessMessage message={successMessage} />}
+        {errorMessage && <ErrorMessage message={errorMessage} />}
       </section>
     </form>
   );
