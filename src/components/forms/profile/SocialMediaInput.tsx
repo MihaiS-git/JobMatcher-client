@@ -8,7 +8,8 @@ type Props = {
   setSocialLinks: (links: string[]) => void;
   errors: (string | null)[];
   setErrors: (errors: (string | null)[]) => void;
-  refs?: RefObject<HTMLInputElement>[];
+  refs?: RefObject<HTMLInputElement | null>[];
+  setApiError: (error: string) => void;
 };
 
 const SocialMediaInput = ({
@@ -17,12 +18,15 @@ const SocialMediaInput = ({
   errors,
   setErrors,
   refs,
+  setApiError,
 }: Props) => {
   const handleChange = (index: number, value: string) => {
     const updatedLinks = [...socialLinks];
     updatedLinks[index] = value;
     setSocialLinks(updatedLinks);
     setErrors(errors.map((e, i) => (i === index ? null : e)));
+    setApiError("");
+
   };
 
   const handleBlur = () => {
@@ -49,19 +53,20 @@ const SocialMediaInput = ({
       </label>
       {socialLinks.map((url, index) => (
         <>
-        <div key={index} className="mt-2 w-full flex items-center gap-2">
-          <input
-            type="url"
-            placeholder="https://your-social-link.com"
-            className="bg-gray-200 text-gray-950 py-2 px-4 rounded-sm border border-gray-950 text-sm xl:text-base grow transition-all duration-200 min-w-0"
-            value={url}
-            onChange={(e) => handleChange(index, e.target.value)}
-            onBlur={handleBlur}
-            aria-invalid={!!errors[index]}
-            aria-describedby={errors[index] ? `social-url-error-${index}` : undefined}
-            ref={refs?.[index] || null}
-          />
-          {/* {url && ( */}
+          <div key={index} className="mt-2 w-full flex items-center gap-2">
+            <input
+              type="url"
+              placeholder="https://your-social-link.com"
+              className="bg-gray-200 text-gray-950 py-2 px-4 rounded-sm border border-gray-950 text-sm xl:text-base grow transition-all duration-200 min-w-0"
+              value={url}
+              onChange={(e) => handleChange(index, e.target.value)}
+              onBlur={handleBlur}
+              aria-invalid={!!errors[index]}
+              aria-describedby={
+                errors[index] ? `social-url-error-${index}` : undefined
+              }
+              ref={refs?.[index] || null}
+            />
             <button
               type="button"
               onClick={() => handleRemoveLink(index)}
@@ -70,7 +75,6 @@ const SocialMediaInput = ({
             >
               <RiDeleteBin6Line className="w-7 h-7 text-gray-800 dark:text-red-600 hover:text-red-700 rounded-xs border border-gray-800 dark:border-red-600 hover:border-red-700 p-1 cursor-pointer" />
             </button>
-          {/* )} */}
           </div>
           {errors[index] && (
             <InputErrorMessage

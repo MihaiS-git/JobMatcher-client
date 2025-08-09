@@ -135,13 +135,17 @@ const FreelancerForm = ({ userId }: Props) => {
     about: useRef<HTMLTextAreaElement>(null),
   };
 
-  const socialLinkRefs = useRef<React.RefObject<HTMLInputElement>[]>([]);
+  const socialLinkRefs = useRef<React.RefObject<HTMLInputElement | null>[]>([]);
 
+  // Initialize refs for social media links before rendering
   useEffect(() => {
-    socialLinkRefs.current = socialLinks.map(
-      (_, i) => socialLinkRefs.current[i] || React.createRef<HTMLInputElement>()
-    );
-  }, [socialLinks]);
+    // If refs length doesn’t match socialLinks length, recreate refs
+    if (socialLinkRefs.current.length !== socialLinks.length) {
+      socialLinkRefs.current = Array(socialLinks.length)
+        .fill(null)
+        .map(() => React.createRef<HTMLInputElement>());
+    }
+  }, [socialLinks.length]);
 
   const queryArgs = useMemo(() => (userId ? userId : skipToken), [userId]);
 
@@ -290,7 +294,7 @@ const FreelancerForm = ({ userId }: Props) => {
   });
 
   const hasServerErrors =
-    validationErrors && Object.keys(validationErrors).length > 0;
+    apiError && Object.keys(apiError).length > 0;
 
   const hasValidationErrors = Boolean(hasClientErrors || hasServerErrors);
 
@@ -313,6 +317,7 @@ const FreelancerForm = ({ userId }: Props) => {
           onChange={(e) => {
             setUsername(e.target.value);
             setErrors((prev) => ({ ...prev, username: null }));
+            setApiError("");
           }}
           onBlur={() => {
             const err = validateName(username);
@@ -334,6 +339,7 @@ const FreelancerForm = ({ userId }: Props) => {
           onChange={(e) => {
             setHeadline(e.target.value);
             setErrors((prev) => ({ ...prev, headline: null }));
+            setApiError("");
           }}
           onBlur={() => {
             const err = validateHeadline(headline);
@@ -357,6 +363,7 @@ const FreelancerForm = ({ userId }: Props) => {
             const parsedValue = parseFloat(e.target.value);
             setHourlyRate(isNaN(parsedValue) ? 0.0 : parsedValue);
             setErrors((prev) => ({ ...prev, hourlyRate: null }));
+            setApiError("");
           }}
           onBlur={() => {
             const err = validateHourlyRate(hourlyRate);
@@ -378,6 +385,7 @@ const FreelancerForm = ({ userId }: Props) => {
           onChange={(e) => {
             setWebsiteUrl(e.target.value);
             setErrors((prev) => ({ ...prev, websiteUrl: null }));
+            setApiError("");
           }}
           onBlur={() => {
             const err = validateUrl(websiteUrl);
@@ -399,6 +407,7 @@ const FreelancerForm = ({ userId }: Props) => {
           onChange={(e) => {
             setSkills(e.target.value);
             setErrors((prev) => ({ ...prev, skills: null }));
+            setApiError("");
           }}
           onBlur={() => {
             const err = validateSkills(skills);
@@ -421,6 +430,7 @@ const FreelancerForm = ({ userId }: Props) => {
             if (values.length <= 5) {
               setSelectedCategories(values);
               setErrors((prev) => ({ ...prev, jobCategories: undefined }));
+              setApiError("");
             } else {
               setErrors((prev) => ({
                 ...prev,
@@ -443,6 +453,7 @@ const FreelancerForm = ({ userId }: Props) => {
             if (values.length <= 5) {
               setSelectedLanguages(values);
               setErrors((prev) => ({ ...prev, languages: undefined }));
+              setApiError("");
             } else {
               setErrors((prev) => ({
                 ...prev,
@@ -465,7 +476,11 @@ const FreelancerForm = ({ userId }: Props) => {
             { value: "MID", label: "Mid" },
             { value: "SENIOR", label: "Senior" },
           ]}
-          onChange={(value: ExperienceLevel) => setExperienceLevel(value)}
+          onChange={(value: ExperienceLevel) => {
+            setExperienceLevel(value);
+            setErrors((prev) => ({ ...prev, experienceLevel: null }));
+            setApiError("");
+          }}
           selectRef={refsGeneral.experienceLevel}
           disabled={isLoading}
         />
@@ -479,6 +494,7 @@ const FreelancerForm = ({ userId }: Props) => {
             setAbout(val);
             setTextCounter(val.length);
             setErrors((prev) => ({ ...prev, about: null }));
+            setApiError("");
           }}
           onBlur={() => {
             const err = validateAboutText(about);
@@ -493,6 +509,7 @@ const FreelancerForm = ({ userId }: Props) => {
           socialLinks={socialLinks}
           setSocialLinks={setSocialLinks}
           errors={errors.socialLinks || []}
+          setApiError={setApiError}
           setErrors={(newErrors) =>
             setErrors((prev) => ({ ...prev, socialLinks: newErrors }))
           }
