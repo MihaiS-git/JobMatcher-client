@@ -1,5 +1,5 @@
-import { skipToken, type FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import {
   validateAboutText,
   validateHeadline,
@@ -20,17 +20,18 @@ import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
 import { useGetAllLanguagesQuery } from "@/features/languages/languagesApi";
 import type {
   ExperienceLevel,
-  FreelancerDetailDTO,
   FreelancerProfileRequestDTO,
 } from "@/types/FreelancerDTO";
 import focusFirstError from "@/utils/focusFirstError";
-import type { SerializedError } from "@reduxjs/toolkit";
 import React from "react";
 import FormInput from "@/components/forms/FormInput";
 import SelectField from "../SelectField";
 import TextareaInput from "../TextareaInput";
 import RadioSelect from "../RadioSelect";
 import SocialMediaInput from "./SocialMediaInput";
+import useDebounce from "@/hooks/useDebounce";
+
+const DEBOUNCE_DELAY = 500;
 
 interface Option {
   value: number;
@@ -42,25 +43,84 @@ type Props = {
 };
 
 const FreelancerForm = ({ userId }: Props) => {
-  const [successMessage, setSuccessMessage] = useState("");
-  const [username, setUsername] = useState("");
-  const [headline, setHeadline] = useState("");
-  const [hourlyRate, setHourlyRate] = useState(0.0);
-  const [websiteUrl, setWebsiteUrl] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [skills, setSkills] = useState("");
-  const [experienceLevel, setExperienceLevel] =
-    useState<ExperienceLevel>("JUNIOR");
-  const [selectedLanguages, setSelectedLanguages] = useState<number[]>([]);
-  const [about, setAbout] = useState("");
-  const [textCounter, setTextCounter] = useState(0);
-  const [socialLinks, setSocialLinks] = useState<string[]>([]);
-  const [availableForHire, setAvailableForHire] = useState<boolean>(false);
-  const [apiError, setApiError] = useState<string>("");
+  const [formData, setFormData] = useState({
+    username: "",
+    headline: "",
+    hourlyRate: 0.0,
+    websiteUrl: "",
+    selectedCategories: [] as number[],
+    skills: "",
+    experienceLevel: "JUNIOR" as ExperienceLevel,
+    selectedLanguages: [] as number[],
+    about: "",
+    socialLinks: [] as string[],
+    availableForHire: false,
+  });
+  const [errors, setErrors] = useState<{
+    username?: string | null;
+    headline?: string | null;
+    hourlyRate?: string | null;
+    websiteUrl?: string | null;
+    skills?: string | null;
+    about?: string | null;
+    socialLinks?: (string | null)[] | null;
+  }>({});
   const [validationErrors, setValidationErrors] = useState<Record<
     string,
     string
   > | null>(null);
+  const [apiError, setApiError] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [textCounter, setTextCounter] = useState(0);
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+    {}
+  );
+
+  const debouncedUsername = useDebounce(formData.username, DEBOUNCE_DELAY);
+  const debouncedHeadline = useDebounce(formData.headline, DEBOUNCE_DELAY);
+  const debouncedWebsiteUrl = useDebounce(formData.websiteUrl, DEBOUNCE_DELAY);
+  const debouncedSkills = useDebounce(formData.skills, DEBOUNCE_DELAY);
+  const debouncedAbout = useDebounce(formData.about, DEBOUNCE_DELAY);
+
+  useEffect(() => {
+    if (!touchedFields.username) return;
+    const trimmed = debouncedUsername.trim();
+    const err = validateName(trimmed);
+    setErrors((prev) =>
+      prev.username === err ? prev : { ...prev, username: err }
+    );
+  }, [debouncedUsername, formData.username, touchedFields.username]);
+
+  useEffect(() => {
+    if (!touchedFields.headline) return;
+    const err = validateHeadline(debouncedHeadline.trim());
+    setErrors((prev) =>
+      prev.headline === err ? prev : { ...prev, headline: err }
+    );
+  }, [debouncedHeadline, formData.headline, touchedFields.headline]);
+
+  useEffect(() => {
+    if (!touchedFields.websiteUrl) return;
+    const err = validateUrl(debouncedWebsiteUrl.trim());
+    setErrors((prev) =>
+      prev.websiteUrl === err ? prev : { ...prev, websiteUrl: err }
+    );
+  }, [debouncedWebsiteUrl, formData.websiteUrl, touchedFields.websiteUrl]);
+
+  useEffect(() => {
+    if (!touchedFields.skills) return;
+    if (!formData.skills) return;
+    const err = validateSkills(debouncedSkills);
+    setErrors((prev) =>
+      prev.skills === err ? prev : { ...prev, skills: err }
+    );
+  }, [debouncedSkills, formData.skills, touchedFields.skills]);
+
+  useEffect(() => {
+    if (!touchedFields.about) return;
+    const err = validateAboutText(debouncedAbout);
+    setErrors((prev) => (prev.about === err ? prev : { ...prev, about: err }));
+  }, [debouncedAbout, formData.about, touchedFields.about]);
 
   // job categories
   const {
@@ -103,16 +163,6 @@ const FreelancerForm = ({ userId }: Props) => {
       label: tag.name,
     })) ?? [];
 
-  const [errors, setErrors] = useState<{
-    username?: string | null;
-    headline?: string | null;
-    hourlyRate?: string | null;
-    websiteUrl?: string | null;
-    skills?: string | null;
-    about?: string | null;
-    socialLinks?: (string | null)[] | null;
-  }>({});
-
   const refsGeneral: {
     username: RefObject<HTMLInputElement | null>;
     headline: RefObject<HTMLInputElement | null>;
@@ -135,25 +185,30 @@ const FreelancerForm = ({ userId }: Props) => {
     about: useRef<HTMLTextAreaElement>(null),
   };
 
-  const socialLinkRefs = useRef<React.RefObject<HTMLInputElement | null>[]>([]);
+  const socialLinkRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Initialize refs for social media links before rendering
-  useEffect(() => {
-    // If refs length doesn’t match socialLinks length, recreate refs
-    if (socialLinkRefs.current.length !== socialLinks.length) {
-      socialLinkRefs.current = Array(socialLinks.length)
-        .fill(null)
-        .map(() => React.createRef<HTMLInputElement>());
-    }
-  }, [socialLinks.length]);
+  const setSocialLinkRef = (index: number, node: HTMLInputElement | null) => {
+    socialLinkRefs.current[index] = node;
+  };
 
-  const queryArgs = useMemo(() => (userId ? userId : skipToken), [userId]);
+  const updateSocialLink = (index: number, value: string) => {
+    setFormData((prev) => {
+      const updatedLinks = [...prev.socialLinks];
+      updatedLinks[index] = value;
+      return { ...prev, socialLinks: updatedLinks };
+    });
+    setErrors((prev) => ({
+      ...prev,
+      socialLinks: prev.socialLinks ? [...prev.socialLinks] : [],
+    }));
+    setApiError("");
+  };
 
   const {
     data: profile,
     isLoading,
     error: freelancerApiError,
-  } = useGetFreelancerByUserIdQuery(queryArgs);
+  } = useGetFreelancerByUserIdQuery(userId ? userId : skipToken);
 
   const [saveProfile, { isLoading: saveLoading }] = useSaveFreelancerMutation();
   const [updateProfile, { isLoading: updateLoading }] =
@@ -167,34 +222,38 @@ const FreelancerForm = ({ userId }: Props) => {
 
   useEffect(() => {
     if (profile) {
-      setUsername(profile.username || "");
-      setHeadline(profile.headline || "");
-      setHourlyRate(profile.hourlyRate || 0);
-      setWebsiteUrl(profile.websiteUrl || "");
-      setSelectedCategories(profile.jobSubcategories.map((js) => js.id) || []);
-      setSkills(
-        profile.skills ? profile.skills.map((s) => s.name).join(", ") : ""
-      );
-      setExperienceLevel(profile.experienceLevel || "");
-      setSelectedLanguages(profile.languages.map((l) => l.id) || []);
-      setAbout(profile.about || "");
+      setFormData((prev) => ({
+        ...prev,
+        username: profile.username || "",
+        headline: profile.headline || "",
+        hourlyRate: profile.hourlyRate || 0,
+        websiteUrl: profile.websiteUrl || "",
+        selectedCategories: profile.jobSubcategories.map((js) => js.id) || [],
+        skills: profile.skills
+          ? profile.skills.map((s) => s.name).join(", ")
+          : "",
+        experienceLevel: profile.experienceLevel || "",
+        selectedLanguages: profile.languages.map((l) => l.id) || [],
+        about: profile.about || "",
+        socialLinks: profile.socialMedia || [],
+        availableForHire: Boolean(profile.availableForHire),
+      }));
       setTextCounter((profile.about ?? "").length);
-      setSocialLinks(profile.socialMedia || []);
-      setAvailableForHire(Boolean(profile.availableForHire));
     }
   }, [profile]);
 
   const validateForm = () => {
+    const socialLinkErrors = validateSocialLinks(formData.socialLinks);
     const errors = {
-      username: validateName(username),
-      headline: validateHeadline(headline),
-      hourlyRate: validateHourlyRate(hourlyRate),
-      websiteUrl: validateUrl(websiteUrl),
-      skills: validateSkills(skills),
-      about: validateAboutText(about),
-      socialLinks: [...validateSocialLinks(socialLinks)],
+      username: validateName(formData.username),
+      headline: validateHeadline(formData.headline),
+      hourlyRate: validateHourlyRate(formData.hourlyRate),
+      websiteUrl: validateUrl(formData.websiteUrl),
+      skills: validateSkills(formData.skills),
+      about: validateAboutText(formData.about),
+      socialLinks: socialLinkErrors,
     };
-    setErrors(errors);
+    setErrors((prev) => ({ ...prev, ...errors }));
     return errors;
   };
 
@@ -212,70 +271,60 @@ const FreelancerForm = ({ userId }: Props) => {
       }
       return Boolean(error);
     });
+
     if (hasError) {
+      if (
+        validationErrors.socialLinks?.some((err) => Boolean(err)) &&
+        socialLinkRefs.current.length > 0
+      ) {
+        const firstErrorIndex = validationErrors.socialLinks.findIndex((err) =>
+          Boolean(err)
+        );
+        const inputToFocus = socialLinkRefs.current[firstErrorIndex];
+        if (inputToFocus) {
+          inputToFocus.focus();
+          return;
+        }
+      }
       focusFirstError(validationErrors, refsGeneral, {
         socialLinks: socialLinkRefs.current,
       });
       return;
     }
 
-    const skillsArray = skills
+    const skillsArray = formData.skills
       .split(",")
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
 
     const payload: FreelancerProfileRequestDTO = {
       userId,
-      username: username.trim(),
-      experienceLevel: experienceLevel as ExperienceLevel,
-      headline: headline.trim(),
-      jobSubcategoryIds: selectedCategories,
-      hourlyRate,
-      availableForHire: availableForHire || false,
+      username: formData.username.trim(),
+      headline: formData.headline.trim(),
+      jobSubcategoryIds: formData.selectedCategories,
       skills: skillsArray,
-      languageIds: selectedLanguages,
-      about: about.trim(),
-      socialMedia: socialLinks.map((s) => s.trim()),
-      websiteUrl: websiteUrl.trim(),
+      experienceLevel: formData.experienceLevel as ExperienceLevel,
+      hourlyRate: formData.hourlyRate,
+      languageIds: formData.selectedLanguages,
+      about: formData.about.trim(),
+      websiteUrl: formData.websiteUrl.trim(),
+      socialMedia: formData.socialLinks.map((s) => s.trim()),
+      availableForHire: formData.availableForHire || false,
     };
 
     try {
-      let result:
-        | { data: FreelancerDetailDTO; error?: undefined }
-        | { data?: undefined; error: FetchBaseQueryError | SerializedError };
       if (!profile?.profileId) {
-        result = await saveProfile(payload);
-        if ("data" in result) {
-          setSuccessMessage("Profile saved successfully.");
-        } else {
-          const errorResult = parseValidationErrors(result.error);
-
-          if (errorResult.validationErrors) {
-            setValidationErrors(errorResult.validationErrors);
-            setApiError("");
-          } else {
-            setApiError(errorResult.message);
-            setValidationErrors(null);
-          }
-        }
+        await saveProfile(payload).unwrap();
+        setSuccessMessage("Profile saved successfully.");
       } else {
-        result = await updateProfile({ id: profile!.profileId, data: payload });
-        if ("data" in result) {
-          setSuccessMessage("Profile updated successfully.");
-        } else {
-          const errorResult = parseValidationErrors(result.error);
-
-          if (errorResult.validationErrors) {
-            setValidationErrors(errorResult.validationErrors);
-            setApiError("");
-          } else {
-            setApiError(errorResult.message);
-            setValidationErrors(null);
-          }
-        }
+        await updateProfile({
+          id: profile.profileId,
+          data: payload,
+        }).unwrap();
+        setSuccessMessage("Profile updated successfully.");
       }
     } catch (err: unknown) {
-      setApiError(parseApiError(err));
+      handleUpsertApiError(err, setValidationErrors, setApiError);
     }
   };
 
@@ -292,10 +341,7 @@ const FreelancerForm = ({ userId }: Props) => {
     }
     return Boolean(err);
   });
-
-  const hasServerErrors =
-    apiError && Object.keys(apiError).length > 0;
-
+  const hasServerErrors = apiError && Object.keys(apiError).length > 0;
   const hasValidationErrors = Boolean(hasClientErrors || hasServerErrors);
 
   if (isLoading) return <div>Loading user profile...</div>;
@@ -313,21 +359,25 @@ const FreelancerForm = ({ userId }: Props) => {
           label="Username:"
           type="text"
           name="username"
-          value={username}
-          onChange={(e) => {
-            setUsername(e.target.value);
-            setErrors((prev) => ({ ...prev, username: null }));
+          value={formData.username}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setFormData((prev) => ({ ...prev, username: e.target.value }));
+            setTouchedFields((prev) =>
+              prev.username ? prev : { ...prev, username: true }
+            );
             setApiError("");
           }}
           onBlur={() => {
-            const err = validateName(username);
-            setErrors((prev) => ({ ...prev, username: err }));
+            setTouchedFields((prev) => ({ ...prev, username: true }));
+            const trimmed = formData.username.trim();
+            const err = validateName(trimmed);
+            setErrors((prev) => (prev.username === err ? prev : { ...prev, username: err }));
           }}
           error={errors.username}
           autoComplete="off"
           aria-required="true"
           ref={refsGeneral.username}
-          disabled={isLoading}
+          isLoading={isLoading}
         />
 
         <FormInput
@@ -335,15 +385,18 @@ const FreelancerForm = ({ userId }: Props) => {
           label="Headline:"
           type="text"
           name="headline"
-          value={headline}
+          value={formData.headline}
           onChange={(e) => {
-            setHeadline(e.target.value);
-            setErrors((prev) => ({ ...prev, headline: null }));
+            setFormData((prev) => ({ ...prev, headline: e.target.value }));
+            setTouchedFields((prev) =>
+              prev.headline ? prev : { ...prev, headline: true }
+            );
             setApiError("");
           }}
           onBlur={() => {
-            const err = validateHeadline(headline);
-            setErrors((prev) => ({ ...prev, headline: err }));
+            setTouchedFields((prev) => ({ ...prev, headline: true }));
+            const err = validateHeadline(formData.headline);
+            setErrors((prev) => (prev.headline === err ? prev : { ...prev, headline: err }));
           }}
           error={errors.headline}
           autoComplete="off"
@@ -358,16 +411,18 @@ const FreelancerForm = ({ userId }: Props) => {
           type="number"
           name="hourlyRate"
           step="0.01"
-          value={hourlyRate}
+          value={formData.hourlyRate}
           onChange={(e) => {
             const parsedValue = parseFloat(e.target.value);
-            setHourlyRate(isNaN(parsedValue) ? 0.0 : parsedValue);
-            setErrors((prev) => ({ ...prev, hourlyRate: null }));
+            setFormData((prev) => ({
+              ...prev,
+              hourlyRate: isNaN(parsedValue) ? 0.0 : parsedValue,
+            }));
             setApiError("");
           }}
           onBlur={() => {
-            const err = validateHourlyRate(hourlyRate);
-            setErrors((prev) => ({ ...prev, hourlyRate: err }));
+            const err = validateHourlyRate(formData.hourlyRate);
+            setErrors((prev) => (prev.hourlyRate === err ? prev : { ...prev, hourlyRate: err }));
           }}
           error={errors.hourlyRate}
           autoComplete="off"
@@ -377,41 +432,22 @@ const FreelancerForm = ({ userId }: Props) => {
         />
 
         <FormInput
-          id="websiteUrl"
-          label="Website URL:"
-          type="text"
-          name="websiteUrl"
-          value={websiteUrl}
-          onChange={(e) => {
-            setWebsiteUrl(e.target.value);
-            setErrors((prev) => ({ ...prev, websiteUrl: null }));
-            setApiError("");
-          }}
-          onBlur={() => {
-            const err = validateUrl(websiteUrl);
-            setErrors((prev) => ({ ...prev, websiteUrl: err }));
-          }}
-          error={errors.websiteUrl}
-          autoComplete="off"
-          aria-required="true"
-          ref={refsGeneral.websiteUrl}
-          disabled={isLoading}
-        />
-
-        <FormInput
           id="skills"
           label="Skills:"
           type="text"
           name="skills"
-          value={skills}
+          value={formData.skills}
           onChange={(e) => {
-            setSkills(e.target.value);
-            setErrors((prev) => ({ ...prev, skills: null }));
+            setFormData((prev) => ({ ...prev, skills: e.target.value }));
+            setTouchedFields((prev) =>
+              prev.skills ? prev : { ...prev, skills: true }
+            );
             setApiError("");
           }}
           onBlur={() => {
-            const err = validateSkills(skills);
-            setErrors((prev) => ({ ...prev, skills: err }));
+            setTouchedFields((prev) => ({ ...prev, skills: true }));
+            const err = validateSkills(formData.skills);
+            setErrors((prev) => (prev.skills === err ? prev : { ...prev, skills: err }));
           }}
           error={errors.skills}
           autoComplete="off"
@@ -425,10 +461,13 @@ const FreelancerForm = ({ userId }: Props) => {
           name="jobCategories"
           label="Project categories"
           options={tagOptions}
-          selectedValues={selectedCategories}
+          selectedValues={formData.selectedCategories}
           onChange={(values) => {
             if (values.length <= 5) {
-              setSelectedCategories(values);
+              setFormData((prev) => ({
+                ...prev,
+                selectedCategories: values,
+              }));
               setErrors((prev) => ({ ...prev, jobCategories: undefined }));
               setApiError("");
             } else {
@@ -448,10 +487,13 @@ const FreelancerForm = ({ userId }: Props) => {
           name="languages"
           label="Languages"
           options={languageOptions}
-          selectedValues={selectedLanguages}
+          selectedValues={formData.selectedLanguages}
           onChange={(values) => {
             if (values.length <= 5) {
-              setSelectedLanguages(values);
+              setFormData((prev) => ({
+                ...prev,
+                selectedLanguages: values,
+              }));
               setErrors((prev) => ({ ...prev, languages: undefined }));
               setApiError("");
             } else {
@@ -470,14 +512,17 @@ const FreelancerForm = ({ userId }: Props) => {
           id="experienceLevel"
           name="experienceLevel"
           label="Experience Level"
-          value={experienceLevel}
+          value={formData.experienceLevel}
           options={[
             { value: "JUNIOR", label: "Junior" },
             { value: "MID", label: "Mid" },
             { value: "SENIOR", label: "Senior" },
           ]}
           onChange={(value: ExperienceLevel) => {
-            setExperienceLevel(value);
+            setFormData((prev) => ({
+              ...prev,
+              experienceLevel: value,
+            }));
             setErrors((prev) => ({ ...prev, experienceLevel: null }));
             setApiError("");
           }}
@@ -489,31 +534,69 @@ const FreelancerForm = ({ userId }: Props) => {
           id="about"
           name="about"
           label="About:"
-          value={about}
+          value={formData.about}
           onChange={(val) => {
-            setAbout(val);
+            setFormData((prev) => ({
+              ...prev,
+              about: val,
+            }));
+            setTouchedFields((prev) =>
+              prev.about ? prev : { ...prev, about: true }
+            );
             setTextCounter(val.length);
-            setErrors((prev) => ({ ...prev, about: null }));
             setApiError("");
           }}
           onBlur={() => {
-            const err = validateAboutText(about);
-            setErrors((prev) => ({ ...prev, about: err }));
+            setTouchedFields((prev) => ({ ...prev, about: true }));
+            const err = validateAboutText(formData.about);
+            setErrors((prev) => (prev.about === err ? prev : { ...prev, about: err }));
           }}
           error={errors.about}
           characterCount={textCounter}
           showCharacterCount
         />
 
+        <FormInput
+          id="websiteUrl"
+          label="Website URL:"
+          type="text"
+          name="websiteUrl"
+          value={formData.websiteUrl}
+          onChange={(e) => {
+            setFormData((prev) => ({ ...prev, websiteUrl: e.target.value }));
+            setTouchedFields((prev) =>
+              prev.websiteUrl ? prev : { ...prev, websiteUrl: true }
+            );
+            setApiError("");
+          }}
+          onBlur={() => {
+            setTouchedFields((prev) => ({ ...prev, websiteUrl: true }));
+            const err = validateUrl(formData.websiteUrl);
+            setErrors((prev) => (prev.websiteUrl === err ? prev : { ...prev, websiteUrl: err }));
+          }}
+          error={errors.websiteUrl}
+          autoComplete="off"
+          aria-required="true"
+          ref={refsGeneral.websiteUrl}
+          disabled={isLoading}
+        />
+
         <SocialMediaInput
-          socialLinks={socialLinks}
-          setSocialLinks={setSocialLinks}
-          errors={errors.socialLinks || []}
-          setApiError={setApiError}
+          socialLinks={formData.socialLinks}
+          setSocialLinks={(links) => {
+            setFormData((prev) => ({
+              ...prev,
+              socialLinks: links,
+            }));
+            setApiError("");
+          }}
+          updateSocialLink={updateSocialLink}
+          errors={errors.socialLinks ?? []}
           setErrors={(newErrors) =>
             setErrors((prev) => ({ ...prev, socialLinks: newErrors }))
           }
-          refs={socialLinkRefs.current}
+          setSocialLinkRef={setSocialLinkRef}
+          debounceDelay={DEBOUNCE_DELAY}
         />
 
         <RadioSelect
@@ -523,14 +606,18 @@ const FreelancerForm = ({ userId }: Props) => {
           id2="notAvailable"
           label2="Not available"
           name="availableForHire"
-          value={availableForHire}
-          setValue={setAvailableForHire}
+          value={formData.availableForHire}
+          setValue={(val: boolean) =>
+            setFormData((prev) => ({ ...prev, availableForHire: val }))
+          }
         />
       </section>
       <button
         type="submit"
         className="bg-blue-500 text-gray-200 p-2 rounded-sm border border-gray-200 disabled:bg-red-400 disabled:cursor-default hover:bg-blue-400 mt-8 w-80 cursor-pointer"
-        disabled={isLoading || saveLoading || updateLoading || hasValidationErrors}
+        disabled={
+          isLoading || saveLoading || updateLoading || hasValidationErrors
+        }
       >
         {submitButtonText}
       </button>
@@ -571,3 +658,21 @@ const FreelancerForm = ({ userId }: Props) => {
 };
 
 export default FreelancerForm;
+
+function handleUpsertApiError(
+  err: unknown,
+  setValidationErrors: React.Dispatch<
+    React.SetStateAction<Record<string, string> | null>
+  >,
+  setApiError: React.Dispatch<React.SetStateAction<string>>
+) {
+  const errorResult = parseValidationErrors(err);
+  if (errorResult.validationErrors) {
+    setValidationErrors(errorResult.validationErrors);
+    setApiError("");
+  } else {
+    setApiError(errorResult.message);
+    setValidationErrors(null);
+  }
+  return;
+}

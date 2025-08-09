@@ -6,7 +6,7 @@ const focusFirstError = (
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
     >
   >,
-  arrayRefs?: Record<string, React.RefObject<HTMLInputElement | null>[]>
+  arrayNodes?: Record<string, (HTMLInputElement | null)[]>
 ) => {
   for (const key of Object.keys(errors)) {
     const error = errors[key];
@@ -14,8 +14,8 @@ const focusFirstError = (
 
     if (Array.isArray(error)) {
       const firstErrorIndex = error.findIndex((e) => e);
-      if (firstErrorIndex !== -1 && arrayRefs?.[key]) {
-        arrayRefs[key][firstErrorIndex]?.current?.focus();
+      if (firstErrorIndex !== -1 && arrayNodes?.[key]) {
+        arrayNodes[key][firstErrorIndex]?.focus();
         break;
       }
     } else {

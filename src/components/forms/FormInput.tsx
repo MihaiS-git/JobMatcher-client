@@ -2,14 +2,17 @@ import InputErrorMessage from "@/components/forms/InputErrorMessage";
 import { forwardRef, type InputHTMLAttributes } from "react";
 
 interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  id?: string;
+  className?: string;
   label: string;
   error?: string | null;
   containerClassName?: string;
+  isLoading?: boolean;
 }
 
 const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   (
-    { label, error, id, containerClassName = "", className = "", ...props },
+    { id, label, containerClassName = "", className = "", error, isLoading, ...props },
     ref
   ) => {
     return (
@@ -25,6 +28,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-error` : undefined}
           className={`bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base ${className}`}
+          disabled={isLoading}
           {...props}
         />
         {error && <InputErrorMessage message={error} label={id!} />}

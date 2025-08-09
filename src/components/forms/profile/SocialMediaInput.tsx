@@ -1,7 +1,8 @@
-import type { RefObject } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import InputErrorMessage from "../InputErrorMessage";
 import { validateSocialLinks } from "@/utils/validation";
+import useDebounce from "@/hooks/useDebounce";
 
 type Props = {
   socialLinks: string[];
@@ -9,7 +10,9 @@ type Props = {
   errors: (string | null)[];
   setErrors: (errors: (string | null)[]) => void;
   refs?: RefObject<HTMLInputElement | null>[];
-  setApiError: (error: string) => void;
+  updateSocialLink: (index: number, value: string) => void;
+  setSocialLinkRef: (index: number, ref: HTMLInputElement | null) => void;
+  debounceDelay?: number;
 };
 
 const SocialMediaInput = ({
@@ -17,22 +20,27 @@ const SocialMediaInput = ({
   setSocialLinks,
   errors,
   setErrors,
-  refs,
-  setApiError,
+  setSocialLinkRef,
+  updateSocialLink,
+  debounceDelay,
 }: Props) => {
-  const handleChange = (index: number, value: string) => {
-    const updatedLinks = [...socialLinks];
-    updatedLinks[index] = value;
-    setSocialLinks(updatedLinks);
-    setErrors(errors.map((e, i) => (i === index ? null : e)));
-    setApiError("");
+  const [touchedFields, setTouchedFields] = useState<Record<number, boolean>>({});
 
-  };
+  const debouncedLinks = useDebounce(socialLinks, debounceDelay || 400);
 
-  const handleBlur = () => {
-    const error = validateSocialLinks(socialLinks);
-    setErrors(error);
-  };
+  useEffect(() => {
+    if (Object.keys(touchedFields).length === 0) return;
+
+    const validationErrors = validateSocialLinks(debouncedLinks);
+
+    const errorsChanged =
+      validationErrors.length !== errors.length ||
+      validationErrors.some((err, i) => err !== errors[i]);
+
+    if (errorsChanged) {
+      setErrors(validationErrors);
+    }
+  }, [debouncedLinks, setErrors, touchedFields, errors]);
 
   const handleRemoveLink = (index: number) => {
     const updatedLinks = socialLinks.filter((_, i) => i !== index);
@@ -52,20 +60,31 @@ const SocialMediaInput = ({
         Social Media URLs:
       </label>
       {socialLinks.map((url, index) => (
-        <>
-          <div key={index} className="mt-2 w-full flex items-center gap-2">
+        <div key={index} className="mt-2 w-full flex flex-col gap-1">
+          <div className="flex items-center gap-2">
             <input
               type="url"
               placeholder="https://your-social-link.com"
               className="bg-gray-200 text-gray-950 py-2 px-4 rounded-sm border border-gray-950 text-sm xl:text-base grow transition-all duration-200 min-w-0"
               value={url}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onBlur={handleBlur}
+              onChange={(e) => {
+                const updatedLinks = [...socialLinks];
+                updatedLinks[index] = e.target.value;
+                setSocialLinks(updatedLinks);
+                updateSocialLink(index, e.target.value);
+                setTouchedFields((prev) => ({ ...prev, [index]: true }));
+              }}
+              onBlur={() => {
+                setTouchedFields((prev) => ({ ...prev, [index]: true }));
+                // Validate on blur immediately
+                const validationErrors = validateSocialLinks(socialLinks);
+                setErrors(validationErrors);
+              }}
               aria-invalid={!!errors[index]}
               aria-describedby={
                 errors[index] ? `social-url-error-${index}` : undefined
               }
-              ref={refs?.[index] || null}
+              ref={(node) => setSocialLinkRef(index, node)}
             />
             <button
               type="button"
@@ -78,11 +97,11 @@ const SocialMediaInput = ({
           </div>
           {errors[index] && (
             <InputErrorMessage
-              message={errors[index]!}
-              label={`social-url-${index}`}
+              message={errors[index]}
+              label={`social-url-error-${index}`}
             />
           )}
-        </>
+        </div>
       ))}
 
       <button
