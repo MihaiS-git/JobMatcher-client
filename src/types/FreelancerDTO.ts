@@ -48,14 +48,14 @@ export type FreelancerDetailDTO = {
 export type FreelancerProfileRequestDTO = {
   userId: string;
   username: string;
-  experienceLevel: ExperienceLevel;
-  headline: string;
-  jobSubcategoryIds: number[];
-  hourlyRate: number;
-  availableForHire: boolean;
-  skills: string[];
-  languageIds: number[];
-  about: string;
-  socialMedia: string[];
-  websiteUrl: string;
+  experienceLevel?: ExperienceLevel;
+  headline?: string;
+  jobSubcategoryIds?: number[];
+  hourlyRate?: number;
+  availableForHire?: boolean;
+  skills?: string[];
+  languageIds?: number[];
+  about?: string;
+  socialMedia?: string[];
+  websiteUrl?: string;
 };
