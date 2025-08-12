@@ -4,10 +4,10 @@ import {
   validateAboutText,
   validateHeadline,
   validateHourlyRate,
-  validateName,
   validateSkills,
   validateSocialLinks,
   validateUrl,
+  validateUsername,
 } from "@/utils/validation";
 import MultiSelect from "@/components/forms/MultiSelect";
 import {
@@ -85,7 +85,7 @@ const FreelancerForm = ({ userId }: Props) => {
   useEffect(() => {
     if (!touchedFields.username) return;
     const trimmed = debouncedUsername.trim();
-    const err = validateName(trimmed);
+    const err = validateUsername(trimmed);
     setErrors((prev) =>
       prev.username === err ? prev : { ...prev, username: err }
     );
@@ -201,7 +201,7 @@ const FreelancerForm = ({ userId }: Props) => {
       ...prev,
       socialLinks: prev.socialLinks ? [...prev.socialLinks] : [],
     }));
-    setApiError("");
+    if (apiError) setApiError("");
   };
 
   const {
@@ -245,7 +245,7 @@ const FreelancerForm = ({ userId }: Props) => {
   const validateForm = () => {
     const socialLinkErrors = validateSocialLinks(formData.socialLinks);
     const errors = {
-      username: validateName(formData.username),
+      username: validateUsername(formData.username),
       headline: validateHeadline(formData.headline),
       hourlyRate: validateHourlyRate(formData.hourlyRate),
       websiteUrl: validateUrl(formData.websiteUrl),
@@ -324,7 +324,7 @@ const FreelancerForm = ({ userId }: Props) => {
         setSuccessMessage("Profile updated successfully.");
       }
     } catch (err: unknown) {
-      handleUpsertApiError(err, setValidationErrors, setApiError);
+      handleUpsertApiError(err, setValidationErrors, setApiError, apiError);
     }
   };
 
@@ -365,13 +365,7 @@ const FreelancerForm = ({ userId }: Props) => {
             setTouchedFields((prev) =>
               prev.username ? prev : { ...prev, username: true }
             );
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, username: true }));
-            const trimmed = formData.username.trim();
-            const err = validateName(trimmed);
-            setErrors((prev) => (prev.username === err ? prev : { ...prev, username: err }));
+            if (apiError) setApiError("");
           }}
           error={errors.username}
           autoComplete="off"
@@ -391,12 +385,7 @@ const FreelancerForm = ({ userId }: Props) => {
             setTouchedFields((prev) =>
               prev.headline ? prev : { ...prev, headline: true }
             );
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, headline: true }));
-            const err = validateHeadline(formData.headline);
-            setErrors((prev) => (prev.headline === err ? prev : { ...prev, headline: err }));
+            if (apiError) setApiError("");
           }}
           error={errors.headline}
           autoComplete="off"
@@ -418,7 +407,7 @@ const FreelancerForm = ({ userId }: Props) => {
               ...prev,
               hourlyRate: isNaN(parsedValue) ? 0.0 : parsedValue,
             }));
-            setApiError("");
+            if (apiError) setApiError("");
           }}
           onBlur={() => {
             const err = validateHourlyRate(formData.hourlyRate);
@@ -442,12 +431,7 @@ const FreelancerForm = ({ userId }: Props) => {
             setTouchedFields((prev) =>
               prev.skills ? prev : { ...prev, skills: true }
             );
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, skills: true }));
-            const err = validateSkills(formData.skills);
-            setErrors((prev) => (prev.skills === err ? prev : { ...prev, skills: err }));
+            if (apiError) setApiError("");
           }}
           error={errors.skills}
           autoComplete="off"
@@ -469,7 +453,7 @@ const FreelancerForm = ({ userId }: Props) => {
                 selectedCategories: values,
               }));
               setErrors((prev) => ({ ...prev, jobCategories: undefined }));
-              setApiError("");
+              if (apiError) setApiError("");
             } else {
               setErrors((prev) => ({
                 ...prev,
@@ -495,7 +479,7 @@ const FreelancerForm = ({ userId }: Props) => {
                 selectedLanguages: values,
               }));
               setErrors((prev) => ({ ...prev, languages: undefined }));
-              setApiError("");
+              if (apiError) setApiError("");
             } else {
               setErrors((prev) => ({
                 ...prev,
@@ -524,7 +508,7 @@ const FreelancerForm = ({ userId }: Props) => {
               experienceLevel: value,
             }));
             setErrors((prev) => ({ ...prev, experienceLevel: null }));
-            setApiError("");
+            if (apiError) setApiError("");
           }}
           selectRef={refsGeneral.experienceLevel}
           disabled={isLoading}
@@ -544,12 +528,7 @@ const FreelancerForm = ({ userId }: Props) => {
               prev.about ? prev : { ...prev, about: true }
             );
             setTextCounter(val.length);
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, about: true }));
-            const err = validateAboutText(formData.about);
-            setErrors((prev) => (prev.about === err ? prev : { ...prev, about: err }));
+            if (apiError) setApiError("");
           }}
           error={errors.about}
           characterCount={textCounter}
@@ -567,12 +546,7 @@ const FreelancerForm = ({ userId }: Props) => {
             setTouchedFields((prev) =>
               prev.websiteUrl ? prev : { ...prev, websiteUrl: true }
             );
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, websiteUrl: true }));
-            const err = validateUrl(formData.websiteUrl);
-            setErrors((prev) => (prev.websiteUrl === err ? prev : { ...prev, websiteUrl: err }));
+            if (apiError) setApiError("");
           }}
           error={errors.websiteUrl}
           autoComplete="off"
@@ -588,7 +562,7 @@ const FreelancerForm = ({ userId }: Props) => {
               ...prev,
               socialLinks: links,
             }));
-            setApiError("");
+            if (apiError) setApiError("");
           }}
           updateSocialLink={updateSocialLink}
           errors={errors.socialLinks ?? []}
@@ -664,14 +638,15 @@ function handleUpsertApiError(
   setValidationErrors: React.Dispatch<
     React.SetStateAction<Record<string, string> | null>
   >,
-  setApiError: React.Dispatch<React.SetStateAction<string>>
+  setApiError: React.Dispatch<React.SetStateAction<string>>,
+  apiError?: string
 ) {
   const errorResult = parseValidationErrors(err);
   if (errorResult.validationErrors) {
     setValidationErrors(errorResult.validationErrors);
-    setApiError("");
+    if (apiError) setApiError("");
   } else {
-    setApiError(parseApiError(errorResult.message));
+    setApiError(errorResult.message);
     setValidationErrors(null);
   }
   return;

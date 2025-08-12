@@ -2,10 +2,10 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import {
   validateAboutText,
-  validateHeadline,
-  validateName,
+  validateNotRequiredName,
   validateSocialLinks,
   validateUrl,
+  validateUsername,
 } from "@/utils/validation";
 import MultiSelect from "@/components/forms/MultiSelect";
 import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
@@ -70,7 +70,7 @@ const CustomerForm = ({ userId }: Props) => {
   useEffect(() => {
     if (!touchedFields.username) return;
     const trimmed = debouncedUsername.trim();
-    const err = validateName(trimmed);
+    const err = validateUsername(trimmed);
     setErrors((prev) =>
       prev.username === err ? prev : { ...prev, username: err }
     );
@@ -78,7 +78,7 @@ const CustomerForm = ({ userId }: Props) => {
 
   useEffect(() => {
     if (!touchedFields.company) return;
-    const err = validateHeadline(debouncedCompany.trim());
+    const err = validateNotRequiredName(debouncedCompany.trim());
     setErrors((prev) =>
       prev.company === err ? prev : { ...prev, company: err }
     );
@@ -147,7 +147,7 @@ const CustomerForm = ({ userId }: Props) => {
       ...prev,
       socialLinks: prev.socialLinks ? [...prev.socialLinks] : [],
     }));
-    setApiError("");
+    if (apiError) setApiError("");
   };
 
   const {
@@ -184,8 +184,8 @@ const CustomerForm = ({ userId }: Props) => {
   const validateForm = () => {
     const socialLinkErrors = validateSocialLinks(formData.socialLinks);
     const errors = {
-      username: validateName(formData.username),
-      company: validateName(formData.company),
+      username: validateUsername(formData.username),
+      company: validateNotRequiredName(formData.company),
       websiteUrl: validateUrl(formData.websiteUrl),
       about: validateAboutText(formData.about),
       socialLinks: socialLinkErrors,
@@ -196,7 +196,7 @@ const CustomerForm = ({ userId }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError("");
+    if (apiError) setApiError("");
     setValidationErrors(null);
     setErrors({});
     setSuccessMessage("");
@@ -251,7 +251,7 @@ const CustomerForm = ({ userId }: Props) => {
         setSuccessMessage("Profile updated successfully.");
       }
     } catch (err: unknown) {
-      handleUpsertApiError(err, setValidationErrors, setApiError);
+      handleUpsertApiError(err, setValidationErrors, setApiError, apiError);
     }
   };
 
@@ -292,15 +292,7 @@ const CustomerForm = ({ userId }: Props) => {
             setTouchedFields((prev) =>
               prev.username ? prev : { ...prev, username: true }
             );
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, username: true }));
-            const trimmed = formData.username.trim();
-            const err = validateName(trimmed);
-            setErrors((prev) =>
-              prev.username === err ? prev : { ...prev, username: err }
-            );
+            if (apiError) setApiError("");
           }}
           error={errors.username}
           autoComplete="off"
@@ -320,14 +312,7 @@ const CustomerForm = ({ userId }: Props) => {
             setTouchedFields((prev) =>
               prev.company ? prev : { ...prev, company: true }
             );
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, company: true }));
-            const err = validateName(formData.company);
-            setErrors((prev) =>
-              prev.company === err ? prev : { ...prev, company: err }
-            );
+            if (apiError) setApiError("");
           }}
           error={errors.company}
           autoComplete="off"
@@ -349,7 +334,7 @@ const CustomerForm = ({ userId }: Props) => {
                 selectedLanguages: values,
               }));
               setErrors((prev) => ({ ...prev, languages: undefined }));
-              setApiError("");
+              if (apiError) setApiError("");
             } else {
               setErrors((prev) => ({
                 ...prev,
@@ -376,14 +361,7 @@ const CustomerForm = ({ userId }: Props) => {
               prev.about ? prev : { ...prev, about: true }
             );
             setTextCounter(val.length);
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, about: true }));
-            const err = validateAboutText(formData.about);
-            setErrors((prev) =>
-              prev.about === err ? prev : { ...prev, about: err }
-            );
+            if (apiError) setApiError("");
           }}
           error={errors.about}
           characterCount={textCounter}
@@ -401,14 +379,7 @@ const CustomerForm = ({ userId }: Props) => {
             setTouchedFields((prev) =>
               prev.websiteUrl ? prev : { ...prev, websiteUrl: true }
             );
-            setApiError("");
-          }}
-          onBlur={() => {
-            setTouchedFields((prev) => ({ ...prev, websiteUrl: true }));
-            const err = validateUrl(formData.websiteUrl);
-            setErrors((prev) =>
-              prev.websiteUrl === err ? prev : { ...prev, websiteUrl: err }
-            );
+            if (apiError) setApiError("");
           }}
           error={errors.websiteUrl}
           autoComplete="off"
@@ -424,7 +395,7 @@ const CustomerForm = ({ userId }: Props) => {
               ...prev,
               socialLinks: links,
             }));
-            setApiError("");
+            if (apiError) setApiError("");
           }}
           updateSocialLink={updateSocialLink}
           errors={errors.socialLinks ?? []}
@@ -461,7 +432,7 @@ const CustomerForm = ({ userId }: Props) => {
           role="alert"
           aria-live="assertive"
         >
-          {parseApiError(apiError)}
+          {apiError}
         </p>
       )}
       {validationErrors && (
@@ -487,14 +458,15 @@ function handleUpsertApiError(
   setValidationErrors: React.Dispatch<
     React.SetStateAction<Record<string, string> | null>
   >,
-  setApiError: React.Dispatch<React.SetStateAction<string>>
+  setApiError: React.Dispatch<React.SetStateAction<string>>,
+  apiError?: string
 ) {
   const errorResult = parseValidationErrors(err);
   if (errorResult.validationErrors) {
     setValidationErrors(errorResult.validationErrors);
-    setApiError("");
+    if (apiError) setApiError("");
   } else {
-    setApiError(parseApiError(errorResult.message));
+    setApiError(errorResult.message);
     setValidationErrors(null);
   }
   return;

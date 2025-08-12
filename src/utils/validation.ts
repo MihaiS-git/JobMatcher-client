@@ -73,6 +73,23 @@ export function validateName(name: string): string | null {
   return null;
 }
 
+export function validateUsername(name: string): string | null {
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' _.-]{2,}$/;
+
+  if (!name.trim()) {
+    return "Field is required.";
+  }
+
+  if (name.trim().length < 2) {
+    return "Username must be at least 2 characters long.";
+  }
+
+  if (!nameRegex.test(name)) {
+    return "Username contains invalid characters.";
+  }
+  return null;
+}
+
 export function validateNotRequiredName(name: string): string | null {
   const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,}$/;
 
@@ -87,7 +104,6 @@ export function validateNotRequiredName(name: string): string | null {
   }
   return null;
 }
-
 
 export function validateHeadline(headline: string): string | null {
   // Allows letters, numbers, space, underscore, dot, comma, exclamation, question mark, single/double quotes, hyphen
@@ -236,14 +252,11 @@ export function validateUrl(value: string): string | null {
 export function validateSocialLinks(links: string[]): (string | null)[] {
   const urlRegex = /^(https?:\/\/)?([\w.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/i;
 
-  return links.map(link => {
+  return links.map((link) => {
     if (!link.trim()) return null; // empty is valid (or change if not)
-    return urlRegex.test(link.trim())
-      ? null
-      : "Invalid social media URL.";
+    return urlRegex.test(link.trim()) ? null : "Invalid social media URL.";
   });
 }
-
 
 export function validateSkills(value: string): string | null {
   const trimmed = value.trim();
@@ -274,15 +287,10 @@ export function validateAboutText(value: string): string | null {
 
   if (!trimmed) return null;
 
-/*   if (trimmed.length < 30) {
-    return "About section must be at least 30 characters.";
-  } */
- 
   if (trimmed.length > 1000) {
     return "About section must be under 1000 characters.";
   }
 
-  // Accept only common text characters
   const allowedCharsRegex = /^[\p{L}\p{N}\p{P}\p{Zs}\n\r]+$/u;
 
   if (!allowedCharsRegex.test(trimmed)) {

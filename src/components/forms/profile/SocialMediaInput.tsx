@@ -70,16 +70,17 @@ const SocialMediaInput = ({
               onChange={(e) => {
                 const updatedLinks = [...socialLinks];
                 updatedLinks[index] = e.target.value;
+                validateSocialLinks(updatedLinks);
                 setSocialLinks(updatedLinks);
                 updateSocialLink(index, e.target.value);
                 setTouchedFields((prev) => ({ ...prev, [index]: true }));
               }}
-              onBlur={() => {
+/*               onBlur={() => {
                 setTouchedFields((prev) => ({ ...prev, [index]: true }));
                 // Validate on blur immediately
                 const validationErrors = validateSocialLinks(socialLinks);
                 setErrors(validationErrors);
-              }}
+              }} */
               aria-invalid={!!errors[index]}
               aria-describedby={
                 errors[index] ? `social-url-error-${index}` : undefined
