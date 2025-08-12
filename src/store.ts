@@ -5,6 +5,7 @@ import { userApi } from "./features/user/userApi";
 import { freelancerApi } from "./features/profile/freelancerApi";
 import { jobCategoriesApi } from "./features/jobs/jobCategoriesApi";
 import { languagesApi } from "./features/languages/languagesApi";
+import { customerApi } from "./features/profile/customerApi";
 
 export const store: EnhancedStore = configureStore({
     reducer: {
@@ -14,6 +15,8 @@ export const store: EnhancedStore = configureStore({
         [jobCategoriesApi.reducerPath]: jobCategoriesApi.reducer,
         [languagesApi.reducerPath]: languagesApi.reducer,
         [freelancerApi.reducerPath]: freelancerApi.reducer,
+        [customerApi.reducerPath]: customerApi.reducer,
+
     },
     middleware: (getDefaultMiddleware) => 
         getDefaultMiddleware()
@@ -22,6 +25,7 @@ export const store: EnhancedStore = configureStore({
     .concat(jobCategoriesApi.middleware)
     .concat(languagesApi.middleware)
     .concat(freelancerApi.middleware)
+    .concat(customerApi.middleware)
 });
 
 export type RootState = ReturnType<typeof store.getState>;

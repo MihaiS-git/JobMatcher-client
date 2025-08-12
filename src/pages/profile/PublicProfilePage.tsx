@@ -1,6 +1,7 @@
 import PageContent from "@/components/PageContent";
 import useAuth from "@/hooks/useAuth";
 import FreelancerProfileForm from "@/components/forms/profile/FreelancerProfileForm";
+import CustomerProfileForm from "@/components/forms/profile/CustomerProfileForm";
 
 const PublicProfilePage = () => {
   const auth = useAuth();
@@ -28,6 +29,8 @@ const PublicProfilePage = () => {
         />
 
         {role === "STAFF" && <FreelancerProfileForm userId={userId} />}
+        {role === "CUSTOMER" && <CustomerProfileForm userId={userId} />}
+
 
       </section>
     </PageContent>
