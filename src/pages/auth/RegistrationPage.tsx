@@ -10,7 +10,7 @@ import {
 import { useRef, useState } from "react";
 import { parseApiError } from "../../utils/parseApiError";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { BiHide, BiShow } from "react-icons/bi";
+import { Eye, EyeOff } from "lucide-react";
 
 const RegistrationPage = () => {
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -239,9 +239,9 @@ const RegistrationPage = () => {
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <BiHide className="w-5 h-5" />
+                  <EyeOff className="w-5 h-5" />
                 ) : (
-                  <BiShow className="w-5 h-5" />
+                  <Eye className="w-5 h-5" />
                 )}
               </button>
             </div>
@@ -306,9 +306,9 @@ const RegistrationPage = () => {
                 }
               >
                 {showConfirmPassword ? (
-                  <BiHide className="w-5 h-5" />
+                  <EyeOff className="w-5 h-5" />
                 ) : (
-                  <BiShow className="w-5 h-5" />
+                  <Eye className="w-5 h-5" />
                 )}
               </button>
             </div>
@@ -406,34 +406,45 @@ const RegistrationPage = () => {
             <fieldset
               className="flex flex-row justify-evenly w-full mt-2"
               ref={roleSelectRef}
-              aria-required="true"
-              aria-invalid={!!errors.role}
               aria-describedby={errors.role ? "role-error" : undefined}
             >
               <legend className="font-semibold text-sm xl:text-base">
                 Choose the desired role:
               </legend>
+
               <div className="flex flex-row items-center">
                 <input
                   type="radio"
+                  id="role-customer"
                   name="role"
                   value="CUSTOMER"
                   checked={role === "CUSTOMER"}
                   onChange={() => setRole("CUSTOMER")}
+                  aria-required="true"
+                  aria-invalid={errors.role ? "true" : "false"}
                 />
-                <legend className="mx-4">Customer</legend>
+                <label htmlFor="role-customer" className="mx-4">
+                  Customer
+                </label>
               </div>
+
               <div className="flex flex-row items-center">
                 <input
                   type="radio"
+                  id="role-staff"
                   name="role"
                   value="STAFF"
                   checked={role === "STAFF"}
                   onChange={() => setRole("STAFF")}
+                  aria-required="true"
+                  aria-invalid={errors.role ? "true" : "false"}
                 />
-                <legend className="mx-4">Freelancer</legend>
+                <label htmlFor="role-staff" className="mx-4">
+                  Freelancer
+                </label>
               </div>
             </fieldset>
+
             {errors.role && (
               <p
                 id="role-error"

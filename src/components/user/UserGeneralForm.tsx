@@ -78,7 +78,7 @@ const UserGeneralForm = ({ user }: { user: UserResponseDTO }) => {
   return (
     <>
       <hr className="bg-gray-300 dark:bg-gray-500 border-0 border-gray-200 w-full pt-0.25 mt-8" />
-      <h3 className="text-base font-semibold pt-4">General Info Update Form</h3>
+      <h2 className="text-base font-semibold pt-4">General Info Update Form</h2>
       <form
         className="flex flex-col items-center"
         onSubmit={handleUserGeneralFormSubmit}

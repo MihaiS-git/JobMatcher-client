@@ -1,13 +1,12 @@
-import { IoMdCloseCircle } from "react-icons/io";
+import { SquareX } from "lucide-react";
 
 const CloseButton = ({handleClose}: {handleClose: () => void}) => {
 
   return (
     <button
-      className="bg-gray-950 dark:bg-gray-200 hover:bg-red-600 text-gray-200 dark:text-gray-950 rounded-full cursor-pointer"
       onClick={handleClose}
     >
-      <IoMdCloseCircle className="w-6 h-6" />
+      <SquareX className="w-6 h-6 text-blue-200 dark:text-gray-200 hover:text-blue-300 dark:hover:text-gray-400 cursor-pointer"/>
     </button>
   );
 };

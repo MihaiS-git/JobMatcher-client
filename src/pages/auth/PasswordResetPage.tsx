@@ -11,7 +11,7 @@ import {
 } from "../../features/authApi";
 import { parseApiError } from "../../utils/parseApiError";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { BiHide, BiShow } from "react-icons/bi";
+import { Eye, EyeOff } from "lucide-react";
 
 const PasswordResetPage = () => {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
@@ -176,10 +176,10 @@ const PasswordResetPage = () => {
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
-                    <BiHide className="w-5 h-5" />
-                  ) : (
-                    <BiShow className="w-5 h-5" />
-                  )}
+                  <EyeOff className="w-5 h-5"/>
+                ) : (
+                  <Eye className="w-5 h-5"/>
+                )}
                 </button>
               </div>
             </div>
@@ -239,9 +239,9 @@ const PasswordResetPage = () => {
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
                   {showConfirmPassword ? (
-                    <BiHide className="w-5 h-5" />
+                    <EyeOff className="w-5 h-5" />
                   ) : (
-                    <BiShow className="w-5 h-5" />
+                    <Eye className="w-5 h-5" />
                   )}
                 </button>
               </div>

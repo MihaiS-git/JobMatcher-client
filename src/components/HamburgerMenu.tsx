@@ -26,7 +26,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   return (
     <>
       <div
-        className={`fixed top-0 left-1/2 transform -translate-x-1/2 w-full h-screen p-6 bg-gray-900 shadow-lg z-100 overflow-auto 
+        className={`fixed top-0 left-1/2 transform -translate-x-1/2 w-full h-screen p-6 bg-blue-500 dark:bg-gray-800 shadow-lg z-100 overflow-auto 
         transition-all duration-500 ease-in-out ${
           openState
             ? "pointer-events-auto opacity-100"

@@ -1,8 +1,8 @@
 import { useEffect, useState, type RefObject } from "react";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import InputErrorMessage from "../InputErrorMessage";
 import { validateSocialLinks } from "@/utils/validation";
 import useDebounce from "@/hooks/useDebounce";
+import { Trash2 } from "lucide-react";
 
 type Props = {
   socialLinks: string[];
@@ -75,12 +75,6 @@ const SocialMediaInput = ({
                 updateSocialLink(index, e.target.value);
                 setTouchedFields((prev) => ({ ...prev, [index]: true }));
               }}
-/*               onBlur={() => {
-                setTouchedFields((prev) => ({ ...prev, [index]: true }));
-                // Validate on blur immediately
-                const validationErrors = validateSocialLinks(socialLinks);
-                setErrors(validationErrors);
-              }} */
               aria-invalid={!!errors[index]}
               aria-describedby={
                 errors[index] ? `social-url-error-${index}` : undefined
@@ -93,7 +87,7 @@ const SocialMediaInput = ({
               aria-label={`Remove social link ${index + 1}`}
               className="p-0 text-xs flex items-center"
             >
-              <RiDeleteBin6Line className="w-7 h-7 text-gray-800 dark:text-red-600 hover:text-red-700 rounded-xs border border-gray-800 dark:border-red-600 hover:border-red-700 p-1 cursor-pointer" />
+              <Trash2 className="w-7 h-7 text-gray-800 dark:text-red-600 hover:text-red-700 rounded-xs border border-gray-800 dark:border-red-600 hover:border-red-700 p-1 cursor-pointer"/>
             </button>
           </div>
           {errors[index] && (
