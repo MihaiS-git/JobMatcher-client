@@ -671,7 +671,7 @@ function handleUpsertApiError(
     setValidationErrors(errorResult.validationErrors);
     setApiError("");
   } else {
-    setApiError(errorResult.message);
+    setApiError(parseApiError(errorResult.message));
     setValidationErrors(null);
   }
   return;

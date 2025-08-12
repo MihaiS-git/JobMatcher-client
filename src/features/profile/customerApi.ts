@@ -43,7 +43,7 @@ export const customerApi = createApi({
         url: `/profiles/customers/users/${userId}`,
       }),
       providesTags: (_result, _error, userId) => [{ type: "Customer", id: userId }],
-      keepUnusedDataFor: 0,
+      keepUnusedDataFor: 300,
     }),
     saveCustomer: builder.mutation<
       CustomerDetailDTO,
