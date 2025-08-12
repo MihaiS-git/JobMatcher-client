@@ -55,7 +55,10 @@ export const userApi = createApi({
           body: formData,
         };
       },
-      invalidatesTags: (_result, _error, { id }) => [{ type: "User", id }],
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "User", id },
+        { type: "User", id: "LIST" },
+      ],
     }),
   }),
 });
