@@ -47,7 +47,7 @@ const TextareaInput = ({
       {showCharacterCount && (
         <p
           id={`${id}-charactersCounter`}
-          className="text-gray-200 text-xs mt-0.5"
+          className="text-gray-500 text-xs mt-0.5"
           role="alert"
           aria-live="assertive"
         >

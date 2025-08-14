@@ -57,7 +57,7 @@ export function validateConfirmPassword(
 }
 
 export function validateName(name: string): string | null {
-  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,}$/;
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9._'\-\s]{2,}$/;
 
   if (!name.trim()) {
     return "Field is required.";
@@ -282,7 +282,7 @@ export function validateSkills(value: string): string | null {
   return null;
 }
 
-export function validateAboutText(value: string): string | null {
+export function validateText(value: string): string | null {
   const trimmed = value.trim();
 
   if (!trimmed) return null;
@@ -291,7 +291,7 @@ export function validateAboutText(value: string): string | null {
     return "About section must be under 1000 characters.";
   }
 
-  const allowedCharsRegex = /^[\p{L}\p{N}\p{P}\p{Zs}\n\r]+$/u;
+  const allowedCharsRegex = /^[A-Za-z0-9șȘțȚăĂâÂîÎéè.\-+#_=*&%$@()!?:;, ]+$/u;
 
   if (!allowedCharsRegex.test(trimmed)) {
     return "About section contains invalid characters.";

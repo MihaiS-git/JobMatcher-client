@@ -9,6 +9,9 @@ import PasswordResetPage from "./pages/auth/PasswordResetPage";
 import OAuthRedirectHandler from "./pages/auth/OAuthRedirectHandler";
 import ProfilePage from "./pages/profile/ProfilePage";
 import PublicProfilePage from "./pages/profile/PublicProfilePage";
+import PortfolioPage from "./pages/profile/PortfolioPage";
+import PortfolioItemPage from "./pages/profile/PortfolioItemPage";
+import PortfolioNewItemPage from "./pages/profile/PortfolioNewItemPage";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +49,20 @@ const router = createBrowserRouter([
       {
         path: "/public_profile",
         element: <PublicProfilePage />,
+      },
+      {
+        path: "/portfolio",
+        element: <PortfolioPage />,
+        children: [
+          {
+            path: ":id",
+            element: <PortfolioItemPage />,
+          },
+          {
+            path: "new",
+            element: <PortfolioNewItemPage />,
+          },
+        ],
       },
     ],
   },

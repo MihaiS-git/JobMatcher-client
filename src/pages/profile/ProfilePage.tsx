@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
 import UserImmutableData from "../../components/user/UserImmutableData";
 import UploadPictureForm from "../../components/user/UploadPictureForm";
+import PageTitle from "@/components/PageTitle";
 
 const ProfilePage = () => {
   const auth = useAuth();
@@ -30,9 +31,7 @@ const ProfilePage = () => {
         className="flex flex-col items-center p-4"
         aria-labelledby="edit-profile-heading"
       >
-        <h1 id="edit-profile-heading" className="text-xl font-bold">
-          User Profile
-        </h1>
+        <PageTitle title="User Profile" id="edit-profile-heading" />
         <img
           className="text-xs font-light m-4 w-80 h-80"
           src={user.pictureUrl || "user_icon.png"}

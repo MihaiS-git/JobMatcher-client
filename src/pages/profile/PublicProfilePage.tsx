@@ -3,6 +3,7 @@ import useAuth from "@/hooks/useAuth";
 import FreelancerProfileForm from "@/components/forms/profile/FreelancerProfileForm";
 import CustomerProfileForm from "@/components/forms/profile/CustomerProfileForm";
 import { useEffect, useState } from "react";
+import PageTitle from "@/components/PageTitle";
 
 const PublicProfilePage = () => {
   const auth = useAuth();
@@ -23,9 +24,7 @@ const PublicProfilePage = () => {
         className="flex flex-col items-center p-4"
         aria-labelledby="edit-profile-heading"
       >
-        <h1 id="edit-profile-heading" className="text-xl font-bold">
-          Public Profile
-        </h1>
+        <PageTitle title="Public Profile" id="edit-profile-heading" />
         <img
           className="m-4 w-80 h-80"
           src={authUser?.pictureUrl || "user_icon.png"}

@@ -1,7 +1,7 @@
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import {
-  validateAboutText,
+  validateText,
   validateNotRequiredName,
   validateSocialLinks,
   validateUrl,
@@ -22,13 +22,9 @@ import {
   useUpdateCustomerMutation,
 } from "@/features/profile/customerApi";
 import type { CustomerProfileRequestDTO } from "@/types/CustomerDTO";
+import type { SelectOption } from "@/types/SelectOption";
 
 const DEBOUNCE_DELAY = 500;
-
-interface Option {
-  value: number;
-  label: string;
-}
 
 type Props = {
   userId: string;
@@ -94,7 +90,7 @@ const CustomerForm = ({ userId }: Props) => {
 
   useEffect(() => {
     if (!touchedFields.about) return;
-    const err = validateAboutText(debouncedAbout);
+    const err = validateText(debouncedAbout);
     setErrors((prev) => (prev.about === err ? prev : { ...prev, about: err }));
   }, [debouncedAbout, formData.about, touchedFields.about]);
 
@@ -111,7 +107,7 @@ const CustomerForm = ({ userId }: Props) => {
     }
   }, [languagesApiError]);
 
-  const languageOptions: Option[] =
+  const languageOptions: SelectOption[] =
     languages?.map((tag) => ({
       value: tag.id,
       label: tag.name,
@@ -187,7 +183,7 @@ const CustomerForm = ({ userId }: Props) => {
       username: validateUsername(formData.username),
       company: validateNotRequiredName(formData.company),
       websiteUrl: validateUrl(formData.websiteUrl),
-      about: validateAboutText(formData.about),
+      about: validateText(formData.about),
       socialLinks: socialLinkErrors,
     };
     setErrors((prev) => ({ ...prev, ...errors }));

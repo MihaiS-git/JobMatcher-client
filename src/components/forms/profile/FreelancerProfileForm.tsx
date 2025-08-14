@@ -1,7 +1,7 @@
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import {
-  validateAboutText,
+  validateText,
   validateHeadline,
   validateHourlyRate,
   validateSkills,
@@ -30,13 +30,9 @@ import TextareaInput from "../TextareaInput";
 import RadioSelect from "../RadioSelect";
 import SocialMediaInput from "./SocialMediaInput";
 import useDebounce from "@/hooks/useDebounce";
+import type { SelectOption } from "@/types/SelectOption";
 
 const DEBOUNCE_DELAY = 500;
-
-interface Option {
-  value: number;
-  label: string;
-}
 
 type Props = {
   userId: string;
@@ -118,7 +114,7 @@ const FreelancerForm = ({ userId }: Props) => {
 
   useEffect(() => {
     if (!touchedFields.about) return;
-    const err = validateAboutText(debouncedAbout);
+    const err = validateText(debouncedAbout);
     setErrors((prev) => (prev.about === err ? prev : { ...prev, about: err }));
   }, [debouncedAbout, formData.about, touchedFields.about]);
 
@@ -139,7 +135,7 @@ const FreelancerForm = ({ userId }: Props) => {
     categories?.flatMap((c) =>
       c.subcategories.map((s) => ({ id: s.id, name: s.name }))
     ) ?? [];
-  const tagOptions: Option[] = subcategories?.map((tag) => ({
+  const tagOptions: SelectOption[] = subcategories?.map((tag) => ({
     value: tag.id,
     label: tag.name,
   }));
@@ -157,7 +153,7 @@ const FreelancerForm = ({ userId }: Props) => {
     }
   }, [languagesApiError]);
 
-  const languageOptions: Option[] =
+  const languageOptions: SelectOption[] =
     languages?.map((tag) => ({
       value: tag.id,
       label: tag.name,
@@ -250,7 +246,7 @@ const FreelancerForm = ({ userId }: Props) => {
       hourlyRate: validateHourlyRate(formData.hourlyRate),
       websiteUrl: validateUrl(formData.websiteUrl),
       skills: validateSkills(formData.skills),
-      about: validateAboutText(formData.about),
+      about: validateText(formData.about),
       socialLinks: socialLinkErrors,
     };
     setErrors((prev) => ({ ...prev, ...errors }));
