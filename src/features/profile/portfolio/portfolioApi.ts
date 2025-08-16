@@ -74,14 +74,15 @@ export const portfolioApi = createApi({
     }),
     uploadPortfolioItemImages: builder.mutation<
       PortfolioItemDetailDTO,
-      { portfolioItemId: string; files: File[] }
+      { portfolioItemId: string; userId: string; files: File[] }
     >({
-      query: ({ portfolioItemId, files }) => {
+      query: ({ portfolioItemId, userId, files }) => {
         const formData = new FormData();
+        formData.append("userId", userId); // Include userId
         files.forEach((file) => formData.append("files", file));
         return {
-          url: `/portfolio-items/${portfolioItemId}/images`,
-          method: "POST",
+          url: `/portfolio-items/images/upload/${portfolioItemId}`,
+          method: "PATCH",
           body: formData,
           headers: {
             // browser sets proper multipart boundary automatically
@@ -99,9 +100,9 @@ export const portfolioApi = createApi({
       { portfolioItemId: string; imageUrl: string }
     >({
       query: ({ portfolioItemId, imageUrl }) => ({
-        url: `/portfolio-items/${portfolioItemId}/images`,
-        method: "DELETE",
-        body: { imageUrl },
+        url: `/portfolio-items/images/remove/${portfolioItemId}`,
+        method: "PATCH",
+        body: imageUrl,
       }),
       invalidatesTags: (_result, _error, { portfolioItemId }) => [
         { type: "Portfolio", id: portfolioItemId },

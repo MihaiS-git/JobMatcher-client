@@ -1,4 +1,5 @@
 import FeedbackMessage from "@/components/FeedbackMessage";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import PortfolioItemCard from "@/components/profile/portfolio/PortfolioItemCard";
@@ -11,6 +12,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 const PortfolioPage = () => {
   const navigate = useNavigate();
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string>("");
 
   // get the freelancer profileId
@@ -46,7 +48,11 @@ const PortfolioPage = () => {
   }, [portfolioError]);
 
   if (isLoading || isProfileLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <LoadingSpinner size={48}/>
+      </div>
+    );
   }
   if (profileError || portfolioError) {
     return <div>Error loading portfolio items.</div>;
@@ -71,11 +77,15 @@ const PortfolioPage = () => {
             <li
               key={index}
               className="mb-4 "
-              onClick={() => navigate(`/portfolio/${item.id}`)}
+              onClick={() => {
+                navigate(`/portfolio/${item.id}`);
+                setSelectedItem(item.id);
+              }}
             >
-
-              <PortfolioItemCard item={item} />
-
+              <PortfolioItemCard
+                item={item}
+                selected={selectedItem === item.id}
+              />
             </li>
           ))}
         </ul>

@@ -5,10 +5,11 @@ import { validateImageFile } from "@/utils/validation";
 import { useRef, useState } from "react";
 
 interface MultiFileUploadFormProps {
-  portfolioItemId: string;
+  itemId: string;
+  userId: string;
 }
 
-const MultiFileUploadForm = ({ portfolioItemId }: MultiFileUploadFormProps) => {
+const MultiFileUploadForm = ({ itemId, userId }: MultiFileUploadFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -61,12 +62,21 @@ const MultiFileUploadForm = ({ portfolioItemId }: MultiFileUploadFormProps) => {
     const file = selectedFiles[currentIndex];
     if (!file) return;
 
-    const result = await uploadFile({ portfolioItemId, files: selectedFiles });
+    const result = await uploadFile({ portfolioItemId: itemId, userId , files: selectedFiles });
     if ("error" in result) {
       setApiError(parseApiError(result.error));
     } else {
-      setSuccessMessage(`${file.name} uploaded successfully.`);
+      setSuccessMessage("Images uploaded successfully.");
       setCurrentIndex((prev) => prev + 1);
+      
+      setTimeout(() => {
+      setSuccessMessage(null);
+      setSelectedFiles([]);
+      setCurrentIndex(0);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // reset file input
+      }
+    }, 3000);
     }
   };
   return (
@@ -108,13 +118,8 @@ const MultiFileUploadForm = ({ portfolioItemId }: MultiFileUploadFormProps) => {
             currentIndex >= selectedFiles.length
           }
         >
-          {isUploading
-            ? `Uploading ${selectedFiles[currentIndex]?.name}...`
-            : currentIndex >= selectedFiles.length
-            ? "All files uploaded"
-            : `Upload ${selectedFiles[currentIndex]?.name}`}
+          {isUploading ? "Uploading..." : "Upload"}
         </button>
-
         <div className="min-h-[2.5rem] flex items-center justify-center">
           {validationError && (
             <FeedbackMessage
