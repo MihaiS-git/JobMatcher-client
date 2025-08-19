@@ -12,6 +12,7 @@ import PublicProfilePage from "./pages/profile/PublicProfilePage";
 import PortfolioPage from "./pages/profile/PortfolioPage";
 import PortfolioItemPage from "./pages/profile/PortfolioItemPage";
 import PortfolioNewItemPage from "./pages/profile/PortfolioNewItemPage";
+import CreateProjectPage from "./pages/projects/CreateProjectPage";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/projects/create",
+        element: <CreateProjectPage />,
+      }
     ],
   },
 ]);

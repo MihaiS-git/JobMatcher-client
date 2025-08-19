@@ -12,7 +12,10 @@ const DrawerAccordion = () => {
       <DrawerAccordionItem
         value="item-1"
         label="Projects"
-        items={[{ targetUrl: "/projects", itemTag: "Projects" }]}
+        items={[
+          { targetUrl: "/projects", itemTag: "Projects List" },
+          { targetUrl: "/projects/create", itemTag: "Create Project" },
+        ]}
       />
 
       <DrawerAccordionItem
