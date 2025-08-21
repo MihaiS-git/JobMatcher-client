@@ -32,7 +32,7 @@ export type ProjectRequestDTO = {
   budget?: string;
   paymentType?: PaymentType;
   deadline?: string; // ISO date string
-  categoryId?: number;
+  categoryId?: number | null;
   subcategoryIds?: number[];
 };
 

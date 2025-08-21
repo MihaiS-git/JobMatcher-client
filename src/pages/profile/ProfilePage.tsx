@@ -3,13 +3,15 @@ import {
   useGetUserByIdQuery,
 } from "../../features/user/userApi";
 import useAuth from "../../hooks/useAuth";
-import UserGeneralForm from "../../components/user/UserGeneralForm";
-import UserAddressForm from "../../components/user/UserAddressForm";
-import { useMemo } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
-import UserImmutableData from "../../components/user/UserImmutableData";
-import UploadPictureForm from "../../components/user/UploadPictureForm";
 import PageTitle from "@/components/PageTitle";
+import LoadingSpinner from "@/components/LoadingSpinner";
+
+const UserGeneralForm = lazy(() => import("../../components/user/UserGeneralForm"));
+const UserAddressForm = lazy(() => import("../../components/user/UserAddressForm"));
+const UserImmutableData = lazy(() => import("../../components/user/UserImmutableData"));
+const UploadPictureForm = lazy(() => import("../../components/user/UploadPictureForm"));
 
 const ProfilePage = () => {
   const auth = useAuth();
@@ -38,10 +40,18 @@ const ProfilePage = () => {
           alt="User profile picture"
         />
 
-        <UploadPictureForm user={user} />
-        <UserImmutableData user={user} />
-        <UserGeneralForm user={user} />
-        <UserAddressForm user={user} />
+        <Suspense fallback={<LoadingSpinner />}>
+          <UploadPictureForm user={user} />
+        </Suspense>
+        <Suspense fallback={<LoadingSpinner />}>
+          <UserImmutableData user={user} />
+        </Suspense>
+        <Suspense fallback={<LoadingSpinner />}>
+          <UserGeneralForm user={user} />
+        </Suspense>
+        <Suspense fallback={<LoadingSpinner />}>
+          <UserAddressForm user={user} />
+        </Suspense>
       </section>
     </PageContent>
   );

@@ -126,7 +126,6 @@ const MultiFileUploadForm = ({ itemId, userId }: MultiFileUploadFormProps) => {
               id="validation-error"
               message={validationError}
               type="error"
-              className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2"
             />
           )}
           {apiError && (
@@ -134,7 +133,6 @@ const MultiFileUploadForm = ({ itemId, userId }: MultiFileUploadFormProps) => {
               id="api-error"
               message={apiError}
               type="error"
-              className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2"
             />
           )}
           {uploadError && (
@@ -142,7 +140,6 @@ const MultiFileUploadForm = ({ itemId, userId }: MultiFileUploadFormProps) => {
               id="upload-error"
               message={parseApiError(uploadError)}
               type="error"
-              className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2"
             />
           )}
           {successMessage && (
@@ -150,7 +147,6 @@ const MultiFileUploadForm = ({ itemId, userId }: MultiFileUploadFormProps) => {
               id="upload-success"
               message={successMessage}
               type="success"
-              className="text-green-400 text-center my-4"
             />
           )}
         </div>

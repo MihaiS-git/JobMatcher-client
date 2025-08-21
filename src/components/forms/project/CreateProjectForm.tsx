@@ -10,72 +10,64 @@ import projectSchema from "@/schemas/projectSchema";
 import useAuth from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { useGetCustomerByUserIdQuery } from "@/features/profile/customerApi";
-import { parseApiError } from "@/utils/parseApiError";
+import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
 import { useCreateProjectMutation } from "@/features/projects/projectsApi";
 import FeedbackMessage from "@/components/FeedbackMessage";
 import { useGetAllJobCategoriesQuery } from "@/features/jobs/jobCategoriesApi";
 import type { JobCategoryDTO, JobSubcategoryDTO } from "@/types/JobCategoryDTO";
 import Select from "react-select";
 import { useMemo } from "react";
+import InputErrorMessage from "../InputErrorMessage";
+import useAutoClear from "@/hooks/useAutoClear";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import SubmitButton from "@/components/SubmitButton";
 
 const CreateProjectForm = () => {
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
+  const [validationErrors, setValidationErrors] = useState<Record<
+    string,
+    string
+  > | null>(null);
 
   const auth = useAuth();
   const userId = auth.user.id;
-
-  useEffect(() => {
-    if (!userId) {
-      return;
-    }
-  }, [userId]);
 
   const {
     data: profile,
     isLoading: isProfileLoading,
     error: profileError,
   } = useGetCustomerByUserIdQuery(userId);
+
   useEffect(() => {
-    if (profileError) {
+    if (!isProfileLoading && profileError) {
       setApiError(parseApiError(profileError));
     }
-    if (isProfileLoading) return;
   }, [isProfileLoading, profileError]);
+
   const customerId = profile?.profileId ?? "";
 
-  const [createProject, { isLoading: isCreating, error: createError }] =
-    useCreateProjectMutation();
+  const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
 
   // get job category options
   const { data: jobCategories } = useGetAllJobCategoriesQuery();
-  useEffect(() => {
-    if (!jobCategories) return;
-  }, [jobCategories]);
   const categoryOptions: Array<JobCategoryDTO> = useMemo(
-    () => [...(jobCategories ?? [])],
+    () => jobCategories ?? [],
     [jobCategories]
-  );
-
-  // get subcategory options
-  const subcategoryOptions: Array<JobSubcategoryDTO> = useMemo(
-    () =>
-      categoryOptions.flatMap((subcategory) => subcategory.subcategories ?? []),
-    [categoryOptions]
   );
 
   const defaultValues = useMemo<ProjectFormValues>(
     () => ({
-      customerId: customerId,
       title: "",
       description: "",
       status: ProjectStatus.NONE,
-      budget: 0,
+      budget: "0",
       paymentType: PaymentType.NONE,
       deadline: new Date().toISOString().slice(0, 10),
-      categoryId: categoryOptions[0]?.id,
+      categoryId: null,
       subcategoryIds: [],
     }),
-    [customerId, categoryOptions]
+    []
   );
 
   const {
@@ -84,102 +76,196 @@ const CreateProjectForm = () => {
     control,
     formState: { errors },
     reset,
+    watch,
+    clearErrors,
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
     defaultValues,
     mode: "onTouched",
   });
 
-  useEffect(() => {
-    if (categoryOptions.length > 0 && customerId) {
-      reset({
-        ...defaultValues,
-        customerId,
-        categoryId: categoryOptions[0].id,
-      });
-    }
-  }, [categoryOptions, customerId, defaultValues, reset]);
+  const selectedCategoryId = watch("categoryId");
 
-  const onSubmit = (data: ProjectFormValues) => {
-    console.log("Form submitted:", data);
+  // get subcategory options
+  const jobSubcategoryMap = useMemo(() => {
+    const map: Record<number, JobSubcategoryDTO[]> = {};
+    (jobCategories ?? []).forEach((cat) => {
+      map[cat.id] = cat.subcategories ?? [];
+    });
+    return map;
+  }, [jobCategories]);
+
+  const subcategoryOptions = useMemo(() => {
+    return selectedCategoryId
+      ? jobSubcategoryMap[selectedCategoryId] ?? []
+      : [];
+  }, [selectedCategoryId, jobSubcategoryMap]);
+
+  const onSubmit = async (data: ProjectFormValues) => {
     if (!data) return;
     const payload: ProjectRequestDTO = {
       ...data,
       budget: data.budget.toString(),
       status: data.status as ProjectStatus,
       paymentType: data.paymentType as PaymentType,
-      deadline: data.deadline ? new Date(data.deadline).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+      deadline: data.deadline
+        ? new Date(data.deadline).toISOString().slice(0, 10)
+        : new Date().toISOString().slice(0, 10),
+      customerId,
     };
-    createProject(payload);
+    try {
+      await createProject(payload).unwrap();
+      setApiError("");
+      setValidationErrors(null);
+      setSuccessMessage("Project created successfully!");
+      reset(defaultValues);
+    } catch (error: unknown) {
+      handleValidationApiError(error, setValidationErrors, setApiError);
+    }
   };
 
-  useEffect(() => {
-    if (createError) {
-      setApiError(parseApiError(createError));
+  const buttonText = isCreating ? "Loading..." : "Submit";
+
+  function handleValidationApiError(
+    err: unknown,
+    setValidationErrors: React.Dispatch<
+      React.SetStateAction<Record<string, string> | null>
+    >,
+    setApiError: React.Dispatch<React.SetStateAction<string>>,
+    apiError?: string
+  ) {
+    const errorResult = parseValidationErrors(err);
+    if (errorResult.validationErrors) {
+      setValidationErrors(errorResult.validationErrors);
+      setApiError(apiError || "Validation error");
+    } else {
+      setApiError(errorResult.message);
+      setValidationErrors(null);
     }
-  }, [createError]);
+    return;
+  }
+
+  useAutoClear(successMessage, setSuccessMessage);
+  useAutoClear(apiError, setApiError);
+  useAutoClear(validationErrors, () => setValidationErrors(null));
+
+  if (!jobCategories) {
+    return (
+      <div className="relative min-h-screen">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <LoadingSpinner className="w-6 h-6 border-3 border-t-transparent border-blue-600 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  const clearFieldError = (fieldName: keyof ProjectFormValues) => {
+    clearErrors(fieldName);
+    setValidationErrors((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev };
+      delete updated[fieldName];
+      return Object.keys(updated).length ? updated : null;
+    });
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label>Title</label>
-        <input {...register("title")} />
-        {errors.title && <p>{errors.title.message}</p>}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-40">
+      <fieldset
+        className="flex flex-col items-center mt-4 space-y-4"
+        disabled={isCreating}
+      >
+        {successMessage && (
+          <FeedbackMessage
+            id="success-message"
+            message={successMessage}
+            type="success"
+          />
+        )}
+        {apiError && (
+          <FeedbackMessage
+            id="api-error"
+            message={apiError}
+            type="error"
+          />
+        )}
+      </fieldset>
+
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label htmlFor="title" className="font-semibold text-sm xl:text-base">
+          Title
+        </label>
+        <input
+          id="title"
+          {...register("title", {
+            onChange: () => clearFieldError("title"),
+          })}
+          className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
+          aria-invalid={!!errors.title}
+          aria-describedby={errors.title ? "title-error" : undefined}
+        />
+        {(errors.title || validationErrors?.title) && (
+          <InputErrorMessage
+            message={errors.title?.message ?? validationErrors?.title}
+            label="title"
+          />
+        )}
       </div>
 
-      <div>
-        <label>Description</label>
-        <textarea {...register("description")} />
-        {errors.description && <p>{errors.description.message}</p>}
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label
+          htmlFor="description"
+          className="font-semibold text-sm xl:text-base"
+        >
+          Description
+        </label>
+        <textarea
+          id="description"
+          {...register("description", {
+            onChange: () => clearFieldError("description"),
+          })}
+          className="bg-gray-200 text-gray-950 py-2 px-4 w-80 h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
+          aria-invalid={!!errors.description}
+          aria-describedby={
+            errors.description ? "description-error" : undefined
+          }
+        />
+        {(errors.description || validationErrors?.description) && (
+          <InputErrorMessage
+            message={
+              (typeof errors.description?.message === "string"
+                ? errors.description?.message
+                : undefined) ?? validationErrors?.description
+            }
+            label={"description"}
+          />
+        )}
       </div>
 
-      <div>
-        <label>Status</label>
-        <select {...register("status")}>
-          {Object.values(ProjectStatus).map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-        {errors.status && <p>{errors.status.message}</p>}
-      </div>
-
-      <div>
-        <label>Budget</label>
-        <input type="number" {...register("budget", { valueAsNumber: true })} />
-        {errors.budget && <p>{errors.budget.message}</p>}
-      </div>
-
-      <div>
-        <label>Payment Type</label>
-        <select {...register("paymentType")}>
-          {Object.values(PaymentType).map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-        {errors.paymentType && <p>{errors.paymentType.message}</p>}
-      </div>
-
-      <div>
-        <label>Deadline</label>
-        <input type="date" {...register("deadline")} />
-        {errors.deadline && <p>{errors.deadline.message}</p>}
-      </div>
-
-      <div>
-        <label>Category</label>
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label
+          htmlFor="categoryId"
+          className="font-semibold text-sm xl:text-base"
+        >
+          Category
+        </label>
         <Controller
           control={control}
           name="categoryId"
           render={({ field }) => (
             <select
+              id="categoryId"
               {...field}
               value={field.value ?? ""}
-              onChange={(e) => field.onChange(Number(e.target.value))}
-              className="border p-2 rounded w-full"
+              onChange={(e) => {
+                field.onChange(Number(e.target.value));
+                clearFieldError("categoryId");
+              }}
+              className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
+              aria-invalid={!!errors.categoryId}
+              aria-describedby={
+                errors.categoryId ? "categoryId-error" : undefined
+              }
             >
               <option value="" disabled>
                 Select category
@@ -192,16 +278,31 @@ const CreateProjectForm = () => {
             </select>
           )}
         />
-        {errors.categoryId && <p>{errors.categoryId.message}</p>}
+        {(errors.categoryId || validationErrors?.categoryId) && (
+          <InputErrorMessage
+            message={
+              (typeof errors.categoryId?.message === "string"
+                ? errors.categoryId?.message
+                : undefined) ?? validationErrors?.categoryId
+            }
+            label={"categoryId"}
+          />
+        )}
       </div>
 
-      <div>
-        <label>Subcategories</label>
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label
+          htmlFor="subcategoryIds"
+          className="font-semibold text-sm xl:text-base"
+        >
+          Subcategories
+        </label>
         <Controller
           control={control}
           name="subcategoryIds"
           render={({ field }) => (
             <Select
+              id="subcategoryIds"
               isMulti
               options={subcategoryOptions.map((sub) => ({
                 value: sub.id,
@@ -210,34 +311,160 @@ const CreateProjectForm = () => {
               value={subcategoryOptions
                 .filter((sub) => (field.value ?? []).includes(sub.id))
                 .map((sub) => ({ value: sub.id, label: sub.name }))}
-              onChange={(selected) =>
-                field.onChange(selected.map((opt) => opt.value))
-              }
-              className="react-select-container"
+              onChange={(selected) => {
+                const values = selected.map((opt) => opt.value);
+                field.onChange(values);
+                clearFieldError("subcategoryIds");
+              }}
+              className="react-select-container bg-gray-200 text-gray-950 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
               classNamePrefix="react-select"
               placeholder="Select subcategories"
+              aria-invalid={!!errors.subcategoryIds}
+              aria-describedby={
+                errors.subcategoryIds ? "subcategoryIds-error" : undefined
+              }
+              inputId="subcategoryIds"
+              aria-labelledby="subcategoryIds-label"
             />
           )}
         />
-        {errors.subcategoryIds && <p>{errors.subcategoryIds.message}</p>}
+        {(errors.subcategoryIds || validationErrors?.subcategoryIds) && (
+          <InputErrorMessage
+            message={
+              (typeof errors.subcategoryIds?.message === "string"
+                ? errors.subcategoryIds.message
+                : undefined) ?? validationErrors?.subcategoryIds
+            }
+            label="subcategoryIds"
+          />
+        )}
       </div>
 
-      <button
-        type="submit"
-        disabled={isCreating}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
-      >
-        Submit
-      </button>
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label htmlFor="status" className="font-semibold text-sm xl:text-base">
+          Status
+        </label>
+        <select
+          id="status"
+          {...register("status", {
+            onChange: () => clearFieldError("status"),
+          })}
+          className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
+          aria-invalid={!!errors.status}
+          aria-describedby={errors.status ? "status-error" : undefined}
+        >
+          {Object.values(ProjectStatus).map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
+        {(typeof errors.status?.message === "string" ||
+          validationErrors?.status) && (
+          <InputErrorMessage
+            message={
+              (typeof errors.status?.message === "string"
+                ? errors.status.message
+                : undefined) ?? validationErrors?.status
+            }
+            label={"status"}
+          />
+        )}
+      </div>
 
-      {apiError && (
-        <FeedbackMessage
-          id="api-error"
-          message={apiError}
-          type="error"
-          className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2 break-words whitespace-normal max-w-80"
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label
+          htmlFor="paymentType"
+          className="font-semibold text-sm xl:text-base"
+        >
+          Payment Type
+        </label>
+        <select
+          id="paymentType"
+          {...register("paymentType", {
+            onChange: () => clearFieldError("paymentType"),
+          })}
+          className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
+          aria-invalid={!!errors.paymentType}
+          aria-describedby={
+            errors.paymentType ? "paymentType-error" : undefined
+          }
+        >
+          {Object.values(PaymentType).map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+        {(typeof errors.paymentType?.message === "string" ||
+          validationErrors?.paymentType) && (
+          <InputErrorMessage
+            message={
+              (typeof errors.paymentType?.message === "string"
+                ? errors.paymentType.message
+                : undefined) ?? validationErrors?.paymentType
+            }
+            label={"paymentType"}
+          />
+        )}
+      </div>
+
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label htmlFor="budget" className="font-semibold text-sm xl:text-base">
+          Budget
+        </label>
+        <input
+          id="budget"
+          type="text"
+          {...register("budget", {
+            required: "Budget is required",
+            pattern: {
+              value: /^\d+(\.\d{1,2})?$/,
+              message:
+                "Budget must be a valid number with up to 2 decimal places",
+            },
+            onChange: () => clearFieldError("budget"),
+          })}
+          className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
+          aria-invalid={!!errors.budget}
+          aria-describedby={errors.budget ? "budget-error" : undefined}
         />
-      )}
+        {(errors.budget?.message || validationErrors?.budget) && (
+          <InputErrorMessage
+            message={errors.budget?.message ?? validationErrors?.budget}
+            label="budget"
+          />
+        )}
+      </div>
+
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <label
+          htmlFor="deadline"
+          className="font-semibold text-sm xl:text-base"
+        >
+          Deadline
+        </label>
+        <input
+          id="deadline"
+          type="date"
+          {...register("deadline", {
+            onChange: () => clearFieldError("deadline"),
+          })}
+          className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
+          aria-invalid={!!errors.deadline}
+          aria-describedby={errors.deadline ? "deadline-error" : undefined}
+        />
+        {(errors.deadline?.message || validationErrors?.deadline) && (
+          <InputErrorMessage
+            message={errors.deadline?.message ?? validationErrors?.deadline}
+            label="deadline"
+          />
+        )}
+      </div>
+
+      <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+        <SubmitButton type="submit" disabled={isCreating} label={buttonText} />
+      </div>
     </form>
   );
 };

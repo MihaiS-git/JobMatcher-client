@@ -1,7 +1,7 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import type { ErrorResponse } from "../types/ErrorResponse";
 
-function isErrorResponse(data: unknown): data is ErrorResponse {
+/* function isErrorResponse(data: unknown): data is ErrorResponse {
   return (
     typeof data === "object" &&
     data !== null &&
@@ -10,7 +10,7 @@ function isErrorResponse(data: unknown): data is ErrorResponse {
     "message" in data &&
     typeof (data as Record<string, unknown>).message === "string"
   );
-}
+} */
 
 function hasErrorField(data: unknown): data is { error: string } {
   return (
@@ -46,11 +46,21 @@ export function parseApiError(err: unknown): string {
       return e.error;
     }
 
-    if (typeof e.status === "number") {
-      if (typeof e.data === "object" && e.data !== null && isErrorResponse(e.data)) {
-        return e.data.message || e.data.error || `Error ${e.status}`;
+    if (typeof e.status === "number" && e.data && typeof e.data === "object") {
+      const data = e.data as ErrorResponse & { errorCode?: string; validationErrors?: Record<string, string> };
+
+      // Handle validation errors specifically
+      if (data.errorCode === "VALIDATION_FAILED" && data.validationErrors) {
+        // return the first validation error message
+        const firstError = Object.values(data.validationErrors)[0];
+        return firstError || "Validation failed.";
       }
-      // fallback
+
+      // fallback to standard message
+      if (typeof data.message === "string") {
+        return data.message;
+      }
+
       return `Error ${e.status}`;
     }
 

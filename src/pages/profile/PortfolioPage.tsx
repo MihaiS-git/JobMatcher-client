@@ -105,7 +105,6 @@ const PortfolioPage = () => {
             id="api-error"
             message={apiError}
             type="error"
-            className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2 break-words whitespace-normal max-w-80"
           />
         )}
       </section>

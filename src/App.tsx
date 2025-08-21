@@ -1,18 +1,34 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 import RootLayout from "./components/RootLayout";
-import HomePage from "./pages/HomePage";
-import AuthPage from "./pages/auth/AuthPage";
-import RegistrationPage from "./pages/auth/RegistrationPage";
-import PasswordRecoveryPage from "./pages/auth/PasswordRecoveryPage";
-import PasswordResetPage from "./pages/auth/PasswordResetPage";
-import OAuthRedirectHandler from "./pages/auth/OAuthRedirectHandler";
-import ProfilePage from "./pages/profile/ProfilePage";
-import PublicProfilePage from "./pages/profile/PublicProfilePage";
-import PortfolioPage from "./pages/profile/PortfolioPage";
-import PortfolioItemPage from "./pages/profile/PortfolioItemPage";
-import PortfolioNewItemPage from "./pages/profile/PortfolioNewItemPage";
-import CreateProjectPage from "./pages/projects/CreateProjectPage";
+import { lazy, Suspense } from "react";
+import LoadingSpinner from "./components/LoadingSpinner";
+
+// Lazy-loaded pages
+const HomePage = lazy(() => import("./pages/HomePage"));
+const AuthPage = lazy(() => import("./pages/auth/AuthPage"));
+const RegistrationPage = lazy(() => import("./pages/auth/RegistrationPage"));
+const PasswordRecoveryPage = lazy(
+  () => import("./pages/auth/PasswordRecoveryPage")
+);
+const PasswordResetPage = lazy(() => import("./pages/auth/PasswordResetPage"));
+const OAuthRedirectHandler = lazy(
+  () => import("./pages/auth/OAuthRedirectHandler")
+);
+const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
+const PublicProfilePage = lazy(
+  () => import("./pages/profile/PublicProfilePage")
+);
+const PortfolioPage = lazy(() => import("./pages/profile/PortfolioPage"));
+const PortfolioItemPage = lazy(
+  () => import("./pages/profile/PortfolioItemPage")
+);
+const PortfolioNewItemPage = lazy(
+  () => import("./pages/profile/PortfolioNewItemPage")
+);
+const CreateProjectPage = lazy(
+  () => import("./pages/projects/CreateProjectPage")
+);
 
 const router = createBrowserRouter([
   {
@@ -21,54 +37,102 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <HomePage />
+          </Suspense>
+        ),
       },
       {
         path: "/auth",
-        element: <AuthPage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <AuthPage />
+          </Suspense>
+        ),
       },
       {
         path: "/register",
-        element: <RegistrationPage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <RegistrationPage />
+          </Suspense>
+        ),
       },
       {
         path: "/recover-password",
-        element: <PasswordRecoveryPage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <PasswordRecoveryPage />
+          </Suspense>
+        ),
       },
       {
         path: "/reset-password",
-        element: <PasswordResetPage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <PasswordResetPage />
+          </Suspense>
+        ),
       },
       {
         path: "/oauth2/redirect",
-        element: <OAuthRedirectHandler />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <OAuthRedirectHandler />
+          </Suspense>
+        ),
       },
       {
         path: "/profile",
-        element: <ProfilePage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ProfilePage />
+          </Suspense>
+        ),
       },
       {
         path: "/public_profile",
-        element: <PublicProfilePage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <PublicProfilePage />
+          </Suspense>
+        ),
       },
       {
         path: "/portfolio",
-        element: <PortfolioPage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <PortfolioPage />
+          </Suspense>
+        ),
         children: [
           {
             path: ":id",
-            element: <PortfolioItemPage />,
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <PortfolioItemPage />
+              </Suspense>
+            ),
           },
           {
             path: "new",
-            element: <PortfolioNewItemPage />,
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <PortfolioNewItemPage />
+              </Suspense>
+            ),
           },
         ],
       },
       {
         path: "/projects/create",
-        element: <CreateProjectPage />,
-      }
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <CreateProjectPage />
+          </Suspense>
+        ),
+      },
     ],
   },
 ]);

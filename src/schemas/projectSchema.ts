@@ -2,13 +2,17 @@ import { PaymentType, ProjectStatus } from "@/types/ProjectDTO";
 import { z } from "zod";
 
 const projectSchema = z.object({
-  customerId: z.string().uuid(),
   title: z.string().min(1, "Title is required"),
   description: z.string(),
   status: z
     .enum(Object.values(ProjectStatus) as [string, ...string[]])
     .optional(),
-  budget: z.number().min(0, "Budget must be a positive number"),
+  budget: z
+    .string()
+    .refine(
+      (val) => /^\d+(\.\d{1,2})?$/.test(val),
+      "Budget must be a valid number with up to 2 decimal places"
+    ),
   paymentType: z
     .enum(Object.values(PaymentType) as [string, ...string[]])
     .optional(),
@@ -16,8 +20,8 @@ const projectSchema = z.object({
     const date = new Date(dateStr);
     return !isNaN(date.getTime()) && date > new Date();
   }, "Deadline must be in the future"),
-  categoryId: z.number(),
-  subcategoryIds: z.array(z.number()),
+  categoryId: z.number().nullable().refine((val) => val !== null, "Category is required"),
+  subcategoryIds: z.array(z.number()).min(1, "At least one subcategory is required"),
 });
 
 export default projectSchema;

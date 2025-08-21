@@ -22,6 +22,7 @@ import type { PortfolioItemRequestDTO } from "@/types/PortfolioDTO";
 import useDebounce from "@/hooks/useDebounce";
 import useAuth from "@/hooks/useAuth";
 import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi";
+import SubmitButton from "@/components/SubmitButton";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -277,13 +278,15 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
 
     try {
       if (!portfolioItem) {
-        console.log("Saving new portfolio item:", payload);
-
         await saveItem(payload).unwrap();
         setSuccessMessage("Portfolio item saved successfully.");
+        setApiError("");
+        setValidationErrors(null);
       } else {
         await updateItem({ id: portfolioItem.id, data: payload }).unwrap();
         setSuccessMessage("Portfolio item updated successfully.");
+        setApiError("");
+        setValidationErrors(null);
       }
     } catch (err: unknown) {
       handleUpsertApiError(err, setValidationErrors, setApiError, apiError);
@@ -458,13 +461,12 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         disabled={isLoading}
       />
 
-      <button
-        type="submit"
-        className="mx-auto bg-blue-500 text-gray-200 p-2 rounded-sm border border-gray-200 hover:bg-blue-400 mt-4 w-80 disabled:bg-gray-400"
-        disabled={isSaving || isUpdating || isLoading || isProfileLoading}
-      >
-        {buttonText}
-      </button>
+      <SubmitButton 
+      type={"submit"} 
+      label={buttonText} 
+      disabled={isSaving || isUpdating || isLoading || isProfileLoading} 
+      className="mx-auto" 
+      />
 
       <section
         className="flex flex-col items-center mt-4"
@@ -474,7 +476,6 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
             id="success-message"
             message={successMessage}
             type="success"
-            className="text-green-400 text-center my-4 break-words whitespace-normal max-w-80"
           />
         )}
 
@@ -483,7 +484,6 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
             id="api-error"
             message={apiError}
             type="error"
-            className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2 break-words whitespace-normal max-w-80"
           />
         )}
 

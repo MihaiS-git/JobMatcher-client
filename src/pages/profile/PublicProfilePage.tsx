@@ -1,9 +1,15 @@
 import PageContent from "@/components/PageContent";
 import useAuth from "@/hooks/useAuth";
-import FreelancerProfileForm from "@/components/forms/profile/FreelancerProfileForm";
-import CustomerProfileForm from "@/components/forms/profile/CustomerProfileForm";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import PageTitle from "@/components/PageTitle";
+import LoadingSpinner from "@/components/LoadingSpinner";
+
+const FreelancerProfileForm = lazy(
+  () => import("@/components/forms/profile/FreelancerProfileForm")
+);
+const CustomerProfileForm = lazy(
+  () => import("@/components/forms/profile/CustomerProfileForm")
+);
 
 const PublicProfilePage = () => {
   const auth = useAuth();
@@ -33,8 +39,17 @@ const PublicProfilePage = () => {
           fetchPriority="high"
         />
 
-        {role === "STAFF" && <FreelancerProfileForm userId={userId} />}
-        {role === "CUSTOMER" && <CustomerProfileForm userId={userId} />}
+        {role === "STAFF" && (
+          <Suspense fallback={<LoadingSpinner />}>
+            <FreelancerProfileForm userId={userId} />
+          </Suspense>
+        )}
+
+        {role === "CUSTOMER" && (
+          <Suspense fallback={<LoadingSpinner />}>
+            <CustomerProfileForm userId={userId} />
+          </Suspense>
+        )}
       </section>
     </PageContent>
   );

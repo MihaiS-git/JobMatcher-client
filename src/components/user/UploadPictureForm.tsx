@@ -96,7 +96,6 @@ const UploadPictureForm = ({ user }: { user: UserResponseDTO }) => {
               id="fileUpload-error"
               message={imageFileError}
               type="error"
-              className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2 break-words whitespace-normal max-w-80"
             />
           )}
           {apiError && (
@@ -104,7 +103,6 @@ const UploadPictureForm = ({ user }: { user: UserResponseDTO }) => {
               id="api-error"
               message={apiError}
               type="error"
-              className="text-red-600 dark:text-red-400 text-xs mt-0.25 mb-2 break-words whitespace-normal max-w-80"
             />
           )}
           {successMessage && (
@@ -112,7 +110,6 @@ const UploadPictureForm = ({ user }: { user: UserResponseDTO }) => {
               id="upload-success"
               message={successMessage}
               type="success"
-              className="text-green-400 text-center my-4 break-words whitespace-normal max-w-80"
             />
           )}
         </div>
