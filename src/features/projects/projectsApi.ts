@@ -91,6 +91,7 @@ export const projectsApi = createApi({
 
 export const {
   useGetProjectsQuery,
+  useGetProjectByIdQuery,
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,

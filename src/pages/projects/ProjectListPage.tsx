@@ -7,9 +7,6 @@ const ProjectList = lazy(() => import("@/components/project/ProjectList"));
 
 const ProjectListPage = () => {
 
-
-    
-
     return (
     <PageContent className="pb-16">
       <section
@@ -18,7 +15,7 @@ const ProjectListPage = () => {
       >
         <PageTitle title="Project List" id="project-list-heading" />
 
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
           <ProjectList />
         </Suspense>
         

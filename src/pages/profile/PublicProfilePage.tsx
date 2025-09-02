@@ -14,12 +14,13 @@ const CustomerProfileForm = lazy(
 const PublicProfilePage = () => {
   const auth = useAuth();
   const authUser = auth?.user;
+  const userRole = authUser?.role;
   const userId = authUser?.id;
   const [role, setRole] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    setRole(authUser?.role);
-  }, [authUser]);
+    if (userRole) setRole(userRole);
+  }, [userRole]);
 
   if (!authUser?.id) return <div>Loading user session...</div>;
   if (!role) return <div>Loading form...</div>;
@@ -40,13 +41,13 @@ const PublicProfilePage = () => {
         />
 
         {role === "STAFF" && (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
             <FreelancerProfileForm userId={userId} />
           </Suspense>
         )}
 
         {role === "CUSTOMER" && (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
             <CustomerProfileForm userId={userId} />
           </Suspense>
         )}

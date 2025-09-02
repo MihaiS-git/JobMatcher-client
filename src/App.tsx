@@ -29,8 +29,11 @@ const PortfolioNewItemPage = lazy(
 const CreateProjectPage = lazy(
   () => import("./pages/projects/CreateProjectPage")
 );
+const EditProjectPage = lazy(
+  () => import("./pages/projects/EditProjectPage")
+);
 
-const ProjectList = lazy(() => import("./pages/projects/ProjectListPage"));
+const ProjectListPage = lazy(() => import("./pages/projects/ProjectListPage"));
 
 const router = createBrowserRouter([
   {
@@ -40,7 +43,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <HomePage />
           </Suspense>
         ),
@@ -48,7 +51,7 @@ const router = createBrowserRouter([
       {
         path: "/auth",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <AuthPage />
           </Suspense>
         ),
@@ -56,7 +59,7 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <RegistrationPage />
           </Suspense>
         ),
@@ -64,7 +67,7 @@ const router = createBrowserRouter([
       {
         path: "/recover-password",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <PasswordRecoveryPage />
           </Suspense>
         ),
@@ -72,7 +75,7 @@ const router = createBrowserRouter([
       {
         path: "/reset-password",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <PasswordResetPage />
           </Suspense>
         ),
@@ -80,7 +83,7 @@ const router = createBrowserRouter([
       {
         path: "/oauth2/redirect",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <OAuthRedirectHandler />
           </Suspense>
         ),
@@ -88,7 +91,7 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <ProfilePage />
           </Suspense>
         ),
@@ -96,7 +99,7 @@ const router = createBrowserRouter([
       {
         path: "/public_profile",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <PublicProfilePage />
           </Suspense>
         ),
@@ -104,7 +107,7 @@ const router = createBrowserRouter([
       {
         path: "/portfolio",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <PortfolioPage />
           </Suspense>
         ),
@@ -112,7 +115,7 @@ const router = createBrowserRouter([
           {
             path: ":id",
             element: (
-              <Suspense fallback={<LoadingSpinner />}>
+              <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
                 <PortfolioItemPage />
               </Suspense>
             ),
@@ -120,7 +123,7 @@ const router = createBrowserRouter([
           {
             path: "new",
             element: (
-              <Suspense fallback={<LoadingSpinner />}>
+              <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
                 <PortfolioNewItemPage />
               </Suspense>
             ),
@@ -130,7 +133,7 @@ const router = createBrowserRouter([
       {
         path: "/projects/create",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <CreateProjectPage />
           </Suspense>
         ),
@@ -138,8 +141,16 @@ const router = createBrowserRouter([
       {
         path: "/projects",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <ProjectList />
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <ProjectListPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/projects/:id/edit",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <EditProjectPage />
           </Suspense>
         ),
       },

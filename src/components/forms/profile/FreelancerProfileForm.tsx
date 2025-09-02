@@ -31,6 +31,7 @@ import RadioSelect from "../RadioSelect";
 import SocialMediaInput from "./SocialMediaInput";
 import useDebounce from "@/hooks/useDebounce";
 import type { SelectOption } from "@/types/SelectOption";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -340,7 +341,7 @@ const FreelancerForm = ({ userId }: Props) => {
   const hasServerErrors = apiError && Object.keys(apiError).length > 0;
   const hasValidationErrors = Boolean(hasClientErrors || hasServerErrors);
 
-  if (isLoading) return <div>Loading user profile...</div>;
+  if (isLoading) return <LoadingSpinner fullScreen={true} size={36} />;
 
   return (
     <form

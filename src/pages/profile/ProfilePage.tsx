@@ -23,7 +23,7 @@ const ProfilePage = () => {
   const { data: user, isLoading, error } = useGetUserByIdQuery(queryArgs);
 
   if (!authUser?.id) return <div>Loading user session...</div>;
-  if (isLoading) return <div>Loading user profile...</div>;
+  if (isLoading) return (<LoadingSpinner fullScreen={true} size={36} />);
   if (error) return <div>Error loading profile.</div>;
   if (!user) return <div>No user data found after fetching.</div>;
 

@@ -79,6 +79,9 @@ const MultiFileUploadForm = ({ itemId, userId }: MultiFileUploadFormProps) => {
     }, 3000);
     }
   };
+
+  const buttonText = isUploading ? "Uploading..." : "Upload"
+
   return (
     <form
       onSubmit={handleUpload}
@@ -118,7 +121,7 @@ const MultiFileUploadForm = ({ itemId, userId }: MultiFileUploadFormProps) => {
             currentIndex >= selectedFiles.length
           }
         >
-          {isUploading ? "Uploading..." : "Upload"}
+          {buttonText}
         </button>
         <div className="min-h-[2.5rem] flex items-center justify-center">
           {validationError && (

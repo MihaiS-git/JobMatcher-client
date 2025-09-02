@@ -47,13 +47,7 @@ const PortfolioItemPage = () => {
   }, [error, isLoading]);
 
   if (isLoading) {
-    console.log("Loading portfolio item...");
-
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <LoadingSpinner size={48} />
-      </div>
-    );
+    return <LoadingSpinner fullScreen={false} size={36} />;
   }
 
   return (
@@ -71,13 +65,13 @@ const PortfolioItemPage = () => {
         </h1>
 
         <div className="flex flex-col items-center w-full mt-4 p-4">
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner fullScreen={false} />}>
             <PortfolioItemUpsertForm itemId={portfolioItem?.id} />
           </Suspense>
           <hr className="my-4 border-gray-950 dark:border-gray-200 w-full" />
 
           {portfolioItem?.imageUrls && (
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<LoadingSpinner fullScreen={false} />}>
               <PortfolioItemImagesCarousel
                 images={portfolioItem?.imageUrls}
                 portfolioItemId={portfolioItem?.id}
@@ -86,17 +80,13 @@ const PortfolioItemPage = () => {
           )}
 
           {portfolioItem?.id && (
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<LoadingSpinner fullScreen={false} />}>
               <MultiFileUploadForm itemId={portfolioItem.id} userId={userId} />
             </Suspense>
           )}
 
           {apiError && (
-            <FeedbackMessage
-              id="api-error"
-              message={apiError}
-              type="error"
-            />
+            <FeedbackMessage id="api-error" message={apiError} type="error" />
           )}
         </div>
       </section>

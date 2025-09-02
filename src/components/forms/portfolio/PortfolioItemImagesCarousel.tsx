@@ -49,7 +49,8 @@ const PortfolioItemImagesCarousel = ({ portfolioItemId, images }: Props) => {
         <SwiperSlide key={idx} className="flex justify-center items-center">
           {!loadedStates[idx] && (
             <LoadingSpinner
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+              fullScreen={false}
+              size={36}
             />
           )}
 
@@ -64,7 +65,7 @@ const PortfolioItemImagesCarousel = ({ portfolioItemId, images }: Props) => {
           />
           {isDeleting && (
             <LoadingSpinner
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              fullScreen={false}
               size={36}
             />
           )}

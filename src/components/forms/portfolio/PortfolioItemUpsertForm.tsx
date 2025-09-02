@@ -23,6 +23,7 @@ import useDebounce from "@/hooks/useDebounce";
 import useAuth from "@/hooks/useAuth";
 import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi";
 import SubmitButton from "@/components/SubmitButton";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -294,6 +295,8 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
   };
 
   const buttonText = itemId ? "Update Item" : "Add Item";
+
+  if(isProfileLoading || isLoading || isLoadingCategories) return <LoadingSpinner fullScreen={true} size={36} />;
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit}>

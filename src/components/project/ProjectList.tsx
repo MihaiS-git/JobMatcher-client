@@ -6,7 +6,7 @@ import {
 } from "@/features/projects/projectsApi";
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
-import { PaymentType, ProjectStatus } from "@/types/ProjectDTO";
+import { ProjectStatus } from "@/types/ProjectDTO";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import { parseApiError } from "@/utils/parseApiError";
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import SortButton from "./SortButton";
 import PagePagination from "./PagePagination";
+import { ProjectPaymentTypeLabel, ProjectStatusLabels } from "@/types/formLabels/projectLabels";
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -115,23 +116,6 @@ const ProjectList = () => {
       return { ...prev, [column]: next };
     });
     setPage(0);
-  };
-
-  const ProjectStatusLabels: Record<ProjectStatus, string> = {
-    OPEN: "Open",
-    PROPOSALS_RECEIVED: "Proposals received",
-    IN_PROGRESS: "In progress",
-    COMPLETED: "Completed",
-    CANCELLED: "Cancelled",
-    NONE: "None",
-  };
-
-  const ProjectPaymentTypeLabel: Record<PaymentType, string> = {
-    UPFRONT: "Upfront",
-    MILESTONE: "Milestone",
-    UPON_COMPLETION: "Upon Completion",
-    COMMISSION: "Commission",
-    NONE: "None",
   };
 
   return (
@@ -252,16 +236,12 @@ const ProjectList = () => {
             onClick={handleResetFilters}
             className="bg-blue-500 hover:bg-blue-600 text-white rounded py-1 px-4 cursor-pointer text-sm min-w-[200px]"
           >
-            Reset
+            Reset filters
           </button>
         </div>
       </section>
 
-      {isLoadingProjects && (
-        <div className="mt-24">
-          <LoadingSpinner />
-        </div>
-      )}
+      {isLoadingProjects && (<LoadingSpinner fullScreen={false} size={36}/>)}
 
       {projectsError && (
         <div>Error loading projects: {parseApiError(projectsError)}</div>
