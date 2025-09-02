@@ -30,6 +30,8 @@ const CreateProjectPage = lazy(
   () => import("./pages/projects/CreateProjectPage")
 );
 
+const ProjectList = lazy(() => import("./pages/projects/ProjectListPage"));
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -130,6 +132,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <CreateProjectPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/projects",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ProjectList />
           </Suspense>
         ),
       },

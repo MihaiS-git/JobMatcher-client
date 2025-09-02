@@ -47,5 +47,5 @@ export type ProjectResponseDTO = {
   paymentType?: PaymentType;
   deadline?: Date;
   category?: JobCategoryDTO;
-  subCategories?: JobSubcategoryDTO[];
+  subcategories?: JobSubcategoryDTO[];
 };
