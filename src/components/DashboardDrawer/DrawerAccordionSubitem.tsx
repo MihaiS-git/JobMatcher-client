@@ -21,6 +21,7 @@ const DrawerAccordionSubitem = ({targetUrl, itemTag}: SubitemProps) => {
     <li onClick={handleItemClick}>
       <NavLink
         to={targetUrl}
+        end                           // exact paths because of nested routes
         className={({ isActive }) =>
           isActive
             ? "text-blue-950 dark:text-blue-400"

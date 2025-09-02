@@ -1,4 +1,3 @@
-import useCustomerId from "@/hooks/useCustomerId";
 import { useState } from "react";
 import {
   useDeleteProjectMutation,
@@ -9,7 +8,6 @@ import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategor
 import { ProjectStatus } from "@/types/ProjectDTO";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
-import { parseApiError } from "@/utils/parseApiError";
 import {
   ArrowDown01,
   ArrowDownAZ,
@@ -24,7 +22,6 @@ import { ProjectPaymentTypeLabel, ProjectStatusLabels } from "@/types/formLabels
 
 const ProjectList = () => {
   const navigate = useNavigate();
-  const { customerId } = useCustomerId();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [status, setStatus] = useState<ProjectStatus | "">("");
@@ -60,7 +57,6 @@ const ProjectList = () => {
   } = useGetProjectsQuery({
     page: page || 0,
     size: size || 10,
-    customerId: customerId,
     status: status || "",
     categoryId: categoryId,
     subcategoryIds: subcategoryId ? [subcategoryId] : undefined,
@@ -242,10 +238,6 @@ const ProjectList = () => {
       </section>
 
       {isLoadingProjects && (<LoadingSpinner fullScreen={false} size={36}/>)}
-
-      {projectsError && (
-        <div>Error loading projects: {parseApiError(projectsError)}</div>
-      )}
 
       {projects && projects.totalElements > 0 && !projectsError ? (
         <section className="w-full overflow-x-auto 2xl:overflow-x-visible">
@@ -493,7 +485,7 @@ const ProjectList = () => {
       ) : (
         !isLoadingProjects && (
           <div className="mt-24 text-sm text-gray-500">
-            No projects found. Try resetting filters using the button above.
+            No projects found for the selected filters.
           </div>
         )
       )}

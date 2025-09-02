@@ -231,7 +231,7 @@ const AuthPage = () => {
               aria-live="polite"
               className="spinner w-full flex flex-row align-middle justify-center items-center text-center pb-4"
             >
-              <LoadingSpinner />
+              <LoadingSpinner fullScreen={false} />
             </div>
           )}
 

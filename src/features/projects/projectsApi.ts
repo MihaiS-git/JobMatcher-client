@@ -17,8 +17,6 @@ export const projectsApi = createApi({
       {
         page?: number;
         size?: number;
-        customerId?: string;
-        freelancerId?: string;
         status?: string;
         categoryId?: number;
         subcategoryIds?: number[];

@@ -19,6 +19,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
 
   const handleLogout = () => {
     dispatch(clearCredentials());
+    dispatch({ type: "auth/logout" });
     navigate("/auth");
     handleClose();
   };
