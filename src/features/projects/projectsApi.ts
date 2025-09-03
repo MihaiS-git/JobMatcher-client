@@ -1,7 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "../baseQueryWithReauth";
 import type { ProjectRequestDTO, ProjectResponseDTO } from "@/types/ProjectDTO";
-import buildSortParams from "@/utils/buildSortParams";
 
 export const projectsApi = createApi({
   reducerPath: "projectsApi",
@@ -21,19 +20,16 @@ export const projectsApi = createApi({
         categoryId?: number;
         subcategoryId?: number;
         searchTerm?: string;
-        sortState?: Record<string, "asc" | "desc" | null>;
+        sort?: string[]; // <- single sort string like "title,asc"
       }
     >({
-      query: ({ sortState, ...rest }) => {
-        const sortParams = sortState ? buildSortParams(sortState) : [];
-        return {
-          url: "/projects",
-          params: {
-            ...rest,
-            sort: sortParams,
-          },
-        };
-      },
+      query: ({ sort, ...rest }) => ({
+        url: "/projects",
+        params: {
+          ...rest,
+          sort: sort ?? "title,asc", // default if nothing selected
+        },
+      }),
       providesTags: (result) =>
         result
           ? [

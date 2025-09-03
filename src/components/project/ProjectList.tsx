@@ -29,7 +29,7 @@ const ProjectList = () => {
 
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
-  const status = (searchParams.get("status") as ProjectStatus) || "";
+  const status = searchParams.get("status") ?? "";
   const categoryId = searchParams.get("categoryId")
     ? Number(searchParams.get("categoryId"))
     : undefined;
@@ -38,7 +38,10 @@ const ProjectList = () => {
     : undefined;
   const searchTerm = searchParams.get("searchTerm") ?? "";
 
-  const sortStateDefaultValues = {
+  const sortStateDefaultValues: Record<
+    "title" | "status" | "budget" | "paymentType" | "deadline" | "category",
+    "asc" | "desc" | null
+  > = {
     title: null,
     status: null,
     budget: null,
@@ -47,11 +50,25 @@ const ProjectList = () => {
     category: null,
   };
 
-  const sortState: Record<string, "asc" | "desc" | null> = JSON.parse(
-    searchParams.get("sortState") ?? JSON.stringify(sortStateDefaultValues)
-  );
+  const sortParam = searchParams.getAll("sort");
+  const sortState: Record<
+    keyof typeof sortStateDefaultValues,
+    "asc" | "desc" | null
+  > = {
+    ...sortStateDefaultValues,
+  };
+  sortParam.forEach((s) => {
+    const [col, dir] = s.split(",");
+    if (col in sortState && (dir === "asc" || dir === "desc")) {
+      sortState[col as keyof typeof sortState] = dir;
+    }
+  });
 
-  const [deleteProject, result] = useDeleteProjectMutation();
+  const [deleteProject] = useDeleteProjectMutation();
+
+  const sortArray = Object.entries(sortState)
+    .filter(([, dir]) => dir !== null)
+    .map(([col, dir]) => `${col},${dir}`);
 
   const {
     data: projects,
@@ -64,7 +81,7 @@ const ProjectList = () => {
     categoryId,
     subcategoryId,
     searchTerm,
-    sortState,
+    sort: sortArray,
   });
 
   const categoryOptions = useCategoryOptions();
@@ -75,42 +92,81 @@ const ProjectList = () => {
   }
 
   const handleDeleteProject = async (id: string): Promise<void> => {
-    if (!window.confirm("Are you sure you want to delete this project?")) {
+    if (!window.confirm("Are you sure you want to delete this project?"))
       return;
+    if (!id) return;
+
+    try {
+      await deleteProject(id).unwrap();
+    } catch (err) {
+      console.error("Failed to delete project:", err);
     }
-    if (!id || id === "") {
-      return;
-    }
-    const response = await deleteProject(id).unwrap();
-    if (result.error) {
-      console.error("Failed to delete project:", result.error);
-      return;
-    }
-    console.log("Project deleted successfully:", response);
   };
 
   type ProjectListSearchParams = {
     page?: number;
     size?: number;
-    status?: ProjectStatus | "";
-    categoryId?: number;
-    subcategoryId?: number;
+    status?: string;
+    categoryId?: number | null;
+    subcategoryId?: number | null;
     searchTerm?: string;
-    sortState?: Record<keyof typeof sortStateDefaultValues, "asc" | "desc" | null>;
+    sortState?: Record<string, "asc" | "desc" | null>;
   };
 
   const updateSearchParams = (newParams: ProjectListSearchParams) => {
-    setSearchParams({
+    const params: Record<string, string | string[]> = {
       page: String(newParams.page ?? page),
       size: String(newParams.size ?? size),
-      status: newParams.status ?? status,
-      categoryId:
-        newParams.categoryId?.toString() ?? categoryId?.toString() ?? "",
-      subcategoryId:
-        newParams.subcategoryId?.toString() ?? subcategoryId?.toString() ?? "",
       searchTerm: newParams.searchTerm ?? searchTerm,
-      sortState: JSON.stringify(newParams.sortState ?? sortState),
-    });
+    };
+
+    // Status
+    if (newParams.status !== undefined) {
+      if (newParams.status === "") {
+        delete params.status;
+      } else {
+        params.status = newParams.status;
+      }
+    } else if (status) params.status = status;
+
+    // Category
+    if (newParams.categoryId !== undefined) {
+      if (newParams.categoryId === null) {
+        delete params.categoryId;
+        delete params.subcategoryId;
+      } else {
+        params.categoryId = String(newParams.categoryId);
+        if (
+          subcategoryId &&
+          !subcategoryOptions.some((s) => s.id === subcategoryId)
+        ) {
+          delete params.subcategoryId;
+        }
+      }
+    } else if (categoryId !== undefined) params.categoryId = String(categoryId);
+
+    // Subcategory
+    if (newParams.subcategoryId !== undefined) {
+      if (newParams.subcategoryId === null) {
+        delete params.subcategoryId;
+      } else {
+        params.subcategoryId = String(newParams.subcategoryId);
+      }
+    } else if (subcategoryId !== undefined)
+      params.subcategoryId = String(subcategoryId);
+
+    // Sorting single-column
+    const mergedSort = newParams.sortState ?? sortState;
+    const sortParams: string[] = [];
+    for (const [col, dir] of Object.entries(mergedSort)) {
+      if (dir) {
+        sortParams.push(`${col},${dir}`);
+        break;
+      }
+    }
+    if (sortParams.length > 0) params.sort = sortParams;
+
+    setSearchParams(params);
   };
 
   const handleResetFilters = () => {
@@ -118,24 +174,31 @@ const ProjectList = () => {
       page: 0,
       size: 10,
       status: "",
-      categoryId: undefined,
-      subcategoryId: undefined,
+      categoryId: null,
+      subcategoryId: null,
       searchTerm: "",
-      sortState: { ...sortStateDefaultValues, title: "asc" },
+      sortState: { ...sortStateDefaultValues },
     });
   };
 
   const toggleSort = (
-    column: keyof typeof sortStateDefaultValues,
+    column: keyof typeof sortState,
     direction: "asc" | "desc"
   ) => {
     const current = sortState[column];
     const next = current === direction ? null : direction;
-    const newSortState = {
-      ...sortStateDefaultValues,
-      ...sortState,
+
+    // Only keep clicked column
+    const newSortState: typeof sortState = {
+      title: null,
+      status: null,
+      budget: null,
+      paymentType: null,
+      deadline: null,
+      category: null,
       [column]: next,
     };
+
     updateSearchParams({ page: 0, sortState: newSortState });
   };
 
@@ -168,7 +231,7 @@ const ProjectList = () => {
                 onChange={(e) =>
                   updateSearchParams({ searchTerm: e.target.value })
                 }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
+                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-auto"
               />
             </div>
 
@@ -183,7 +246,7 @@ const ProjectList = () => {
                 onChange={(e) =>
                   updateSearchParams({ size: Number(e.target.value) })
                 }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
+                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -203,12 +266,12 @@ const ProjectList = () => {
                 id="category"
                 onChange={(e) =>
                   updateSearchParams({
-                    categoryId: e.target.value
-                      ? Number(e.target.value)
-                      : undefined,
+                    categoryId: e.target.value ? Number(e.target.value) : null,
+                    subcategoryId: null,
+                    page: 0,
                   })
                 }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
+                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
                 value={categoryId ?? ""}
               >
                 <option value={""}>All Categories</option>
@@ -232,11 +295,13 @@ const ProjectList = () => {
                   updateSearchParams({
                     subcategoryId: e.target.value
                       ? Number(e.target.value)
-                      : undefined,
+                      : null,
+                    page: 0,
                   })
                 }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
+                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
                 value={subcategoryId ?? ""}
+                disabled={!categoryId}
               >
                 <option value={""}>All Subcategories</option>
 
@@ -262,7 +327,7 @@ const ProjectList = () => {
                       : "",
                   })
                 }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
+                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
                 value={status ?? ""}
               >
                 <option value={""}>All Statuses</option>
