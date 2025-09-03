@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   useDeleteProjectMutation,
   useGetProjectsQuery,
@@ -6,7 +5,7 @@ import {
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
 import { ProjectStatus } from "@/types/ProjectDTO";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
   ArrowDown01,
@@ -18,18 +17,26 @@ import {
 } from "lucide-react";
 import SortButton from "./SortButton";
 import PagePagination from "./PagePagination";
-import { ProjectPaymentTypeLabel, ProjectStatusLabels } from "@/types/formLabels/projectLabels";
+import {
+  ProjectPaymentTypeLabel,
+  ProjectStatusLabels,
+} from "@/types/formLabels/projectLabels";
+import { useEffect } from "react";
 
 const ProjectList = () => {
   const navigate = useNavigate();
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [status, setStatus] = useState<ProjectStatus | "">("");
-  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
-  const [subcategoryId, setSubcategoryId] = useState<number | undefined>(
-    undefined
-  );
-  const [searchTerm, setSearchTerm] = useState<string | "">("");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Number(searchParams.get("page") ?? 0);
+  const size = Number(searchParams.get("size") ?? 10);
+  const status = (searchParams.get("status") as ProjectStatus) || "";
+  const categoryId = searchParams.get("categoryId")
+    ? Number(searchParams.get("categoryId"))
+    : undefined;
+  const subcategoryId = searchParams.get("subcategoryId")
+    ? Number(searchParams.get("subcategoryId"))
+    : undefined;
+  const searchTerm = searchParams.get("searchTerm") ?? "";
 
   const sortStateDefaultValues = {
     title: null,
@@ -39,14 +46,10 @@ const ProjectList = () => {
     deadline: null,
     category: null,
   };
-  const [sortState, setSortState] = useState<{
-    title: "asc" | "desc" | null;
-    status: "asc" | "desc" | null;
-    budget: "asc" | "desc" | null;
-    paymentType: "asc" | "desc" | null;
-    deadline: "asc" | "desc" | null;
-    category: "asc" | "desc" | null;
-  }>(sortStateDefaultValues);
+
+  const sortState: Record<string, "asc" | "desc" | null> = JSON.parse(
+    searchParams.get("sortState") ?? JSON.stringify(sortStateDefaultValues)
+  );
 
   const [deleteProject, result] = useDeleteProjectMutation();
 
@@ -55,13 +58,13 @@ const ProjectList = () => {
     isLoading: isLoadingProjects,
     error: projectsError,
   } = useGetProjectsQuery({
-    page: page || 0,
-    size: size || 10,
-    status: status || "",
-    categoryId: categoryId,
-    subcategoryId: subcategoryId ? subcategoryId : undefined,
-    searchTerm: searchTerm || "",
-    sortState: sortState || sortStateDefaultValues,
+    page,
+    size,
+    status,
+    categoryId,
+    subcategoryId,
+    searchTerm,
+    sortState,
   });
 
   const categoryOptions = useCategoryOptions();
@@ -86,33 +89,67 @@ const ProjectList = () => {
     console.log("Project deleted successfully:", response);
   };
 
-  const handleResetFilters = () => {
-    setPage(0);
-    setSize(10);
-    setStatus("");
-    setCategoryId(undefined);
-    setSubcategoryId(undefined);
-    setSearchTerm("");
-    toggleSort("title", "asc");
+  type ProjectListSearchParams = {
+    page?: number;
+    size?: number;
+    status?: ProjectStatus | "";
+    categoryId?: number;
+    subcategoryId?: number;
+    searchTerm?: string;
+    sortState?: Record<keyof typeof sortStateDefaultValues, "asc" | "desc" | null>;
   };
 
-  type SortColumn =
-    | "title"
-    | "status"
-    | "budget"
-    | "paymentType"
-    | "deadline"
-    | "category";
-
-  const toggleSort = (column: SortColumn, direction: "asc" | "desc") => {
-    setSortState(sortStateDefaultValues);
-    setSortState((prev) => {
-      const current = prev[column];
-      const next = current === direction ? null : direction;
-      return { ...prev, [column]: next };
+  const updateSearchParams = (newParams: ProjectListSearchParams) => {
+    setSearchParams({
+      page: String(newParams.page ?? page),
+      size: String(newParams.size ?? size),
+      status: newParams.status ?? status,
+      categoryId:
+        newParams.categoryId?.toString() ?? categoryId?.toString() ?? "",
+      subcategoryId:
+        newParams.subcategoryId?.toString() ?? subcategoryId?.toString() ?? "",
+      searchTerm: newParams.searchTerm ?? searchTerm,
+      sortState: JSON.stringify(newParams.sortState ?? sortState),
     });
-    setPage(0);
   };
+
+  const handleResetFilters = () => {
+    updateSearchParams({
+      page: 0,
+      size: 10,
+      status: "",
+      categoryId: undefined,
+      subcategoryId: undefined,
+      searchTerm: "",
+      sortState: { ...sortStateDefaultValues, title: "asc" },
+    });
+  };
+
+  const toggleSort = (
+    column: keyof typeof sortStateDefaultValues,
+    direction: "asc" | "desc"
+  ) => {
+    const current = sortState[column];
+    const next = current === direction ? null : direction;
+    const newSortState = {
+      ...sortStateDefaultValues,
+      ...sortState,
+      [column]: next,
+    };
+    updateSearchParams({ page: 0, sortState: newSortState });
+  };
+
+  useEffect(() => {
+    updateSearchParams({
+      page,
+      size,
+      status,
+      categoryId,
+      subcategoryId,
+      searchTerm,
+      sortState,
+    });
+  }, []);
 
   return (
     <div className="flex flex-col items-center p-0 m-0 w-full gap-2">
@@ -128,7 +165,9 @@ const ProjectList = () => {
                 type="text"
                 id="searchTerm"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) =>
+                  updateSearchParams({ searchTerm: e.target.value })
+                }
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
               />
             </div>
@@ -141,7 +180,9 @@ const ProjectList = () => {
                 name="size"
                 id="size"
                 value={size}
-                onChange={(e) => setSize(Number(e.target.value))}
+                onChange={(e) =>
+                  updateSearchParams({ size: Number(e.target.value) })
+                }
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
               >
                 <option value={5}>5</option>
@@ -161,9 +202,11 @@ const ProjectList = () => {
                 name="category"
                 id="category"
                 onChange={(e) =>
-                  setCategoryId(
-                    e.target.value ? Number(e.target.value) : undefined
-                  )
+                  updateSearchParams({
+                    categoryId: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
+                  })
                 }
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
                 value={categoryId ?? ""}
@@ -186,9 +229,11 @@ const ProjectList = () => {
                 name="subcategory"
                 id="subcategory"
                 onChange={(e) =>
-                  setSubcategoryId(
-                    e.target.value ? Number(e.target.value) : undefined
-                  )
+                  updateSearchParams({
+                    subcategoryId: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
+                  })
                 }
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
                 value={subcategoryId ?? ""}
@@ -211,9 +256,11 @@ const ProjectList = () => {
                 name="status"
                 id="status"
                 onChange={(e) =>
-                  setStatus(
-                    e.target.value ? (e.target.value as ProjectStatus) : ""
-                  )
+                  updateSearchParams({
+                    status: e.target.value
+                      ? (e.target.value as ProjectStatus)
+                      : "",
+                  })
                 }
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
                 value={status ?? ""}
@@ -240,7 +287,7 @@ const ProjectList = () => {
         </div>
       </section>
 
-      {isLoadingProjects && (<LoadingSpinner fullScreen={false} size={36}/>)}
+      {isLoadingProjects && <LoadingSpinner fullScreen={false} size={36} />}
 
       {projects && projects.totalElements > 0 && !projectsError ? (
         <section className="w-full overflow-x-auto 2xl:overflow-x-visible">
@@ -478,7 +525,7 @@ const ProjectList = () => {
           <div>
             <PagePagination
               currentPage={page}
-              onPageChange={setPage}
+              onPageChange={(newPage) => updateSearchParams({ page: newPage })}
               totalPages={projects.totalPages}
               size={size}
               totalElements={projects.totalElements}
