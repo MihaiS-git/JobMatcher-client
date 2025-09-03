@@ -32,6 +32,9 @@ const CreateProjectPage = lazy(
 const EditProjectPage = lazy(
   () => import("./pages/projects/EditProjectPage")
 );
+const ProjectDetailsPage = lazy(
+  () => import("./pages/projects/ProjectDetailsPage")
+);
 
 const ProjectListPage = lazy(() => import("./pages/projects/ProjectListPage"));
 
@@ -143,6 +146,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <ProjectListPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/projects/:id",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <ProjectDetailsPage />
           </Suspense>
         ),
       },

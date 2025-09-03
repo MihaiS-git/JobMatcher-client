@@ -214,6 +214,10 @@ const ProjectList = () => {
     });
   }, []);
 
+  function handleProjectClick(id: string) {
+    navigate(`/projects/${id}`);
+  }
+  
   return (
     <div className="flex flex-col items-center p-0 m-0 w-full gap-2">
       <section className="w-full bg-gray-200 dark:bg-gray-900 p-2">
@@ -515,6 +519,7 @@ const ProjectList = () => {
                 <tr
                   key={project.id}
                   className="bg-gray-200 dark:bg-gray-700 border-1 border-gray-300 dark:border-gray-600 items-center justify-items-center hover:bg-gray-300 dark:hover:bg-gray-600"
+                  onClick={() => handleProjectClick(project.id)}
                 >
                   <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
                     {project.title}
