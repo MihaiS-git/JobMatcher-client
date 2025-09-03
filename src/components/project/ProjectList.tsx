@@ -59,7 +59,7 @@ const ProjectList = () => {
     size: size || 10,
     status: status || "",
     categoryId: categoryId,
-    subcategoryIds: subcategoryId ? [subcategoryId] : undefined,
+    subcategoryId: subcategoryId ? subcategoryId : undefined,
     searchTerm: searchTerm || "",
     sortState: sortState || sortStateDefaultValues,
   });
@@ -168,12 +168,13 @@ const ProjectList = () => {
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
                 value={categoryId ?? ""}
               >
+                <option value={""}>All Categories</option>
+
                 {categoryOptions.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
                 ))}
-                <option value={""}>All Categories</option>
               </select>
             </div>
 
@@ -192,12 +193,13 @@ const ProjectList = () => {
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
                 value={subcategoryId ?? ""}
               >
+                <option value={""}>All Subcategories</option>
+
                 {subcategoryOptions.map((subcategory) => (
                   <option key={subcategory.id} value={subcategory.id}>
                     {subcategory.name}
                   </option>
                 ))}
-                <option value={""}>All Subcategories</option>
               </select>
             </div>
 
@@ -216,12 +218,13 @@ const ProjectList = () => {
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1"
                 value={status ?? ""}
               >
+                <option value={""}>All Statuses</option>
+
                 {Object.values(ProjectStatus).map((status) => (
                   <option key={status} value={status}>
                     {ProjectStatusLabels[status]}
                   </option>
                 ))}
-                <option value={""}>All Statuses</option>
               </select>
             </div>
           </fieldset>

@@ -19,7 +19,7 @@ export const projectsApi = createApi({
         size?: number;
         status?: string;
         categoryId?: number;
-        subcategoryIds?: number[];
+        subcategoryId?: number;
         searchTerm?: string;
         sortState?: Record<string, "asc" | "desc" | null>;
       }
