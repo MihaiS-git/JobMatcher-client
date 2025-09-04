@@ -1,4 +1,7 @@
 import { useGetProjectByIdQuery } from "@/features/projects/projectsApi";
+import { formatCurrency } from "@/utils/formatCurrency";
+import { formatDate } from "@/utils/formatDate";
+import { toTitleCase } from "@/utils/stringEdit";
 
 type ProjectDetailsProps = {
   projectId: string;
@@ -22,13 +25,13 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
         </p>
       </div>
       <div className="space-y-2 my-4 min-w-100 mx-auto">
-        <p>Status: {project?.status}</p>
-        <p>Payment Type: {project?.paymentType}</p>
-        <p>Budget: {project?.budget}$</p>
+        <p>Status: {project?.status ? toTitleCase(project?.status) : "N/A"}</p>
+        <p>Payment Type: {project?.paymentType ? toTitleCase(project?.paymentType) : "N/A"}</p>
+        <p>Budget: {project?.budget ? formatCurrency(project?.budget) : "N/A"}</p>
         <p>
           Deadline:{" "}
           {project?.deadline
-            ? new Date(project.deadline).toLocaleDateString()
+            ? formatDate(project.deadline)
             : "N/A"}
         </p>
       </div>
