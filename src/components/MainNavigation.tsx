@@ -24,7 +24,7 @@ const MainNavigation = () => {
             </li>
             <li>
               <NavLink
-                to="/"
+                to="/job-feed"
                 className="text-blue-100 hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
               >
                 Job Feed

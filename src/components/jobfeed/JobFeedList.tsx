@@ -1,10 +1,9 @@
 import {
-  useDeleteProjectMutation,
-  useGetProjectsQuery,
+  useGetJobFeedProjectsQuery,
 } from "@/features/projects/projectsApi";
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
-import { ProjectStatus } from "@/types/ProjectDTO";
+import { JobFeederProjectStatus, ProjectStatus } from "@/types/ProjectDTO";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
@@ -23,7 +22,7 @@ import {
 } from "@/types/formLabels/projectLabels";
 import { useEffect } from "react";
 
-const ProjectList = () => {
+const JobFeedList = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -64,8 +63,6 @@ const ProjectList = () => {
     }
   });
 
-  const [deleteProject] = useDeleteProjectMutation();
-
   const sortArray = Object.entries(sortState)
     .filter(([, dir]) => dir !== null)
     .map(([col, dir]) => `${col},${dir}`);
@@ -74,7 +71,7 @@ const ProjectList = () => {
     data: projects,
     isLoading: isLoadingProjects,
     error: projectsError,
-  } = useGetProjectsQuery({
+  } = useGetJobFeedProjectsQuery({
     page,
     size,
     status,
@@ -86,22 +83,6 @@ const ProjectList = () => {
 
   const categoryOptions = useCategoryOptions();
   const subcategoryOptions = useSubcategoryByCategoryOptions(categoryId);
-
-  function handleEditProject(id: string): void {
-    navigate(`/projects/${id}/edit`);
-  }
-
-  const handleDeleteProject = async (id: string): Promise<void> => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
-    if (!id) return;
-
-    try {
-      await deleteProject(id).unwrap();
-    } catch (err) {
-      console.error("Failed to delete project:", err);
-    }
-  };
 
   type ProjectListSearchParams = {
     page?: number;
@@ -336,7 +317,7 @@ const ProjectList = () => {
               >
                 <option value={""}>All Statuses</option>
 
-                {Object.values(ProjectStatus).map((status) => (
+                {Object.values(JobFeederProjectStatus).map((status) => (
                   <option key={status} value={status}>
                     {ProjectStatusLabels[status]}
                   </option>
@@ -506,11 +487,6 @@ const ProjectList = () => {
                     <span className="flex-1 text-center">Subcategories</span>
                   </div>
                 </th>
-                <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-center relative border border-gray-400">
-                  <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Actions</span>
-                  </div>
-                </th>
               </tr>
             </thead>
 
@@ -518,7 +494,7 @@ const ProjectList = () => {
               {projects?.content?.map((project) => (
                 <tr
                   key={project.id}
-                  className="bg-gray-200 dark:bg-gray-700 border-1 border-gray-300 dark:border-gray-600 items-center justify-items-center hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer"
+                  className="h-12 bg-gray-200 dark:bg-gray-700 border-1 border-gray-300 dark:border-gray-600 items-center justify-items-center hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer"
                   onClick={() => handleProjectClick(project.id)}
                 >
                   <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
@@ -567,33 +543,6 @@ const ProjectList = () => {
                       <div>No Subcategories</div>
                     )}
                   </td>
-
-                  <td className=" truncate max-w-[150px] overflow-hidden whitespace-nowrap mx-auto flex flex-col gap-1 p-1">
-                    <div className="flex flex-row justify-center items-center gap-2 w-full">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditProject(project.id);
-                        }}
-                        className="bg-green-500 hover:bg-green-600 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                    </div>
-                    <div className="flex flex-row justify-center items-center gap-2 w-full">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteProject(project.id);
-                        }}
-                        className="bg-red-500 hover:bg-red-600 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -619,4 +568,4 @@ const ProjectList = () => {
   );
 };
 
-export default ProjectList;
+export default JobFeedList;

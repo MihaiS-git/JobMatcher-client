@@ -13,6 +13,15 @@ export const ProjectStatus = {
 
 export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus];
 
+export const JobFeederProjectStatus = {
+  OPEN: "OPEN",
+  PROPOSALS_RECEIVED: "PROPOSALS_RECEIVED",
+  CANCELLED: "CANCELLED",
+  NONE: "NONE",
+} as const;
+
+export type JobFeederProjectStatus = (typeof JobFeederProjectStatus)[keyof typeof JobFeederProjectStatus];
+
 export const PaymentType = {
   UPFRONT: "UPFRONT",
   MILESTONE: "MILESTONE",

@@ -41,6 +41,40 @@ export const projectsApi = createApi({
             ]
           : [{ type: "Project", id: "LIST" }],
     }),
+    getJobFeedProjects: builder.query<
+      {
+        content: ProjectResponseDTO[];
+        totalElements: number;
+        totalPages: number;
+      },
+      {
+        page?: number;
+        size?: number;
+        status?: string;
+        categoryId?: number;
+        subcategoryId?: number;
+        searchTerm?: string;
+        sort?: string[]; // <- single sort string like "title,asc"
+      }
+    >({
+      query: ({ sort, ...rest }) => ({
+        url: "/projects/job-feed",
+        params: {
+          ...rest,
+          sort: sort ?? "title,asc", // default if nothing selected
+        },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.content.map((project) => ({
+                type: "Project" as const,
+                id: project.id,
+              })),
+              { type: "Project", id: "LIST" },
+            ]
+          : [{ type: "Project", id: "LIST" }],
+    }),
     getProjectById: builder.query<ProjectResponseDTO, string>({
       query: (id) => ({
         url: `/projects/${id}`,
@@ -85,6 +119,7 @@ export const projectsApi = createApi({
 
 export const {
   useGetProjectsQuery,
+  useGetJobFeedProjectsQuery,
   useGetProjectByIdQuery,
   useCreateProjectMutation,
   useUpdateProjectMutation,

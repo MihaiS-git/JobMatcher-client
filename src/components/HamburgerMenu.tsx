@@ -51,7 +51,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                   <DashboardDrawerToggleButton />
                 </li>
                 <li onClick={handleClose}>
-                  <button className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer">Job Feed</button>
+                  <NavLink to={"/job-feed"} className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer">Job Feed</NavLink>
                 </li>
                 <li onClick={handleClose}>
                   <button className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer">Chat</button>

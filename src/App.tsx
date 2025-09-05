@@ -29,14 +29,13 @@ const PortfolioNewItemPage = lazy(
 const CreateProjectPage = lazy(
   () => import("./pages/projects/CreateProjectPage")
 );
-const EditProjectPage = lazy(
-  () => import("./pages/projects/EditProjectPage")
-);
+const EditProjectPage = lazy(() => import("./pages/projects/EditProjectPage"));
 const ProjectDetailsPage = lazy(
   () => import("./pages/projects/ProjectDetailsPage")
 );
 
 const ProjectListPage = lazy(() => import("./pages/projects/ProjectListPage"));
+const JobFeedPage = lazy(() => import("./pages/jobfeed/JobFeedPage"));
 
 const router = createBrowserRouter([
   {
@@ -118,7 +117,9 @@ const router = createBrowserRouter([
           {
             path: ":id",
             element: (
-              <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+              <Suspense
+                fallback={<LoadingSpinner fullScreen={true} size={36} />}
+              >
                 <PortfolioItemPage />
               </Suspense>
             ),
@@ -126,7 +127,9 @@ const router = createBrowserRouter([
           {
             path: "new",
             element: (
-              <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+              <Suspense
+                fallback={<LoadingSpinner fullScreen={true} size={36} />}
+              >
                 <PortfolioNewItemPage />
               </Suspense>
             ),
@@ -162,6 +165,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <EditProjectPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/job-feed",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <JobFeedPage />
           </Suspense>
         ),
       },
