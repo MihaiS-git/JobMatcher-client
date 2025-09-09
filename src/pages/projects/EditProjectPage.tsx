@@ -3,7 +3,7 @@ import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import { lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
-import BackButton from "./BackButton";
+import BackButton from "../../components/BackButton";
 
 const UpsertProjectForm = lazy(
   () => import("@/components/forms/project/UpsertProjectForm")

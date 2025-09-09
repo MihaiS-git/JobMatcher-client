@@ -1,56 +1,56 @@
 import PageContent from "@/components/PageContent";
-import useAuth from "@/hooks/useAuth";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import PageTitle from "@/components/PageTitle";
 import LoadingSpinner from "@/components/LoadingSpinner";
-
-const FreelancerProfileForm = lazy(
-  () => import("@/components/forms/profile/FreelancerProfileForm")
-);
-const CustomerProfileForm = lazy(
-  () => import("@/components/forms/profile/CustomerProfileForm")
-);
+import { useGetFreelancerByIdQuery } from "@/features/profile/freelancerApi";
+import { useGetCustomerByIdQuery } from "@/features/profile/customerApi";
+import { useParams } from "react-router-dom";
+import ProfileData from "@/components/profile/ProfileData";
+import BackButton from "../../components/BackButton";
 
 const PublicProfilePage = () => {
-  const auth = useAuth();
-  const authUser = auth?.user;
-  const userRole = authUser?.role;
-  const userId = authUser?.id;
-  const [role, setRole] = useState<string | undefined>(undefined);
+  const { type, profileId } = useParams<{
+    type: "customer" | "freelancer";
+    profileId: string;
+  }>();
 
-  useEffect(() => {
-    if (userRole) setRole(userRole);
-  }, [userRole]);
+  const customerQuery = useGetCustomerByIdQuery(profileId!, {
+    skip: !profileId || type !== "customer",
+  });
+  const freelancerQuery = useGetFreelancerByIdQuery(profileId!, {
+    skip: !profileId || type !== "freelancer",
+  });
 
-  if (!authUser?.id) return <div>Loading user session...</div>;
-  if (!role) return <div>Loading form...</div>;
+  const isLoading =
+    type === "freelancer" ? freelancerQuery.isLoading : customerQuery.isLoading;
+  const error =
+    type === "freelancer" ? freelancerQuery.error : customerQuery.error;
+
+  if (type !== "customer" && type !== "freelancer") {
+    return <div>Invalid profile type</div>;
+  }
+
+  if (isLoading) return <LoadingSpinner fullScreen={false} size={36} />;
+  if (error) return <div>Error loading profile</div>;
 
   return (
     <PageContent className="pb-16">
       <section
         className="flex flex-col items-center p-4"
-        aria-labelledby="edit-profile-heading"
+        aria-labelledby="public-profile-heading"
       >
-        <PageTitle title="Public Profile" id="edit-profile-heading" />
-        <img
-          className="m-4 w-80 h-80"
-          src={authUser?.pictureUrl || "user_icon.png"}
-          alt="User profile picture"
-          aria-label="user-profile-picture"
-          fetchPriority="high"
-        />
+        <PageTitle title="Public Profile" id="public-profile-heading" />
+        <BackButton />
 
-        {role === "STAFF" && (
-          <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
-            <FreelancerProfileForm userId={userId} />
-          </Suspense>
-        )}
+        <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
+          {type === "freelancer" && freelancerQuery.data && (
+            <ProfileData type="freelancer" profile={freelancerQuery.data} />
+          )}
 
-        {role === "CUSTOMER" && (
-          <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
-            <CustomerProfileForm userId={userId} />
-          </Suspense>
-        )}
+          {type === "customer" && customerQuery.data && (
+            <ProfileData type="customer" profile={customerQuery.data} />
+          )}
+        </Suspense>
       </section>
     </PageContent>
   );

@@ -19,6 +19,9 @@ const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 const PublicProfilePage = lazy(
   () => import("./pages/profile/PublicProfilePage")
 );
+const PublicProfileFormPage = lazy(
+  () => import("./pages/profile/PublicProfileFormPage")
+);
 const PortfolioPage = lazy(() => import("./pages/profile/PortfolioPage"));
 const PortfolioItemPage = lazy(
   () => import("./pages/profile/PortfolioItemPage")
@@ -36,6 +39,10 @@ const ProjectDetailsPage = lazy(
 
 const ProjectListPage = lazy(() => import("./pages/projects/ProjectListPage"));
 const JobFeedPage = lazy(() => import("./pages/jobfeed/JobFeedPage"));
+
+const ProjectNewProposalFormPage = lazy(
+  () => import("./pages/projects/ProjectNewProposalFormPage")
+);
 
 const router = createBrowserRouter([
   {
@@ -99,7 +106,15 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/public_profile",
+        path: "/edit_public_profile",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <PublicProfileFormPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/public_profile/:type/:profileId",
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <PublicProfilePage />
@@ -165,6 +180,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <EditProjectPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/projects/:id/proposals/new",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <ProjectNewProposalFormPage />
           </Suspense>
         ),
       },

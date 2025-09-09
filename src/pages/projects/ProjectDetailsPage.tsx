@@ -2,7 +2,7 @@ import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import ProjectDetails from "@/components/project/ProjectDetails";
 import { useParams } from "react-router-dom";
-import BackButton from "./BackButton";
+import BackButton from "../../components/BackButton";
 
 const ProjectDetailsPage = () => {
   const { id: projectId } = useParams<{ id: string }>();

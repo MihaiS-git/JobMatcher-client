@@ -10,6 +10,7 @@ import { portfolioApi } from "./features/profile/portfolio/portfolioApi";
 import { projectsApi } from "./features/projects/projectsApi";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage
 import { persistReducer, type PersistConfig } from "redux-persist";
+import { proposalApi } from "./features/proposal/proposalApi";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -21,6 +22,7 @@ const appReducer = combineReducers({
   [customerApi.reducerPath]: customerApi.reducer,
   [portfolioApi.reducerPath]: portfolioApi.reducer,
   [projectsApi.reducerPath]: projectsApi.reducer,
+  [proposalApi.reducerPath]: proposalApi.reducer,
 });
 
 const persistConfig: PersistConfig<ReturnType<typeof appReducer>> = {
