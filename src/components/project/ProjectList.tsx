@@ -15,7 +15,7 @@ import {
   ArrowUpAZ,
   ArrowUpNarrowWide,
 } from "lucide-react";
-import SortButton from "../SortButton";
+import SortButton from "../ProjectsSortButton";
 import PagePagination from "../PagePagination";
 import {
   ProjectPaymentTypeLabel,
@@ -64,8 +64,6 @@ const ProjectList = () => {
     }
   });
 
-  const [deleteProject] = useDeleteProjectMutation();
-
   const sortArray = Object.entries(sortState)
     .filter(([, dir]) => dir !== null)
     .map(([col, dir]) => `${col},${dir}`);
@@ -86,22 +84,6 @@ const ProjectList = () => {
 
   const categoryOptions = useCategoryOptions();
   const subcategoryOptions = useSubcategoryByCategoryOptions(categoryId);
-
-  function handleEditProject(id: string): void {
-    navigate(`/projects/${id}/edit`);
-  }
-
-  const handleDeleteProject = async (id: string): Promise<void> => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
-    if (!id) return;
-
-    try {
-      await deleteProject(id).unwrap();
-    } catch (err) {
-      console.error("Failed to delete project:", err);
-    }
-  };
 
   type ProjectListSearchParams = {
     page?: number;
@@ -214,10 +196,28 @@ const ProjectList = () => {
     });
   }, []);
 
+  function handleEditProject(id: string): void {
+    navigate(`/projects/${id}/edit`);
+  }
+
+  const [deleteProject] = useDeleteProjectMutation();
+
+  const handleDeleteProject = async (id: string): Promise<void> => {
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
+    if (!id) return;
+
+    try {
+      await deleteProject(id).unwrap();
+    } catch (err) {
+      console.error("Failed to delete project:", err);
+    }
+  };
+
   function handleProjectClick(id: string) {
     navigate(`/projects/${id}`);
   }
-  
+
   return (
     <div className="flex flex-col items-center p-0 m-0 w-full gap-2">
       <section className="w-full bg-gray-200 dark:bg-gray-900 p-2">

@@ -14,7 +14,7 @@ import {
   ArrowUpAZ,
   ArrowUpNarrowWide,
 } from "lucide-react";
-import SortButton from "../SortButton";
+import SortButton from "../ProjectsSortButton";
 import PagePagination from "../PagePagination";
 import {
   ProjectPaymentTypeLabel,

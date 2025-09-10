@@ -66,6 +66,8 @@ export type ProposalDetailDTO = {
   actualStartDate: string;
   actualEndDate: string;
   priority: Priority;
+  createdAt: string; // ISO date string
+  lastUpdate: string; // ISO date string
 };
 
 export type ProposalSummaryDTO = {
@@ -85,4 +87,6 @@ export type ProposalSummaryDTO = {
   actualStartDate: string;
   actualEndDate: string;
   priority: Priority;
+  createdAt: string; // ISO date string
+  lastUpdate: string; // ISO date string
 };
