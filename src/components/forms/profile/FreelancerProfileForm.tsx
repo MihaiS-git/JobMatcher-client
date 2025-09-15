@@ -315,9 +315,12 @@ const FreelancerForm = ({ userId }: Props) => {
 
     try {
       if (!profile?.profileId) {
+        console.log("Saving profile with payload:", payload);
+        
         await saveProfile(payload).unwrap();
         setSuccessMessage("Profile saved successfully.");
       } else {
+        console.log("Updating profile with payload:", payload);
         await updateProfile({
           id: profile.profileId,
           data: payload,
@@ -423,7 +426,7 @@ const FreelancerForm = ({ userId }: Props) => {
 
         <FormInput
           id="skills"
-          label="Skills:"
+          label="Skills (separated by commas):"
           type="text"
           name="skills"
           value={formData.skills}

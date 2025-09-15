@@ -54,7 +54,10 @@ export const customerApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [{ type: "Customer", id: "LIST" }],
+      invalidatesTags: (_result, _error, { userId }) => [
+        { type: "Customer", id: userId },
+        { type: "Customer", id: "LIST" },
+        ],
     }),
     updateCustomer: builder.mutation<
       CustomerDetailDTO,

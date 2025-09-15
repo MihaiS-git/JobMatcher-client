@@ -269,7 +269,7 @@ export function validateSkills(value: string): string | null {
 
   if (!trimmed) return null;
 
-  const allowedCharsRegex = /^[A-Za-z0-9șȘțȚăĂâÂîÎéè.\-+# ]+$/u;
+  const allowedCharsRegex = /^[A-Za-z0-9șȘțȚăĂâÂîÎéè.\-+#/()&*: ]+$/u;
   const skills = trimmed.split(",").map((s) => s.trim());
 
   if (skills.some((skill) => skill.length === 0)) {
@@ -297,7 +297,7 @@ export function validateText(value: string): string | null {
     return "About section must be under 1000 characters.";
   }
 
-  const allowedCharsRegex = /^[A-Za-z0-9șȘțȚăĂâÂîÎéè.\-+#_=*&%$@()!?:;, ]+$/u;
+  const allowedCharsRegex = /^[A-Za-z0-9șȘțȚăĂâÂîÎéè./\-+#_=*&%$@()!?:;, ]+$/u;
 
   if (!allowedCharsRegex.test(trimmed)) {
     return "About section contains invalid characters.";

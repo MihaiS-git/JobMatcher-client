@@ -53,7 +53,10 @@ export const freelancerApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [{ type: "Freelancer", id: "LIST" }],
+      invalidatesTags: (_result, _error, { userId }) => [
+        { type: "Freelancer", id: "LIST" },
+        { type: "Freelancer", id: userId },
+      ],
     }),
     updateFreelancer: builder.mutation<
       FreelancerDetailDTO,
