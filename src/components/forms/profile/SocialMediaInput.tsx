@@ -104,7 +104,7 @@ const SocialMediaInput = ({
         onClick={handleAddLink}
         className="mx-auto mt-2 bg-gray-300 text-gray-950 text-sm p-0.5 rounded-sm border border-gray-950 hover:bg-gray-500 hover:text-gray-200 w-40 cursor-pointer"
       >
-        + Add Another Link
+        + Add Link
       </button>
     </div>
   );

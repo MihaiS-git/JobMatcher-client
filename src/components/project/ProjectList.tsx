@@ -5,7 +5,7 @@ import {
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
 import { ProjectStatus } from "@/types/ProjectDTO";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
   ArrowDown01,
@@ -25,6 +25,7 @@ import { useEffect } from "react";
 
 const ProjectList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? 0);
@@ -194,9 +195,18 @@ const ProjectList = () => {
       searchTerm,
       sortState,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function handleProjectClick(id: string) {
+    const from = location.pathname + location.search;
+    sessionStorage.setItem("lastURL", from);
+    navigate(`/projects/${id}`);
+  }
+
   function handleEditProject(id: string): void {
+    const from = location.pathname + location.search;
+    sessionStorage.setItem("lastURL", from);
     navigate(`/projects/${id}/edit`);
   }
 
@@ -213,10 +223,6 @@ const ProjectList = () => {
       console.error("Failed to delete project:", err);
     }
   };
-
-  function handleProjectClick(id: string) {
-    navigate(`/projects/${id}`);
-  }
 
   return (
     <div className="flex flex-col items-center p-0 m-0 w-full gap-2">

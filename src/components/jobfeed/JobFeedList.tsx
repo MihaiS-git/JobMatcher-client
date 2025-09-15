@@ -4,7 +4,7 @@ import {
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
 import { JobFeederProjectStatus, ProjectStatus } from "@/types/ProjectDTO";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
   ArrowDown01,
@@ -24,6 +24,7 @@ import { useEffect } from "react";
 
 const JobFeedList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? 0);
@@ -193,9 +194,12 @@ const JobFeedList = () => {
       searchTerm,
       sortState,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleProjectClick(id: string) {
+    const from = location.pathname + location.search;
+    sessionStorage.setItem("lastURL", from);
     navigate(`/projects/${id}`);
   }
   

@@ -18,7 +18,7 @@ const ProjectNewProposalFormPage = () => {
         aria-labelledby="new-proposal-heading"
       >
         <PageTitle title="New Proposal" id="new-proposal-heading" />
-        <BackButton />
+        <BackButton label={"lastProjectURL"}/>
         <UpsertProposalForm projectId={id} role={authenticatedUserRole}/>
       </section>
     </PageContent>

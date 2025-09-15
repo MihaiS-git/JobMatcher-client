@@ -207,6 +207,10 @@ const FreelancerForm = ({ userId }: Props) => {
     error: freelancerApiError,
   } = useGetFreelancerByUserIdQuery(userId ? userId : skipToken);
 
+  useEffect(() => {
+    if(profile) console.log("Profile", profile);
+  },[profile]);
+
   const [saveProfile, { isLoading: saveLoading }] = useSaveFreelancerMutation();
   const [updateProfile, { isLoading: updateLoading }] =
     useUpdateFreelancerMutation();

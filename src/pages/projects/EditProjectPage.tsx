@@ -19,9 +19,7 @@ const EditProjectPage = () => {
         aria-labelledby="edit-project-heading"
       >
         <PageTitle title="Edit Project" id="edit-project-heading" />
-
-        <BackButton />
-        
+        <BackButton label={"lastURL"}/>
         <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
           <UpsertProjectForm projectId={projectId!} />
         </Suspense>

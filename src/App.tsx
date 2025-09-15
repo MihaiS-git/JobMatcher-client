@@ -41,7 +41,11 @@ const ProjectListPage = lazy(() => import("./pages/projects/ProjectListPage"));
 const JobFeedPage = lazy(() => import("./pages/jobfeed/JobFeedPage"));
 
 const ProjectNewProposalFormPage = lazy(
-  () => import("./pages/projects/ProjectNewProposalFormPage")
+  () => import("./pages/proposals/NewProposalFormPage")
+);
+
+const ProposalDetailPage = lazy(
+  () => import("./pages/proposals/ProposalDetailsPage")
 );
 
 const router = createBrowserRouter([
@@ -199,6 +203,14 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "/proposals/:id",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <ProposalDetailPage />
+          </Suspense>
+        ),
+      }
     ],
   },
 ]);

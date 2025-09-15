@@ -133,9 +133,12 @@ const ProposalsList = ({ projectId }: { projectId: string }) => {
 
   useEffect(() => {
     updateSearchParams({ page, size, status, sortState });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleProposalClick(id: string) {
+    const from = location.pathname + location.search;
+    sessionStorage.setItem("lastProjectURL", from);
     navigate(`/proposals/${id}`);
   }
 

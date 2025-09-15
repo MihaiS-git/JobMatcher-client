@@ -14,7 +14,7 @@ const ProjectDetailsPage = () => {
         aria-labelledby="project-list-heading"
       >
         <PageTitle title="Project Details" id="project-details-heading" />
-        <BackButton />
+        <BackButton label={"lastURL"}/>
         <ProjectDetails projectId={projectId!} />
       </section>
     </PageContent>

@@ -9,9 +9,9 @@ const JobFeedPage = () => {
     <PageContent className="pb-16">
       <section
         className="flex flex-col items-center p-0 pt-4 pb-16 w-full"
-        aria-labelledby="project-list-heading"
+        aria-labelledby="job-feed-heading"
       >
-        <PageTitle title="Project List" id="project-list-heading" />
+        <PageTitle title="Job Feed" id="job-feed-heading" />
 
         <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
           <JobFeedList />

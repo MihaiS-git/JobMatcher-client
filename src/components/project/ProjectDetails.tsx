@@ -3,10 +3,11 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { toTitleCase } from "@/utils/stringEdit";
 import { Button } from "../ui/button";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import ProposalsList from "./ProposalsList";
 import LoadingSpinner from "../LoadingSpinner";
+import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi";
 
 type ProjectDetailsProps = {
   projectId: string;
@@ -14,12 +15,22 @@ type ProjectDetailsProps = {
 
 const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: project, isLoading, error } = useGetProjectByIdQuery(projectId);
 
   const auth = useAuth();
+  const userId = auth?.user?.id;
   const role = auth?.user?.role;
 
+  const {
+    data: profile,
+    isLoading: profileLoading,
+    error: profileError,
+  } = useGetFreelancerByUserIdQuery(userId);
+
   const handleApply = () => {
+    const from = location.pathname + location.search;
+    sessionStorage.setItem("lastProjectURL", from);
     navigate(`/projects/${projectId}/proposals/new`);
   };
 
@@ -87,7 +98,27 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
             <b>Description:</b> {project?.description}
           </p>
         </div>
-        {role === "STAFF" && (
+        {role === "STAFF" && !profileLoading && !profileError && !profile && (
+          <div className="col-span-2 space-y-2 my-8 text-center">
+            <p className="text-red-500">
+              You need to create a profile before applying to projects.{" "}
+            </p>
+            <p>
+              <Link to="/profile" className="text-blue-500 hover:underline">
+                Create User Profile
+              </Link>
+            </p>
+            <p>
+              <Link
+                to="/edit_public_profile"
+                className="text-blue-500 hover:underline"
+              >
+                Create Public Profile
+              </Link>
+            </p>
+          </div>
+        )}
+        {role === "STAFF" && profile && (
           <div className="col-span-2 space-y-2 my-8 text-center">
             <Button
               variant="default"
@@ -95,7 +126,7 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
               onClick={handleApply}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              Submit proposal
+              Apply
             </Button>
           </div>
         )}
