@@ -61,6 +61,7 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
     data: profile,
     isLoading: isProfileLoading,
     error: profileError,
+    refetch,
   } = useGetCustomerByUserIdQuery(userId);
 
   useEffect(() => {
@@ -68,6 +69,11 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
       setApiError(parseApiError(profileError));
     }
   }, [isProfileLoading, profileError]);
+
+  useEffect(() => {
+    refetch();
+  // eslint-disable-next-line
+  }, [])
 
   const customerId = profile?.profileId ?? "";
 
