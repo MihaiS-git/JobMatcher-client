@@ -24,6 +24,7 @@ import {
 import type { CustomerProfileRequestDTO } from "@/types/CustomerDTO";
 import type { SelectOption } from "@/types/SelectOption";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { normalizeUrl } from "@/utils/normalizeUrl";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -372,10 +373,16 @@ const CustomerForm = ({ userId }: Props) => {
           name="websiteUrl"
           value={formData.websiteUrl}
           onChange={(e) => {
-            setFormData((prev) => ({ ...prev, websiteUrl: e.target.value }));
+            const rawValue = e.target.value;
+            const normalizedValue = rawValue.trim()
+              ? normalizeUrl(rawValue)
+              : rawValue;
+            setFormData((prev) => ({ ...prev, websiteUrl: normalizedValue }));
+
             setTouchedFields((prev) =>
               prev.websiteUrl ? prev : { ...prev, websiteUrl: true }
             );
+
             if (apiError) setApiError("");
           }}
           error={errors.websiteUrl}

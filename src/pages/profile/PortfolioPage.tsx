@@ -22,7 +22,13 @@ const PortfolioPage = () => {
     data: profile,
     isLoading: isProfileLoading,
     error: profileError,
+    refetch: refetchProfile,
   } = useGetFreelancerByUserIdQuery(userId);
+
+  useEffect(() => {
+    refetchProfile();
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (profileError) {
@@ -50,7 +56,7 @@ const PortfolioPage = () => {
   if (isLoading || isProfileLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <LoadingSpinner size={48}/>
+        <LoadingSpinner size={48} />
       </div>
     );
   }
@@ -101,11 +107,7 @@ const PortfolioPage = () => {
         <Outlet />
 
         {apiError && (
-          <FeedbackMessage
-            id="api-error"
-            message={apiError}
-            type="error"
-          />
+          <FeedbackMessage id="api-error" message={apiError} type="error" />
         )}
       </section>
     </PageContent>

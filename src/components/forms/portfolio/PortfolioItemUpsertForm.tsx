@@ -12,11 +12,7 @@ import TextareaInput from "@/components/forms/TextareaInput";
 import type { SelectOption } from "@/types/SelectOption";
 import { useGetAllJobCategoriesQuery } from "@/features/jobs/jobCategoriesApi";
 import FeedbackMessage from "@/components/FeedbackMessage";
-import {
-  validateText,
-  validateName,
-  validateUrl,
-} from "@/utils/validation";
+import { validateText, validateName, validateUrl } from "@/utils/validation";
 import focusFirstError from "@/utils/focusFirstError";
 import type { PortfolioItemRequestDTO } from "@/types/PortfolioDTO";
 import useDebounce from "@/hooks/useDebounce";
@@ -24,6 +20,7 @@ import useAuth from "@/hooks/useAuth";
 import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi";
 import SubmitButton from "@/components/SubmitButton";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { normalizeUrl } from "@/utils/normalizeUrl";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -49,14 +46,18 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
     data: profile,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetFreelancerByUserIdQuery(userId);
+  } = useGetFreelancerByUserIdQuery(userId, { skip: !userId });
+
+  const profileId = profile?.profileId;
+
   useEffect(() => {
     if (profileError) {
       setApiError(parseApiError(profileError));
     }
     if (isProfileLoading) return;
   }, [isProfileLoading, profileError]);
-  const profileId = profile?.profileId;
+
+  console.log("Profile ID:", profileId);
 
   const [apiError, setApiError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -296,7 +297,16 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
 
   const buttonText = itemId ? "Update Item" : "Add Item";
 
-  if(isProfileLoading || isLoading || isLoadingCategories) return <LoadingSpinner fullScreen={true} size={36} />;
+  if (isProfileLoading || isLoading || isLoadingCategories)
+    return <LoadingSpinner fullScreen={true} size={36} />;
+
+  if (!profile?.profileId) {
+    return (
+      <div className="text-center text-red-600 dark:text-red-400 mt-8">
+        You must create a freelancer profile before adding portfolio items.
+      </div>
+    );
+  }
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit}>
@@ -402,9 +412,13 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         name="demoUrl"
         value={formData.demoUrl}
         onChange={(e) => {
+          const rawValue = e.target.value;
+          const normalizedValue = rawValue.trim()
+            ? normalizeUrl(rawValue)
+            : "";
           setFormData((prev) => ({
             ...prev,
-            demoUrl: e.target.value,
+            demoUrl: normalizedValue,
           }));
           setTouchedFields((prev) =>
             prev.demoUrl ? prev : { ...prev, demoUrl: true }
@@ -425,9 +439,13 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         name="sourceUrl"
         value={formData.sourceUrl}
         onChange={(e) => {
+          const rawValue = e.target.value;
+          const normalizedValue = rawValue.trim()
+            ? normalizeUrl(rawValue)
+            : "";
           setFormData((prev) => ({
             ...prev,
-            sourceUrl: e.target.value,
+            sourceUrl: normalizedValue,
           }));
           setTouchedFields((prev) =>
             prev.sourceUrl ? prev : { ...prev, sourceUrl: true }
@@ -464,16 +482,14 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         disabled={isLoading}
       />
 
-      <SubmitButton 
-      type={"submit"} 
-      label={buttonText} 
-      disabled={isSaving || isUpdating || isLoading || isProfileLoading} 
-      className="mx-auto" 
+      <SubmitButton
+        type={"submit"}
+        label={buttonText}
+        disabled={isSaving || isUpdating || isLoading || isProfileLoading}
+        className="mx-auto"
       />
 
-      <section
-        className="flex flex-col items-center mt-4"
-      >
+      <section className="flex flex-col items-center mt-4">
         {successMessage && (
           <FeedbackMessage
             id="success-message"
@@ -483,11 +499,7 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         )}
 
         {apiError && (
-          <FeedbackMessage
-            id="api-error"
-            message={apiError}
-            type="error"
-          />
+          <FeedbackMessage id="api-error" message={apiError} type="error" />
         )}
 
         {validationErrors && (

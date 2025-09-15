@@ -3,6 +3,7 @@ import InputErrorMessage from "../InputErrorMessage";
 import { validateSocialLinks } from "@/utils/validation";
 import useDebounce from "@/hooks/useDebounce";
 import { Trash2 } from "lucide-react";
+import { normalizeUrl } from "@/utils/normalizeUrl";
 
 type Props = {
   socialLinks: string[];
@@ -24,7 +25,9 @@ const SocialMediaInput = ({
   updateSocialLink,
   debounceDelay,
 }: Props) => {
-  const [touchedFields, setTouchedFields] = useState<Record<number, boolean>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<number, boolean>>(
+    {}
+  );
 
   const debouncedLinks = useDebounce(socialLinks, debounceDelay || 400);
 
@@ -68,11 +71,18 @@ const SocialMediaInput = ({
               className="bg-gray-200 text-gray-950 py-2 px-4 rounded-sm border border-gray-950 text-sm xl:text-base grow transition-all duration-200 min-w-0"
               value={url}
               onChange={(e) => {
+                const rawValue = e.target.value;
+                const normalizedValue = rawValue.trim()
+                  ? normalizeUrl(rawValue)
+                  : rawValue;
                 const updatedLinks = [...socialLinks];
-                updatedLinks[index] = e.target.value;
-                validateSocialLinks(updatedLinks);
+                updatedLinks[index] = normalizedValue;
+
+                const validationErrors = validateSocialLinks(updatedLinks);
+
                 setSocialLinks(updatedLinks);
-                updateSocialLink(index, e.target.value);
+                setErrors(validationErrors);
+                updateSocialLink(index, normalizedValue);
                 setTouchedFields((prev) => ({ ...prev, [index]: true }));
               }}
               aria-invalid={!!errors[index]}
@@ -87,7 +97,7 @@ const SocialMediaInput = ({
               aria-label={`Remove social link ${index + 1}`}
               className="p-0 text-xs flex items-center"
             >
-              <Trash2 className="w-7 h-7 text-gray-800 dark:text-red-600 hover:text-red-700 rounded-xs border border-gray-800 dark:border-red-600 hover:border-red-700 p-1 cursor-pointer"/>
+              <Trash2 className="w-7 h-7 text-gray-800 dark:text-red-600 hover:text-red-700 rounded-xs border border-gray-800 dark:border-red-600 hover:border-red-700 p-1 cursor-pointer" />
             </button>
           </div>
           {errors[index] && (

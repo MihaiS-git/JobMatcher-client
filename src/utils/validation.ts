@@ -74,7 +74,7 @@ export function validateName(name: string): string | null {
 }
 
 export function validateUsername(name: string): string | null {
-  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' _.-]{2,}$/;
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9'_. -]{2,}$/;
 
   if (!name.trim()) {
     return "Field is required.";
@@ -91,7 +91,7 @@ export function validateUsername(name: string): string | null {
 }
 
 export function validateNotRequiredName(name: string): string | null {
-  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,}$/;
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9'_. -]{2,}$/;
 
   if (!name.trim()) return null;
 
@@ -236,10 +236,18 @@ export function validateHourlyRate(hourlyRate: number) {
 
 export function validateUrl(value: string): string | null {
   const trimmed = value.trim();
-  if (!trimmed) return null;
+  if (!trimmed) return null; // empty is allowed
+
+  let urlToCheck = trimmed;
+
+  // If no scheme, prepend https://
+  if (!/^https?:\/\//i.test(trimmed)) {
+    urlToCheck = `https://${trimmed}`;
+  }
 
   try {
-    const url = new URL(trimmed);
+    const url = new URL(urlToCheck);
+    // Optional: allow only http or https
     if (!["http:", "https:"].includes(url.protocol)) {
       return "URL must start with http:// or https://";
     }
@@ -250,11 +258,9 @@ export function validateUrl(value: string): string | null {
 }
 
 export function validateSocialLinks(links: string[]): (string | null)[] {
-  const urlRegex = /^(https?:\/\/)?([\w.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/i;
-
   return links.map((link) => {
-    if (!link.trim()) return null; // empty is valid (or change if not)
-    return urlRegex.test(link.trim()) ? null : "Invalid social media URL.";
+    if (!link.trim()) return null; // empty is valid
+    return validateUrl(link) ?? null; // reuse your URL validator
   });
 }
 
