@@ -5,6 +5,7 @@ interface Option {
   label: string;
 }
 
+// Hook to fetch and return job subcategory options for dropdowns
 function useJobSubcategories(){
 const {
     data: categories,

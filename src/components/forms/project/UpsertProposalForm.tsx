@@ -14,7 +14,7 @@ import {
   Priority,
   ProposalStatus,
   type ProposalRequestDTO,
-} from "@/types/Proposal";
+} from "@/types/ProposalDTO";
 import { parseValidationErrors } from "@/utils/parseApiError";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -26,20 +26,35 @@ import {
   PriorityLabels,
   ProposalStatusLabels,
 } from "@/types/formLabels/proposalLabels";
+import { formatCurrency } from "@/utils/formatCurrency";
+import { formatDate } from "@/utils/formatDate";
+import { Link } from "react-router-dom";
 
 type ProposalProps = {
   proposalId?: string;
   projectId?: string;
-  role: Role;
 };
 
 const EditableFieldsByRole: Record<Role, (keyof ProposalFormValues)[]> = {
-  STAFF: ["coverLetter", "amount", "estimatedDuration", "notes", "plannedStartDate"],
-  CUSTOMER: ["penaltyAmount", "bonusAmount", "status", "notes", "plannedStartDate", "actualStartDate", "priority"],
+  STAFF: [
+    "coverLetter",
+    "amount",
+    "estimatedDuration",
+    "notes",
+    "plannedStartDate",
+  ],
+  CUSTOMER: [
+    "penaltyAmount",
+    "bonusAmount",
+    "notes",
+    "plannedStartDate",
+    "actualStartDate",
+    "priority",
+  ],
   ADMIN: [],
 };
 
-const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
+const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<Record<
@@ -63,6 +78,7 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
 
   const auth = useAuth();
   const userId = auth.user?.id;
+  const role = auth.user?.role as Role;
 
   const {
     data: freelancer,
@@ -83,14 +99,14 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
 
   const defaultValues = useMemo<ProposalFormValues>(
     () => ({
-      projectId: projectId || "",
-      freelancerId: freelancer?.profileId || "",
+      projectId: existingProposal?.project.id ?? projectId ?? "",
+      freelancerId: freelancer?.profileId ?? "",
       coverLetter: "",
       amount: "0",
       penaltyAmount: "0",
       bonusAmount: "0",
       estimatedDuration: 0,
-      status: ProposalStatus.NONE,
+      status: ProposalStatus.PENDING,
       paymentStatus: PaymentStatus.NONE,
       notes: "",
       plannedStartDate: "",
@@ -99,8 +115,12 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
       actualEndDate: "",
       priority: Priority.NONE,
     }),
-    [projectId, freelancer?.profileId]
+    [existingProposal?.project.id, freelancer?.profileId, projectId]
   );
+
+  
+  console.log("Project ID:", defaultValues.projectId);
+  
 
   const {
     register,
@@ -108,25 +128,25 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
     formState: { errors },
     reset,
     clearErrors,
-  } = useForm<ProposalFormValues>({defaultValues});
+  } = useForm<ProposalFormValues>({ defaultValues });
 
   useEffect(() => {
-    if(freelancer?.profileId) {
-      reset((prev) => ({...prev, freelancerId: freelancer.profileId}));
+    if (freelancer?.profileId) {
+      reset((prev) => ({ ...prev, freelancerId: freelancer.profileId }));
     }
   }, [freelancer, reset]);
 
   useEffect(() => {
     if (existingProposal) {
       reset({
-        projectId: existingProposal.project.id ?? "",
+        projectId: existingProposal.project.id ?? projectId,
         freelancerId: existingProposal?.freelancer.profileId ?? "",
         coverLetter: existingProposal.coverLetter ?? "",
         amount: existingProposal.amount.toString() ?? "0",
         penaltyAmount: existingProposal.penaltyAmount.toString() ?? "0",
         bonusAmount: existingProposal.bonusAmount.toString() ?? "0",
-        estimatedDuration: existingProposal.estimatedDuration ?? "0",
-        status: existingProposal.status ?? ProposalStatus.NONE,
+        estimatedDuration: existingProposal.estimatedDuration ?? 0,
+        status: existingProposal.status ?? ProposalStatus.PENDING,
         paymentStatus: existingProposal.paymentStatus ?? PaymentStatus.NONE,
         notes: existingProposal.notes ?? "",
         plannedStartDate: existingProposal.plannedStartDate ?? "",
@@ -136,7 +156,7 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
         priority: existingProposal.priority ?? Priority.NONE,
       });
     }
-  }, [existingProposal, reset]);
+  }, [existingProposal, projectId, reset]);
 
   let buttonText;
   if (proposalId) {
@@ -231,6 +251,27 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
     return <LoadingSpinner fullScreen={true} size={36} />;
   }
 
+  function handleProposalAction(action: "accept" | "reject") {
+    if (!existingProposal) return;
+
+    const updatedProposal = {
+      status:
+        action === "accept" ? ProposalStatus.ACCEPTED : ProposalStatus.REJECTED,
+    };
+
+    updateProposal({ id: existingProposal.id, updatedProposal })
+      .unwrap()
+      .then(() => {
+        setSuccessMessage(`Proposal ${action}ed successfully.`);
+        setApiError("");
+        setValidationErrors(null);
+        reset(defaultValues);
+      })
+      .catch((err: unknown) => {
+        handleValidationApiError(err, setValidationErrors, setApiError);
+      });
+  }
+
   return (
     <>
       {existingProposalError ? (
@@ -257,7 +298,21 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
             )}
           </fieldset>
 
-          {editableFields.includes("coverLetter") && (
+          {existingProposal && (
+            <div className="flex flex-col items-center w-full my-2 px-2 xl:px-16">
+              <p className="text-center">
+                <b>Proposal ID: <br /></b> {existingProposal.id}
+              </p>
+              <p className="text-center">
+                <b>Submitted by:</b> <Link to={`/profile/${existingProposal?.freelancer.profileId}`}>{existingProposal?.freelancer.username}</Link>
+              </p>
+              <p className="text-center">
+                <b>For Project: <br /></b> {existingProposal?.project.title}
+              </p>
+            </div>
+          )}
+
+          {editableFields.includes("coverLetter") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="coverLetter"
@@ -287,9 +342,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Cover Letter:</b>
+              </p>
+              <p>
+                {existingProposal?.coverLetter ?? "No cover letter provided."}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("amount") && (
+          {editableFields.includes("amount") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="amount"
@@ -320,9 +384,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Amount:</b>{" "}
+                {existingProposal?.amount
+                  ? formatCurrency(existingProposal.amount)
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("penaltyAmount") && (
+          {editableFields.includes("penaltyAmount") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="penaltyAmount"
@@ -359,9 +432,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Penalty Amount:</b>{" "}
+                {existingProposal?.penaltyAmount
+                  ? formatCurrency(existingProposal.penaltyAmount)
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("bonusAmount") && (
+          {editableFields.includes("bonusAmount") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="bonusAmount"
@@ -397,9 +479,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Bonus Amount:</b>{" "}
+                {existingProposal?.bonusAmount
+                  ? formatCurrency(existingProposal.bonusAmount)
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("estimatedDuration") && (
+          {editableFields.includes("estimatedDuration") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="estimatedDuration"
@@ -438,9 +529,16 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Estimated Duration:</b>{" "}
+                {existingProposal?.estimatedDuration ?? "N/A"} days
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("status") && (
+          {editableFields.includes("status") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="status"
@@ -475,9 +573,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Status:</b>{" "}
+                {existingProposal?.status
+                  ? ProposalStatusLabels[existingProposal.status]
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("paymentStatus") && (
+          {editableFields.includes("paymentStatus") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="paymentStatus"
@@ -514,9 +621,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Payment Status:</b>{" "}
+                {existingProposal?.paymentStatus
+                  ? PaymentStatusLabels[existingProposal.paymentStatus]
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("notes") && (
+          {editableFields.includes("notes") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="notes"
@@ -544,9 +660,15 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Notes:</b> {existingProposal?.notes ?? "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("plannedStartDate") && (
+          {editableFields.includes("plannedStartDate") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="plannedStartDate"
@@ -577,9 +699,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Planned Start Date:</b>{" "}
+                {existingProposal?.plannedStartDate
+                  ? formatDate(existingProposal?.plannedStartDate)
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("plannedEndDate") && (
+          {editableFields.includes("plannedEndDate") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="plannedEndDate"
@@ -610,9 +741,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Planned End Date:</b>{" "}
+                {existingProposal?.plannedEndDate
+                  ? formatDate(existingProposal?.plannedEndDate)
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("actualStartDate") && (
+          {editableFields.includes("actualStartDate") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="actualStartDate"
@@ -643,9 +783,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Actual Start Date:</b>{" "}
+                {existingProposal?.actualStartDate
+                  ? formatDate(existingProposal?.actualStartDate)
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("actualEndDate") && (
+          {editableFields.includes("actualEndDate") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="actualEndDate"
@@ -676,9 +825,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Actual End Date:</b>{" "}
+                {existingProposal?.actualEndDate
+                  ? formatDate(existingProposal?.actualEndDate)
+                  : "N/A"}
+              </p>
+            </div>
           )}
 
-          {editableFields.includes("priority") && (
+          {editableFields.includes("priority") ? (
             <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
               <label
                 htmlFor="priority"
@@ -715,7 +873,18 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
                 />
               )}
             </div>
+          ) : (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <p>
+                <b>Priority:</b>{" "}
+                {existingProposal?.priority
+                  ? PriorityLabels[existingProposal.priority]
+                  : "N/A"}
+              </p>
+            </div>
           )}
+
+          <br className="" />
 
           <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
             <SubmitButton
@@ -724,6 +893,28 @@ const UpsertProposalForm = ({ proposalId, projectId, role }: ProposalProps) => {
               label={buttonText}
             />
           </div>
+          {existingProposal && (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <SubmitButton
+                type="button"
+                disabled={isUpdating}
+                label="Accept Proposal"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => handleProposalAction("accept")}
+              />
+            </div>
+          )}
+          {existingProposal && (
+            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+              <SubmitButton
+                type="button"
+                disabled={isUpdating}
+                label="Reject Proposal"
+                className="bg-red-600 hover:bg-red-700"
+                onClick={() => handleProposalAction("reject")}
+              />
+            </div>
+          )}
         </form>
       )}
     </>

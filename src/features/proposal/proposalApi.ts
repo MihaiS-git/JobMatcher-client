@@ -4,7 +4,7 @@ import type {
   ProposalDetailDTO,
   ProposalRequestDTO,
   ProposalSummaryDTO,
-} from "@/types/Proposal";
+} from "@/types/ProposalDTO";
 
 export const proposalApi = createApi({
   reducerPath: "proposalApi",
@@ -43,11 +43,50 @@ export const proposalApi = createApi({
             ]
           : [{ type: "Proposal", id: "LIST" }],
     }),
+    getAllProposalsByFreelancerId: builder.query<
+      {
+        content: ProposalSummaryDTO[];
+        totalElements: number;
+        totalPages: number;
+      },
+      {
+        freelancerId: string;
+        page?: number;
+        size?: number;
+        status?: string;
+        sort?: string[]; // <- single sort string like "title,asc"
+      }
+    >({
+      query: ({ freelancerId, sort, ...rest }) => ({
+        url: `/proposals/freelancer/${freelancerId}`,
+        params: {
+          ...rest,
+          sort: sort ?? "lastUpdate,desc", // default if nothing selected
+        },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.content.map((proposal) => ({
+                type: "Proposal" as const,
+                id: proposal.id,
+              })),
+              { type: "Proposal", id: "LIST" },
+            ]
+          : [{ type: "Proposal", id: "LIST" }],
+    }),
     getProposalById: builder.query<ProposalDetailDTO, string>({
       query: (id) => ({
         url: `/proposals/${id}`,
       }),
       providesTags: (_result, _error, id) => [{ type: "Proposal", id }],
+      keepUnusedDataFor: 300,
+    }),
+    getProposalByFreelancerIdAndProjectId: builder.query<ProposalDetailDTO, {freelancerId: string, projectId: string}>({
+      query: ({freelancerId, projectId}) => ({
+        url: `/proposals/by-freelancer-and-project?freelancerId=${freelancerId}&projectId=${projectId}`,
+      }),
+      providesTags: (_result, _error, {freelancerId, projectId}) => [{ type: "Proposal", id: `${freelancerId}-${projectId}` }],
       keepUnusedDataFor: 300,
     }),
     createProposal: builder.mutation<ProposalSummaryDTO, ProposalRequestDTO>({
@@ -85,6 +124,8 @@ export const proposalApi = createApi({
 export const {
   useGetAllProposalsByProjectIdQuery,
   useGetProposalByIdQuery,
+  useGetAllProposalsByFreelancerIdQuery,
+  useGetProposalByFreelancerIdAndProjectIdQuery,
   useCreateProposalMutation,
   useUpdateProposalByIdMutation,
   useDeleteProposalByIdMutation,

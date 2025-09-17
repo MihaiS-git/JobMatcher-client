@@ -1,29 +1,29 @@
-import { useGetAllProposalsByProjectIdQuery } from "@/features/proposal/proposalApi";
+import { useGetAllProposalsByFreelancerIdQuery } from "@/features/proposal/proposalApi";
 import { ProposalStatusLabels } from "@/types/formLabels/proposalLabels";
-import { ProposalStatus } from "@/types/Proposal";
+import { ProposalStatus } from "@/types/ProposalDTO";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import SortButton from "../ProposalsSortButton";
 import {
-  ArrowDownAZ,
   ArrowDownNarrowWide,
-  ArrowUpAZ,
   ArrowUpNarrowWide,
 } from "lucide-react";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
+import useFreelancerId from "@/hooks/useFreelancerId";
 
-const ProposalsList = ({ projectId }: { projectId: string }) => {
+const ProposalsList = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const { freelancerId, isLoading: isLoadingFreelancerId, error: freelancerIdError } = useFreelancerId();
 
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
   const status = searchParams.get("status") ?? "";
 
   const sortStateDefaultValues: Record<
-    | "freelancer"
     | "amount"
     | "estimatedDuration"
     | "status"
@@ -31,7 +31,6 @@ const ProposalsList = ({ projectId }: { projectId: string }) => {
     | "lastUpdate",
     "asc" | "desc" | null
   > = {
-    freelancer: null,
     amount: null,
     estimatedDuration: null,
     status: null,
@@ -59,13 +58,13 @@ const ProposalsList = ({ projectId }: { projectId: string }) => {
     data: proposals,
     isLoading,
     isError,
-  } = useGetAllProposalsByProjectIdQuery({
-    projectId,
+  } = useGetAllProposalsByFreelancerIdQuery({
+    freelancerId: freelancerId!,
     page,
     size,
     status,
     sort: sortArray,
-  });
+  }, {skip: !freelancerId || isLoadingFreelancerId});
 
   type ProposalListSearchParams = {
     page?: number;
@@ -119,7 +118,6 @@ const ProposalsList = ({ projectId }: { projectId: string }) => {
     const next = current === direction ? null : direction;
 
     const newSortState: typeof sortState = {
-      freelancer: null,
       amount: null,
       estimatedDuration: null,
       status: null,
@@ -206,33 +204,24 @@ const ProposalsList = ({ projectId }: { projectId: string }) => {
         </section>
       </div>
 
+      {isLoadingFreelancerId && (
+        <div className="p-4 text-center">
+          <LoadingSpinner fullScreen={false} size={24} />
+        </div>
+      )}
+      
+      {freelancerIdError && (
+        <div className="p-4 text-center">
+          <p className="text-red-500">Error loading freelancer ID</p>
+        </div>
+      )}
+
       <section className="w-full overflow-x-auto 2xl:overflow-x-visible">
         <table className="w-full p-4 bg-gray-200 dark:bg-gray-900 border-collapse border border-gray-400 table-fixed text-xs min-w-[1100px]">
           <thead>
             <tr className="bg-gray-300 dark:bg-gray-800">
               <th>
                 <span className="flex-1 text-center">No.crt.</span>
-              </th>
-              <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
-                <div className="flex items-center justify-between">
-                  <span className="flex-1 text-center">Freelancer</span>
-                  <div className="flex gap-1">
-                    <SortButton
-                      column="freelancer"
-                      direction="asc"
-                      sortState={sortState}
-                      toggleSort={toggleSort}
-                      icon={ArrowDownAZ}
-                    />
-                    <SortButton
-                      column="freelancer"
-                      direction="desc"
-                      sortState={sortState}
-                      toggleSort={toggleSort}
-                      icon={ArrowUpAZ}
-                    />
-                  </div>
-                </div>
               </th>
               <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                 <div className="flex items-center justify-between">
@@ -388,9 +377,6 @@ const ProposalsList = ({ projectId }: { projectId: string }) => {
               >
                 <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
                   {index + 1}
-                </td>
-                <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
-                  {proposal.freelancer.username}
                 </td>
                 <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
                   {formatCurrency(Number(proposal.amount))}

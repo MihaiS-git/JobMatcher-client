@@ -9,7 +9,6 @@ import {
 } from "@/utils/validation";
 import MultiSelect from "@/components/forms/MultiSelect";
 import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
-import { useGetAllLanguagesQuery } from "@/features/languages/languagesApi";
 import focusFirstError from "@/utils/focusFirstError";
 import React from "react";
 import FormInput from "@/components/forms/FormInput";
@@ -22,9 +21,9 @@ import {
   useUpdateCustomerMutation,
 } from "@/features/profile/customerApi";
 import type { CustomerProfileRequestDTO } from "@/types/CustomerDTO";
-import type { SelectOption } from "@/types/SelectOption";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { normalizeUrl } from "@/utils/normalizeUrl";
+import useLanguages from "@/hooks/useLanguages";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -96,24 +95,17 @@ const CustomerForm = ({ userId }: Props) => {
     setErrors((prev) => (prev.about === err ? prev : { ...prev, about: err }));
   }, [debouncedAbout, formData.about, touchedFields.about]);
 
-  // languages
   const {
-    data: languages,
-    error: languagesApiError,
+    languageOptions,
     isLoading: isLoadingLanguages,
-  } = useGetAllLanguagesQuery();
+    error: languagesError,
+  } = useLanguages();
 
   useEffect(() => {
-    if (languagesApiError) {
-      setApiError(parseApiError(languagesApiError));
+    if (languagesError) {
+      setApiError(parseApiError(languagesError));
     }
-  }, [languagesApiError]);
-
-  const languageOptions: SelectOption[] =
-    languages?.map((tag) => ({
-      value: tag.id,
-      label: tag.name,
-    })) ?? [];
+  }, [languagesError]);
 
   const refsGeneral: {
     username: RefObject<HTMLInputElement | null>;

@@ -15,6 +15,8 @@ const ProfileData = ({
   type,
   profile,
 }: CustomerProfileProps | FreelancerProfileProps) => {
+  console.log("profile data:", profile);
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 max-w-4xl p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
       <div className="flex justify-center w-full md:w-auto">

@@ -17,7 +17,6 @@ import {
 } from "@/features/profile/freelancerApi";
 import { useGetAllJobCategoriesQuery } from "@/features/jobs/jobCategoriesApi";
 import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
-import { useGetAllLanguagesQuery } from "@/features/languages/languagesApi";
 import type {
   ExperienceLevel,
   FreelancerProfileRequestDTO,
@@ -32,6 +31,7 @@ import SocialMediaInput from "./SocialMediaInput";
 import useDebounce from "@/hooks/useDebounce";
 import type { SelectOption } from "@/types/SelectOption";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import useLanguages from "@/hooks/useLanguages";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -141,24 +141,17 @@ const FreelancerForm = ({ userId }: Props) => {
     label: tag.name,
   }));
 
-  // languages
   const {
-    data: languages,
-    error: languagesApiError,
+    languageOptions,
     isLoading: isLoadingLanguages,
-  } = useGetAllLanguagesQuery();
+    error: languagesError,
+  } = useLanguages();
 
   useEffect(() => {
-    if (languagesApiError) {
-      setApiError(parseApiError(languagesApiError));
+    if (languagesError) {
+      setApiError(parseApiError(languagesError));
     }
-  }, [languagesApiError]);
-
-  const languageOptions: SelectOption[] =
-    languages?.map((tag) => ({
-      value: tag.id,
-      label: tag.name,
-    })) ?? [];
+  }, [languagesError]);
 
   const refsGeneral: {
     username: RefObject<HTMLInputElement | null>;
@@ -208,8 +201,8 @@ const FreelancerForm = ({ userId }: Props) => {
   } = useGetFreelancerByUserIdQuery(userId ? userId : skipToken);
 
   useEffect(() => {
-    if(profile) console.log("Profile", profile);
-  },[profile]);
+    if (profile) console.log("Profile", profile);
+  }, [profile]);
 
   const [saveProfile, { isLoading: saveLoading }] = useSaveFreelancerMutation();
   const [updateProfile, { isLoading: updateLoading }] =
@@ -316,7 +309,7 @@ const FreelancerForm = ({ userId }: Props) => {
     try {
       if (!profile?.profileId) {
         console.log("Saving profile with payload:", payload);
-        
+
         await saveProfile(payload).unwrap();
         setSuccessMessage("Profile saved successfully.");
       } else {
@@ -415,7 +408,9 @@ const FreelancerForm = ({ userId }: Props) => {
           }}
           onBlur={() => {
             const err = validateHourlyRate(formData.hourlyRate);
-            setErrors((prev) => (prev.hourlyRate === err ? prev : { ...prev, hourlyRate: err }));
+            setErrors((prev) =>
+              prev.hourlyRate === err ? prev : { ...prev, hourlyRate: err }
+            );
           }}
           error={errors.hourlyRate}
           autoComplete="off"

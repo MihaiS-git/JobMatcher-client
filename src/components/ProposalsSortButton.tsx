@@ -1,14 +1,14 @@
-type SortColumn = "freelancer" | "amount" | "estimatedDuration" | "status" | "plannedStartDate" | "lastUpdate";
+/* type SortColumn = "freelancer" | "amount" | "estimatedDuration" | "status" | "plannedStartDate" | "lastUpdate"; */
 
-type SortButtonProps = {
-  column: SortColumn;
+type SortButtonProps<T extends string> = {
+  column: T;
   direction: "asc" | "desc";
-  sortState: Record<SortColumn, "asc" | "desc" | null>;
-  toggleSort: (column: SortColumn, direction: "asc" | "desc") => void;
+  sortState: Record<T, "asc" | "desc" | null>;
+  toggleSort: (column: T, direction: "asc" | "desc") => void;
   icon: React.ElementType;
 };
 
-const SortButton = ({ column, direction, sortState, toggleSort, icon: Icon }: SortButtonProps) => {
+const SortButton = <T extends string>({ column, direction, sortState, toggleSort, icon: Icon }: SortButtonProps<T>) => {
   const isActive = sortState[column] === direction;
 
   return (

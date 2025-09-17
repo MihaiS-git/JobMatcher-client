@@ -5,9 +5,11 @@ import { toTitleCase } from "@/utils/stringEdit";
 import { Button } from "../ui/button";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
-import ProposalsList from "./ProposalsList";
+import ProposalsList from "../proposal/ProposalsList";
 import LoadingSpinner from "../LoadingSpinner";
 import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi";
+import { useGetProposalByFreelancerIdAndProjectIdQuery } from "@/features/proposal/proposalApi";
+import useFreelancerId from "@/hooks/useFreelancerId";
 
 type ProjectDetailsProps = {
   projectId: string;
@@ -23,16 +25,55 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
   const role = auth?.user?.role;
 
   const {
+    freelancerId,
+    isLoading: freelancerLoading,
+    error: freelancerError,
+  } = useFreelancerId();
+
+  const {
     data: profile,
     isLoading: profileLoading,
     error: profileError,
   } = useGetFreelancerByUserIdQuery(userId);
+
+  const {
+    data: existingProposal,
+    isLoading: existingProposalLoading,
+    error: existingProposalError,
+  } = useGetProposalByFreelancerIdAndProjectIdQuery(
+    freelancerId && projectId
+      ? { freelancerId, projectId }
+      : { freelancerId: "", projectId: "" }, // dummy value won't be used because skip=true
+    { skip: !freelancerId || !projectId }
+  );
 
   const handleApply = () => {
     const from = location.pathname + location.search;
     sessionStorage.setItem("lastProjectURL", from);
     navigate(`/projects/${projectId}/proposals/new`);
   };
+
+  const handleView = () => {
+    const from = location.pathname + location.search;
+    sessionStorage.setItem("lastProjectURL", from);
+    navigate(`/proposals/edit/${existingProposal?.id}`);
+  };
+
+  if (existingProposalLoading) {
+    return <LoadingSpinner fullScreen={false} size={36} />;
+  }
+
+  if (freelancerLoading) {
+    return <LoadingSpinner fullScreen={false} size={36} />;
+  }
+
+  if (existingProposalError) {
+    return <div>Error loading existing proposal</div>;
+  }
+
+  if (freelancerError) {
+    return <div>Error loading freelancer data</div>;
+  }
 
   return (
     <>
@@ -123,10 +164,10 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
             <Button
               variant="default"
               size="sm"
-              onClick={handleApply}
+              onClick={existingProposal ? handleView : handleApply}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              Apply
+              {existingProposal ? "View Proposal" : "Create Proposal"}
             </Button>
           </div>
         )}

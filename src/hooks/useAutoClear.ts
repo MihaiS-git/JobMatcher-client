@@ -1,5 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from "react";
 
+// Auto-clear a value (string or object) after a delay (default 10s)
 const useAutoClear = <T>(
   value: T | null,
   setValue: Dispatch<SetStateAction<T | string>>,

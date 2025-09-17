@@ -3,6 +3,7 @@ import "./App.css";
 import RootLayout from "./components/RootLayout";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
+import ProposalsListPage from "./pages/proposals/ProposalsListPage";
 
 // Lazy-loaded pages
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -40,11 +41,15 @@ const ProjectDetailsPage = lazy(
 const ProjectListPage = lazy(() => import("./pages/projects/ProjectListPage"));
 const JobFeedPage = lazy(() => import("./pages/jobfeed/JobFeedPage"));
 
-const ProjectNewProposalFormPage = lazy(
-  () => import("./pages/proposals/NewProposalFormPage")
+const EditProposalPage = lazy(
+  () => import("./pages/proposals/EditProposalPage")
 );
 
-const ProposalDetailPage = lazy(
+const CreateProposalPage = lazy(
+  () => import("./pages/proposals/CreateProposalPage")
+);
+
+const ProposalDetailsPage = lazy(
   () => import("./pages/proposals/ProposalDetailsPage")
 );
 
@@ -188,10 +193,10 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/projects/:id/proposals/new",
+        path: "/projects/:projectId/proposals/new",
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
-            <ProjectNewProposalFormPage />
+            <CreateProposalPage />
           </Suspense>
         ),
       },
@@ -204,13 +209,29 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/proposals",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <ProposalsListPage />
+          </Suspense>
+        ),
+      },
+      {
         path: "/proposals/:id",
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
-            <ProposalDetailPage />
+            <ProposalDetailsPage />
           </Suspense>
         ),
-      }
+      },
+      {
+        path: "/proposals/edit/:id",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <EditProposalPage />
+          </Suspense>
+        ),
+      },
     ],
   },
 ]);

@@ -1,4 +1,4 @@
-import type { PaymentStatus, Priority, ProposalStatus } from "../Proposal";
+import type { PaymentStatus, Priority, ProposalStatus } from "../ProposalDTO";
 
 export const ProposalStatusLabels: Record<ProposalStatus, string> = {
   PENDING: "Pending",

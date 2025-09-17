@@ -1,6 +1,6 @@
-import { Priority } from "@/types/Proposal";
+import { Priority } from "@/types/ProposalDTO";
 import { z } from "zod";
-import { PaymentStatus, ProposalStatus } from "@/types/Proposal";
+import { PaymentStatus, ProposalStatus } from "@/types/ProposalDTO";
 
 const proposalSchema = z.object({
   projectId: z.string(),

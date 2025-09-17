@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+/* import { useEffect, useState } from "react";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
 
@@ -51,3 +51,4 @@ export function useApiErrors(...apiErrors: ApiError[]) {
 
   return { errorMessage, validationErrors, handleApiError, clearErrors };
 }
+ */

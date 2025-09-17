@@ -20,24 +20,24 @@ const DrawerAccordion = () => {
 
       <DrawerAccordionItem
         value="item-2"
+        label="Proposals"
+        items={[{ targetUrl: "/proposals", itemTag: "Proposals List" }]}
+      />
+
+      <DrawerAccordionItem
+        value="item-3"
         label="Financial"
         items={[{ targetUrl: "/financial", itemTag: "Financial" }]}
       />
 
       <DrawerAccordionItem
-        value="item-3"
+        value="item-4"
         label="Profile"
         items={[
           { targetUrl: "/profile", itemTag: "Profile" },
           { targetUrl: "/edit_public_profile", itemTag: "Public Profile" },
           { targetUrl: "/portfolio", itemTag: "Portfolio" },
         ]}
-      />
-
-      <DrawerAccordionItem
-        value="item-4"
-        label="Settings"
-        items={[{ targetUrl: "/settings", itemTag: "Settings" }]}
       />
     </Accordion>
   );

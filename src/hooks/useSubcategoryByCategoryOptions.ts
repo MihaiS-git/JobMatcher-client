@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useCategoryOptions } from "./useCategoryOptions";
 import type { JobSubcategoryDTO } from "@/types/JobCategoryDTO";
 
+// Hook to fetch and return job subcategory options based on selected category for dropdowns
 export function useSubcategoryByCategoryOptions(selectedCategoryId?: number): JobSubcategoryDTO[] {
   const categoryOptions = useCategoryOptions();
 

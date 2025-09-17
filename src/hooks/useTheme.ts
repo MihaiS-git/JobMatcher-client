@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { ThemeContext, type ThemeContextType } from "../types/ThemeContextType";
 
+// Hook to access theme context
 export function useTheme(): ThemeContextType {
   const context = useContext(ThemeContext);
   if (!context) {
