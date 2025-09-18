@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "../baseQueryWithReauth";
-import type { ProjectRequestDTO, ProjectResponseDTO } from "@/types/ProjectDTO";
+import type { ProjectDetailDTO, ProjectRequestDTO, ProjectSummaryDTO } from "@/types/ProjectDTO";
 
 export const projectsApi = createApi({
   reducerPath: "projectsApi",
@@ -9,7 +9,7 @@ export const projectsApi = createApi({
   endpoints: (builder) => ({
     getProjects: builder.query<
       {
-        content: ProjectResponseDTO[];
+        content: ProjectSummaryDTO[];
         totalElements: number;
         totalPages: number;
       },
@@ -27,7 +27,7 @@ export const projectsApi = createApi({
         url: "/projects",
         params: {
           ...rest,
-          sort: sort ?? "title,asc", // default if nothing selected
+          sort: sort ?? "lastUpdate,desc", // default if nothing selected
         },
       }),
       providesTags: (result) =>
@@ -43,7 +43,7 @@ export const projectsApi = createApi({
     }),
     getJobFeedProjects: builder.query<
       {
-        content: ProjectResponseDTO[];
+        content: ProjectSummaryDTO[];
         totalElements: number;
         totalPages: number;
       },
@@ -61,7 +61,7 @@ export const projectsApi = createApi({
         url: "/projects/job-feed",
         params: {
           ...rest,
-          sort: sort ?? "title,asc", // default if nothing selected
+          sort: sort ?? "lastUpdate,desc", // default if nothing selected
         },
       }),
       providesTags: (result) =>
@@ -75,14 +75,14 @@ export const projectsApi = createApi({
             ]
           : [{ type: "Project", id: "LIST" }],
     }),
-    getProjectById: builder.query<ProjectResponseDTO, string>({
+    getProjectById: builder.query<ProjectDetailDTO, string>({
       query: (id) => ({
         url: `/projects/${id}`,
       }),
       providesTags: (_result, _error, id) => [{ type: "Project", id }],
       keepUnusedDataFor: 300,
     }),
-    createProject: builder.mutation<ProjectResponseDTO, ProjectRequestDTO>({
+    createProject: builder.mutation<ProjectDetailDTO, ProjectRequestDTO>({
       query: (newProject) => ({
         url: "/projects",
         method: "POST",
@@ -91,7 +91,7 @@ export const projectsApi = createApi({
       invalidatesTags: [{ type: "Project", id: "LIST" }],
     }),
     updateProject: builder.mutation<
-      ProjectResponseDTO,
+      ProjectDetailDTO,
       { id: string; data: ProjectRequestDTO }
     >({
       query: ({ id, data }) => ({

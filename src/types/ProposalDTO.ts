@@ -1,5 +1,4 @@
 import type { FreelancerSummaryDTO } from "./FreelancerDTO";
-import type { ProjectResponseDTO } from "./ProjectDTO";
 
 export const ProposalStatus = {
   PENDING: "PENDING",
@@ -51,7 +50,7 @@ export type ProposalRequestDTO = {
 
 export type ProposalDetailDTO = {
   id: string;
-  project: ProjectResponseDTO;
+  projectId: string;
   freelancer: FreelancerSummaryDTO;
   coverLetter: string;
   amount: number;

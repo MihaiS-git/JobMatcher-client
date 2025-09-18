@@ -1,6 +1,7 @@
 import type { CustomerSummaryDTO } from "./CustomerDTO";
 import type { FreelancerSummaryDTO, JobSubcategoryDTO } from "./FreelancerDTO";
 import type { JobCategoryDTO } from "./JobCategoryDTO";
+import type { ProposalSummaryDTO } from "./ProposalDTO";
 
 export const ProjectStatus = {
   OPEN: "OPEN",
@@ -20,7 +21,8 @@ export const JobFeederProjectStatus = {
   NONE: "NONE",
 } as const;
 
-export type JobFeederProjectStatus = (typeof JobFeederProjectStatus)[keyof typeof JobFeederProjectStatus];
+export type JobFeederProjectStatus =
+  (typeof JobFeederProjectStatus)[keyof typeof JobFeederProjectStatus];
 
 export const PaymentType = {
   UPFRONT: "UPFRONT",
@@ -30,7 +32,7 @@ export const PaymentType = {
   NONE: "NONE",
 } as const;
 
-export type PaymentType = typeof PaymentType[keyof typeof PaymentType];
+export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType];
 
 export type ProjectRequestDTO = {
   customerId: string;
@@ -45,7 +47,23 @@ export type ProjectRequestDTO = {
   subcategoryIds?: number[];
 };
 
-export type ProjectResponseDTO = {
+export type ProjectSummaryDTO = {
+  id: string;
+  customerId: string;
+  freelancerId?: string;
+  title: string;
+  description: string;
+  status?: ProjectStatus;
+  budget?: number;
+  paymentType?: PaymentType;
+  deadline?: Date;
+  category?: JobCategoryDTO;
+  subcategories?: JobSubcategoryDTO[];
+  createdAt: Date;
+  lastUpdate: Date;
+};
+
+export type ProjectDetailDTO = {
   id: string;
   customer: CustomerSummaryDTO;
   freelancer?: FreelancerSummaryDTO;
@@ -57,4 +75,7 @@ export type ProjectResponseDTO = {
   deadline?: Date;
   category?: JobCategoryDTO;
   subcategories?: JobSubcategoryDTO[];
+  proposals?: ProposalSummaryDTO[];
+  createdAt: Date;
+  lastUpdate: Date;
 };

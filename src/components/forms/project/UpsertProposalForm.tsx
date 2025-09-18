@@ -26,9 +26,8 @@ import {
   PriorityLabels,
   ProposalStatusLabels,
 } from "@/types/formLabels/proposalLabels";
-import { formatCurrency } from "@/utils/formatCurrency";
-import { formatDate } from "@/utils/formatDate";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 type ProposalProps = {
   proposalId?: string;
@@ -99,7 +98,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
 
   const defaultValues = useMemo<ProposalFormValues>(
     () => ({
-      projectId: existingProposal?.project.id ?? projectId ?? "",
+      projectId: existingProposal?.projectId ?? projectId ?? "",
       freelancerId: freelancer?.profileId ?? "",
       coverLetter: "",
       amount: "0",
@@ -115,12 +114,8 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
       actualEndDate: "",
       priority: Priority.NONE,
     }),
-    [existingProposal?.project.id, freelancer?.profileId, projectId]
+    [existingProposal?.projectId, freelancer?.profileId, projectId]
   );
-
-  
-  console.log("Project ID:", defaultValues.projectId);
-  
 
   const {
     register,
@@ -139,7 +134,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
   useEffect(() => {
     if (existingProposal) {
       reset({
-        projectId: existingProposal.project.id ?? projectId,
+        projectId: existingProposal.projectId ?? projectId,
         freelancerId: existingProposal?.freelancer.profileId ?? "",
         coverLetter: existingProposal.coverLetter ?? "",
         amount: existingProposal.amount.toString() ?? "0",
@@ -281,641 +276,555 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
           type="error"
         />
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-40">
-          <fieldset
-            className="flex flex-col items-center mt-4 space-y-4"
-            disabled={isUpdating}
+        <>
+          {existingProposal && (
+            <section className="flex flex-col items-start w-full my-2 px-2 xl:px-16 border-b border-gray-500 pb-4 text-sm">
+              <p>
+                <b>Proposal ID: </b>{" "}
+                <Link
+                  to={`/proposals/${existingProposal.id}`}
+                  className="text-blue-500 hover:text-blue-400 cursor-pointer italic font-light underline"
+                >
+                  {existingProposal.id}
+                </Link>
+              </p>
+              <p>
+                <b>Submitted by:</b>{" "}
+                <Link
+                  to={`/public_profile/freelancer/${existingProposal?.freelancer.profileId}`}
+                  className="text-blue-500 hover:text-blue-400 cursor-pointer italic font-light underline"
+                >
+                  {existingProposal?.freelancer.username}
+                </Link>
+              </p>
+              <p>
+                <b>For Project: </b>{" "}
+                <Link
+                  to={`/projects/${existingProposal?.projectId}`}
+                  className="text-blue-500 hover:text-blue-400 cursor-pointer italic font-light underline"
+                >
+                  {existingProposal?.projectId}
+                </Link>
+              </p>
+            </section>
+          )}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="w-full pb-40 flex flex-col items-center"
           >
-            {successMessage && (
-              <FeedbackMessage
-                id="success-message"
-                message={successMessage}
-                type="success"
-              />
-            )}
-            {apiError && (
-              <FeedbackMessage id="api-error" message={apiError} type="error" />
-            )}
-          </fieldset>
-
-          {existingProposal && (
-            <div className="flex flex-col items-center w-full my-2 px-2 xl:px-16">
-              <p className="text-center">
-                <b>Proposal ID: <br /></b> {existingProposal.id}
-              </p>
-              <p className="text-center">
-                <b>Submitted by:</b> <Link to={`/profile/${existingProposal?.freelancer.profileId}`}>{existingProposal?.freelancer.username}</Link>
-              </p>
-              <p className="text-center">
-                <b>For Project: <br /></b> {existingProposal?.project.title}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("coverLetter") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="coverLetter"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Cover Letter
-              </label>
-              <textarea
-                id="coverLetter"
-                {...register("coverLetter", {
-                  onChange: () => clearFieldError("coverLetter"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
-                aria-invalid={!!errors.coverLetter}
-                aria-describedby={
-                  errors.coverLetter ? "coverLetter-error" : undefined
-                }
-              />
-              {(errors.coverLetter || validationErrors?.coverLetter) && (
-                <InputErrorMessage
-                  message={
-                    (typeof errors.coverLetter?.message === "string"
-                      ? errors.coverLetter?.message
-                      : undefined) ?? validationErrors?.coverLetter
-                  }
-                  label="coverLetter"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Cover Letter:</b>
-              </p>
-              <p>
-                {existingProposal?.coverLetter ?? "No cover letter provided."}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("amount") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="amount"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Amount
-              </label>
-              <input
-                id="amount"
-                type="text"
-                {...register("amount", {
-                  required: "Amount is required",
-                  pattern: {
-                    value: /^\d+(\.\d{1,2})?$/,
-                    message:
-                      "Amount must be a valid number with up to 2 decimal places",
-                  },
-                  onChange: () => clearFieldError("amount"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.amount}
-                aria-describedby={errors.amount ? "amount-error" : undefined}
-              />
-              {(errors.amount?.message || validationErrors?.amount) && (
-                <InputErrorMessage
-                  message={errors.amount?.message ?? validationErrors?.amount}
-                  label="amount"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Amount:</b>{" "}
-                {existingProposal?.amount
-                  ? formatCurrency(existingProposal.amount)
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("penaltyAmount") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="penaltyAmount"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Penalty Amount
-              </label>
-              <input
-                id="penaltyAmount"
-                type="text"
-                {...register("penaltyAmount", {
-                  required: "Penalty Amount is required",
-                  pattern: {
-                    value: /^\d+(\.\d{1,2})?$/,
-                    message:
-                      "Penalty Amount must be a valid number with up to 2 decimal places",
-                  },
-                  onChange: () => clearFieldError("penaltyAmount"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.penaltyAmount}
-                aria-describedby={
-                  errors.penaltyAmount ? "penaltyAmount-error" : undefined
-                }
-              />
-              {(errors.penaltyAmount?.message ||
-                validationErrors?.penaltyAmount) && (
-                <InputErrorMessage
-                  message={
-                    errors.penaltyAmount?.message ??
-                    validationErrors?.penaltyAmount
-                  }
-                  label="penaltyAmount"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Penalty Amount:</b>{" "}
-                {existingProposal?.penaltyAmount
-                  ? formatCurrency(existingProposal.penaltyAmount)
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("bonusAmount") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="bonusAmount"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Bonus Amount
-              </label>
-              <input
-                id="bonusAmount"
-                type="text"
-                {...register("bonusAmount", {
-                  required: "Bonus Amount is required",
-                  pattern: {
-                    value: /^\d+(\.\d{1,2})?$/,
-                    message:
-                      "Bonus Amount must be a valid number with up to 2 decimal places",
-                  },
-                  onChange: () => clearFieldError("bonusAmount"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.bonusAmount}
-                aria-describedby={
-                  errors.bonusAmount ? "bonusAmount-error" : undefined
-                }
-              />
-              {(errors.bonusAmount?.message ||
-                validationErrors?.bonusAmount) && (
-                <InputErrorMessage
-                  message={
-                    errors.bonusAmount?.message ?? validationErrors?.bonusAmount
-                  }
-                  label="bonusAmount"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Bonus Amount:</b>{" "}
-                {existingProposal?.bonusAmount
-                  ? formatCurrency(existingProposal.bonusAmount)
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("estimatedDuration") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="estimatedDuration"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Estimated Duration (in days)
-              </label>
-              <input
-                id="estimatedDuration"
-                type="number"
-                {...register("estimatedDuration", {
-                  required: "Estimated Duration is required",
-                  min: {
-                    value: 0,
-                    message: "Estimated Duration cannot be negative",
-                  },
-                  onChange: () => clearFieldError("estimatedDuration"),
-                  valueAsNumber: true, // important: ensures RHF gives a number
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.estimatedDuration}
-                aria-describedby={
-                  errors.estimatedDuration
-                    ? "estimatedDuration-error"
-                    : undefined
-                }
-              />
-              {(errors.estimatedDuration?.message ||
-                validationErrors?.estimatedDuration) && (
-                <InputErrorMessage
-                  message={
-                    errors.estimatedDuration?.message ??
-                    validationErrors?.estimatedDuration
-                  }
-                  label="estimatedDuration"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Estimated Duration:</b>{" "}
-                {existingProposal?.estimatedDuration ?? "N/A"} days
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("status") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="status"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Status
-              </label>
-              <select
-                id="status"
-                {...register("status", {
-                  onChange: () => clearFieldError("status"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.status}
-                aria-describedby={errors.status ? "status-error" : undefined}
-              >
-                {Object.values(ProposalStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {ProposalStatusLabels[status]}
-                  </option>
-                ))}
-              </select>
-              {(typeof errors.status?.message === "string" ||
-                validationErrors?.status) && (
-                <InputErrorMessage
-                  message={
-                    (typeof errors.status?.message === "string"
-                      ? errors.status.message
-                      : undefined) ?? validationErrors?.status
-                  }
-                  label={"status"}
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Status:</b>{" "}
-                {existingProposal?.status
-                  ? ProposalStatusLabels[existingProposal.status]
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("paymentStatus") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="paymentStatus"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Payment Status
-              </label>
-              <select
-                id="paymentStatus"
-                {...register("paymentStatus", {
-                  onChange: () => clearFieldError("paymentStatus"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.paymentStatus}
-                aria-describedby={
-                  errors.paymentStatus ? "paymentStatus-error" : undefined
-                }
-              >
-                {Object.values(PaymentStatus).map((paymentStatus) => (
-                  <option key={paymentStatus} value={paymentStatus}>
-                    {PaymentStatusLabels[paymentStatus]}
-                  </option>
-                ))}
-              </select>
-              {(typeof errors.paymentStatus?.message === "string" ||
-                validationErrors?.paymentStatus) && (
-                <InputErrorMessage
-                  message={
-                    (typeof errors.paymentStatus?.message === "string"
-                      ? errors.paymentStatus.message
-                      : undefined) ?? validationErrors?.paymentStatus
-                  }
-                  label={"paymentStatus"}
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Payment Status:</b>{" "}
-                {existingProposal?.paymentStatus
-                  ? PaymentStatusLabels[existingProposal.paymentStatus]
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("notes") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="notes"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Notes
-              </label>
-              <textarea
-                id="notes"
-                {...register("notes", {
-                  onChange: () => clearFieldError("notes"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
-                aria-invalid={!!errors.notes}
-                aria-describedby={errors.notes ? "notes-error" : undefined}
-              />
-              {(errors.notes || validationErrors?.notes) && (
-                <InputErrorMessage
-                  message={
-                    (typeof errors.notes?.message === "string"
-                      ? errors.notes?.message
-                      : undefined) ?? validationErrors?.notes
-                  }
-                  label="notes"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Notes:</b> {existingProposal?.notes ?? "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("plannedStartDate") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="plannedStartDate"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Planned Start Date
-              </label>
-              <input
-                id="plannedStartDate"
-                type="date"
-                {...register("plannedStartDate", {
-                  onChange: () => clearFieldError("plannedStartDate"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.plannedStartDate}
-                aria-describedby={
-                  errors.plannedStartDate ? "plannedStartDate-error" : undefined
-                }
-              />
-              {(errors.plannedStartDate?.message ||
-                validationErrors?.plannedStartDate) && (
-                <InputErrorMessage
-                  message={
-                    errors.plannedStartDate?.message ??
-                    validationErrors?.plannedStartDate
-                  }
-                  label="plannedStartDate"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Planned Start Date:</b>{" "}
-                {existingProposal?.plannedStartDate
-                  ? formatDate(existingProposal?.plannedStartDate)
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("plannedEndDate") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="plannedEndDate"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Planned End Date
-              </label>
-              <input
-                id="plannedEndDate"
-                type="date"
-                {...register("plannedEndDate", {
-                  onChange: () => clearFieldError("plannedEndDate"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.plannedEndDate}
-                aria-describedby={
-                  errors.plannedEndDate ? "plannedEndDate-error" : undefined
-                }
-              />
-              {(errors.plannedEndDate?.message ||
-                validationErrors?.plannedEndDate) && (
-                <InputErrorMessage
-                  message={
-                    errors.plannedEndDate?.message ??
-                    validationErrors?.plannedEndDate
-                  }
-                  label="plannedEndDate"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Planned End Date:</b>{" "}
-                {existingProposal?.plannedEndDate
-                  ? formatDate(existingProposal?.plannedEndDate)
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("actualStartDate") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="actualStartDate"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Actual Start Date
-              </label>
-              <input
-                id="actualStartDate"
-                type="date"
-                {...register("actualStartDate", {
-                  onChange: () => clearFieldError("actualStartDate"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.actualStartDate}
-                aria-describedby={
-                  errors.actualStartDate ? "actualStartDate-error" : undefined
-                }
-              />
-              {(errors.actualStartDate?.message ||
-                validationErrors?.actualStartDate) && (
-                <InputErrorMessage
-                  message={
-                    errors.actualStartDate?.message ??
-                    validationErrors?.actualStartDate
-                  }
-                  label="actualStartDate"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Actual Start Date:</b>{" "}
-                {existingProposal?.actualStartDate
-                  ? formatDate(existingProposal?.actualStartDate)
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("actualEndDate") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="actualEndDate"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Actual End Date
-              </label>
-              <input
-                id="actualEndDate"
-                type="date"
-                {...register("actualEndDate", {
-                  onChange: () => clearFieldError("actualEndDate"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.actualEndDate}
-                aria-describedby={
-                  errors.actualEndDate ? "actualEndDate-error" : undefined
-                }
-              />
-              {(errors.actualEndDate?.message ||
-                validationErrors?.actualEndDate) && (
-                <InputErrorMessage
-                  message={
-                    errors.actualEndDate?.message ??
-                    validationErrors?.actualEndDate
-                  }
-                  label="actualEndDate"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Actual End Date:</b>{" "}
-                {existingProposal?.actualEndDate
-                  ? formatDate(existingProposal?.actualEndDate)
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          {editableFields.includes("priority") ? (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <label
-                htmlFor="priority"
-                className="font-semibold text-sm xl:text-base"
-              >
-                Priority
-              </label>
-              <select
-                id="priority"
-                {...register("priority", {
-                  onChange: () => clearFieldError("priority"),
-                })}
-                className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-                aria-invalid={!!errors.priority}
-                aria-describedby={
-                  errors.priority ? "priority-error" : undefined
-                }
-              >
-                {Object.values(Priority).map((priority) => (
-                  <option key={priority} value={priority}>
-                    {PriorityLabels[priority]}
-                  </option>
-                ))}
-              </select>
-              {(typeof errors.priority?.message === "string" ||
-                validationErrors?.priority) && (
-                <InputErrorMessage
-                  message={
-                    (typeof errors.priority?.message === "string"
-                      ? errors.priority.message
-                      : undefined) ?? validationErrors?.priority
-                  }
-                  label={"priority"}
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <p>
-                <b>Priority:</b>{" "}
-                {existingProposal?.priority
-                  ? PriorityLabels[existingProposal.priority]
-                  : "N/A"}
-              </p>
-            </div>
-          )}
-
-          <br className="" />
-
-          <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-            <SubmitButton
-              type="submit"
+            <fieldset
+              className="flex flex-col items-center mt-4 space-y-4 w-full mx-auto"
               disabled={isUpdating}
-              label={buttonText}
-            />
-          </div>
-          {existingProposal && (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
+            >
+              {successMessage && (
+                <FeedbackMessage
+                  id="success-message"
+                  message={successMessage}
+                  type="success"
+                />
+              )}
+              {apiError && (
+                <FeedbackMessage
+                  id="api-error"
+                  message={apiError}
+                  type="error"
+                />
+              )}
+            </fieldset>
+
+            {editableFields.includes("coverLetter") && (
+              <div className="flex flex-col w-full max-w-2xl items-start my-2 px-2">
+                <label
+                  htmlFor="coverLetter"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Cover Letter
+                </label>
+                <textarea
+                  id="coverLetter"
+                  {...register("coverLetter", {
+                    onChange: () => clearFieldError("coverLetter"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
+                  aria-invalid={!!errors.coverLetter}
+                  aria-describedby={
+                    errors.coverLetter ? "coverLetter-error" : undefined
+                  }
+                />
+                {(errors.coverLetter || validationErrors?.coverLetter) && (
+                  <InputErrorMessage
+                    message={
+                      (typeof errors.coverLetter?.message === "string"
+                        ? errors.coverLetter?.message
+                        : undefined) ?? validationErrors?.coverLetter
+                    }
+                    label="coverLetter"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("amount") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="amount"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Amount
+                </label>
+                <input
+                  id="amount"
+                  type="text"
+                  {...register("amount", {
+                    required: "Amount is required",
+                    pattern: {
+                      value: /^\d+(\.\d{1,2})?$/,
+                      message:
+                        "Amount must be a valid number with up to 2 decimal places",
+                    },
+                    onChange: () => clearFieldError("amount"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-2 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.amount}
+                  aria-describedby={errors.amount ? "amount-error" : undefined}
+                />
+                {(errors.amount?.message || validationErrors?.amount) && (
+                  <InputErrorMessage
+                    message={errors.amount?.message ?? validationErrors?.amount}
+                    label="amount"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("penaltyAmount") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="penaltyAmount"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Penalty Amount
+                </label>
+                <input
+                  id="penaltyAmount"
+                  type="text"
+                  {...register("penaltyAmount", {
+                    required: "Penalty Amount is required",
+                    pattern: {
+                      value: /^\d+(\.\d{1,2})?$/,
+                      message:
+                        "Penalty Amount must be a valid number with up to 2 decimal places",
+                    },
+                    onChange: () => clearFieldError("penaltyAmount"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.penaltyAmount}
+                  aria-describedby={
+                    errors.penaltyAmount ? "penaltyAmount-error" : undefined
+                  }
+                />
+                {(errors.penaltyAmount?.message ||
+                  validationErrors?.penaltyAmount) && (
+                  <InputErrorMessage
+                    message={
+                      errors.penaltyAmount?.message ??
+                      validationErrors?.penaltyAmount
+                    }
+                    label="penaltyAmount"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("bonusAmount") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="bonusAmount"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Bonus Amount
+                </label>
+                <input
+                  id="bonusAmount"
+                  type="text"
+                  {...register("bonusAmount", {
+                    required: "Bonus Amount is required",
+                    pattern: {
+                      value: /^\d+(\.\d{1,2})?$/,
+                      message:
+                        "Bonus Amount must be a valid number with up to 2 decimal places",
+                    },
+                    onChange: () => clearFieldError("bonusAmount"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.bonusAmount}
+                  aria-describedby={
+                    errors.bonusAmount ? "bonusAmount-error" : undefined
+                  }
+                />
+                {(errors.bonusAmount?.message ||
+                  validationErrors?.bonusAmount) && (
+                  <InputErrorMessage
+                    message={
+                      errors.bonusAmount?.message ??
+                      validationErrors?.bonusAmount
+                    }
+                    label="bonusAmount"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("estimatedDuration") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="estimatedDuration"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Estimated Duration (in days)
+                </label>
+                <input
+                  id="estimatedDuration"
+                  type="number"
+                  {...register("estimatedDuration", {
+                    required: "Estimated Duration is required",
+                    min: {
+                      value: 0,
+                      message: "Estimated Duration cannot be negative",
+                    },
+                    onChange: () => clearFieldError("estimatedDuration"),
+                    valueAsNumber: true, // important: ensures RHF gives a number
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.estimatedDuration}
+                  aria-describedby={
+                    errors.estimatedDuration
+                      ? "estimatedDuration-error"
+                      : undefined
+                  }
+                />
+                {(errors.estimatedDuration?.message ||
+                  validationErrors?.estimatedDuration) && (
+                  <InputErrorMessage
+                    message={
+                      errors.estimatedDuration?.message ??
+                      validationErrors?.estimatedDuration
+                    }
+                    label="estimatedDuration"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("status") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="status"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Status
+                </label>
+                <select
+                  id="status"
+                  {...register("status", {
+                    onChange: () => clearFieldError("status"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.status}
+                  aria-describedby={errors.status ? "status-error" : undefined}
+                >
+                  {Object.values(ProposalStatus).map((status) => (
+                    <option key={status} value={status}>
+                      {ProposalStatusLabels[status]}
+                    </option>
+                  ))}
+                </select>
+                {(typeof errors.status?.message === "string" ||
+                  validationErrors?.status) && (
+                  <InputErrorMessage
+                    message={
+                      (typeof errors.status?.message === "string"
+                        ? errors.status.message
+                        : undefined) ?? validationErrors?.status
+                    }
+                    label={"status"}
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("paymentStatus") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="paymentStatus"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Payment Status
+                </label>
+                <select
+                  id="paymentStatus"
+                  {...register("paymentStatus", {
+                    onChange: () => clearFieldError("paymentStatus"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.paymentStatus}
+                  aria-describedby={
+                    errors.paymentStatus ? "paymentStatus-error" : undefined
+                  }
+                >
+                  {Object.values(PaymentStatus).map((paymentStatus) => (
+                    <option key={paymentStatus} value={paymentStatus}>
+                      {PaymentStatusLabels[paymentStatus]}
+                    </option>
+                  ))}
+                </select>
+                {(typeof errors.paymentStatus?.message === "string" ||
+                  validationErrors?.paymentStatus) && (
+                  <InputErrorMessage
+                    message={
+                      (typeof errors.paymentStatus?.message === "string"
+                        ? errors.paymentStatus.message
+                        : undefined) ?? validationErrors?.paymentStatus
+                    }
+                    label={"paymentStatus"}
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("notes") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="notes"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Notes
+                </label>
+                <textarea
+                  id="notes"
+                  {...register("notes", {
+                    onChange: () => clearFieldError("notes"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
+                  aria-invalid={!!errors.notes}
+                  aria-describedby={errors.notes ? "notes-error" : undefined}
+                />
+                {(errors.notes || validationErrors?.notes) && (
+                  <InputErrorMessage
+                    message={
+                      (typeof errors.notes?.message === "string"
+                        ? errors.notes?.message
+                        : undefined) ?? validationErrors?.notes
+                    }
+                    label="notes"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("plannedStartDate") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="plannedStartDate"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Planned Start Date
+                </label>
+                <input
+                  id="plannedStartDate"
+                  type="date"
+                  {...register("plannedStartDate", {
+                    onChange: () => clearFieldError("plannedStartDate"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.plannedStartDate}
+                  aria-describedby={
+                    errors.plannedStartDate
+                      ? "plannedStartDate-error"
+                      : undefined
+                  }
+                />
+                {(errors.plannedStartDate?.message ||
+                  validationErrors?.plannedStartDate) && (
+                  <InputErrorMessage
+                    message={
+                      errors.plannedStartDate?.message ??
+                      validationErrors?.plannedStartDate
+                    }
+                    label="plannedStartDate"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("plannedEndDate") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="plannedEndDate"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Planned End Date
+                </label>
+                <input
+                  id="plannedEndDate"
+                  type="date"
+                  {...register("plannedEndDate", {
+                    onChange: () => clearFieldError("plannedEndDate"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.plannedEndDate}
+                  aria-describedby={
+                    errors.plannedEndDate ? "plannedEndDate-error" : undefined
+                  }
+                />
+                {(errors.plannedEndDate?.message ||
+                  validationErrors?.plannedEndDate) && (
+                  <InputErrorMessage
+                    message={
+                      errors.plannedEndDate?.message ??
+                      validationErrors?.plannedEndDate
+                    }
+                    label="plannedEndDate"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("actualStartDate") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="actualStartDate"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Actual Start Date
+                </label>
+                <input
+                  id="actualStartDate"
+                  type="date"
+                  {...register("actualStartDate", {
+                    onChange: () => clearFieldError("actualStartDate"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.actualStartDate}
+                  aria-describedby={
+                    errors.actualStartDate ? "actualStartDate-error" : undefined
+                  }
+                />
+                {(errors.actualStartDate?.message ||
+                  validationErrors?.actualStartDate) && (
+                  <InputErrorMessage
+                    message={
+                      errors.actualStartDate?.message ??
+                      validationErrors?.actualStartDate
+                    }
+                    label="actualStartDate"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("actualEndDate") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="actualEndDate"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Actual End Date
+                </label>
+                <input
+                  id="actualEndDate"
+                  type="date"
+                  {...register("actualEndDate", {
+                    onChange: () => clearFieldError("actualEndDate"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.actualEndDate}
+                  aria-describedby={
+                    errors.actualEndDate ? "actualEndDate-error" : undefined
+                  }
+                />
+                {(errors.actualEndDate?.message ||
+                  validationErrors?.actualEndDate) && (
+                  <InputErrorMessage
+                    message={
+                      errors.actualEndDate?.message ??
+                      validationErrors?.actualEndDate
+                    }
+                    label="actualEndDate"
+                  />
+                )}
+              </div>
+            )}
+
+            {editableFields.includes("priority") && (
+              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
+                <label
+                  htmlFor="priority"
+                  className="font-semibold text-sm xl:text-base"
+                >
+                  Priority
+                </label>
+                <select
+                  id="priority"
+                  {...register("priority", {
+                    onChange: () => clearFieldError("priority"),
+                  })}
+                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  aria-invalid={!!errors.priority}
+                  aria-describedby={
+                    errors.priority ? "priority-error" : undefined
+                  }
+                >
+                  {Object.values(Priority).map((priority) => (
+                    <option key={priority} value={priority}>
+                      {PriorityLabels[priority]}
+                    </option>
+                  ))}
+                </select>
+                {(typeof errors.priority?.message === "string" ||
+                  validationErrors?.priority) && (
+                  <InputErrorMessage
+                    message={
+                      (typeof errors.priority?.message === "string"
+                        ? errors.priority.message
+                        : undefined) ?? validationErrors?.priority
+                    }
+                    label={"priority"}
+                  />
+                )}
+              </div>
+            )}
+
+            <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
               <SubmitButton
-                type="button"
+                type="submit"
                 disabled={isUpdating}
-                label="Accept Proposal"
-                className="bg-green-600 hover:bg-green-700"
-                onClick={() => handleProposalAction("accept")}
+                label={buttonText}
+                className="cursor-pointer"
               />
+              {existingProposal && (
+                <Button
+                  variant="default"
+                  onClick={() => handleProposalAction("accept")}
+                  disabled={isUpdating}
+                  className="w-80 bg-green-600 text-gray-100 hover:bg-green-500 cursor-pointer"
+                >
+                  Accept Proposal
+                </Button>
+              )}
+              {existingProposal && (
+                <Button
+                  variant="destructive"
+                  onClick={() => handleProposalAction("reject")}
+                  disabled={isUpdating}
+                  className="w-80 cursor-pointer"
+                >
+                  Reject Proposal
+                </Button>
+              )}
             </div>
-          )}
-          {existingProposal && (
-            <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-              <SubmitButton
-                type="button"
-                disabled={isUpdating}
-                label="Reject Proposal"
-                className="bg-red-600 hover:bg-red-700"
-                onClick={() => handleProposalAction("reject")}
-              />
-            </div>
-          )}
-        </form>
+          </form>
+        </>
       )}
     </>
   );
