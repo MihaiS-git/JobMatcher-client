@@ -46,7 +46,6 @@ const EditableFieldsByRole: Record<Role, (keyof ProposalFormValues)[]> = {
     "penaltyAmount",
     "bonusAmount",
     "notes",
-    "plannedStartDate",
     "actualStartDate",
     "priority",
   ],
@@ -802,7 +801,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                 label={buttonText}
                 className="cursor-pointer"
               />
-              {existingProposal && (
+              {(existingProposal && (existingProposal.status !== "REJECTED" && existingProposal?.status !== "ACCEPTED")) && (
                 <Button
                   variant="default"
                   onClick={() => handleProposalAction("accept")}
@@ -812,7 +811,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                   Accept Proposal
                 </Button>
               )}
-              {existingProposal && (
+              {(existingProposal && (existingProposal.status !== "REJECTED" && existingProposal?.status !== "ACCEPTED")) && (
                 <Button
                   variant="destructive"
                   onClick={() => handleProposalAction("reject")}

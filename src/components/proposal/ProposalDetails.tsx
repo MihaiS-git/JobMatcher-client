@@ -243,13 +243,17 @@ const ProposalDetails = ({ id }: ProposalProps) => {
           </p>
         </section>
         <section className="flex space-x-4 mt-4 justify-center w-full">
-          <Button
-            variant="default"
-            className="cursor-pointer"
-            onClick={handleEdit}
-          >
-            Edit
-          </Button>
+          {proposal?.status !== "REJECTED" &&
+            proposal?.status !== "WITHDRAWN" && (
+              <Button
+                variant="default"
+                className="cursor-pointer"
+                onClick={handleEdit}
+              >
+                Edit
+              </Button>
+            )}
+
           {role === "STAFF" && (
             <Button
               variant="destructive"
