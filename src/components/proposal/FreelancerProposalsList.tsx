@@ -220,8 +220,8 @@ const ProposalsList = () => {
         <table className="w-full p-4 bg-gray-200 dark:bg-gray-900 border-collapse border border-gray-400 table-fixed text-xs min-w-[1100px]">
           <thead>
             <tr className="bg-gray-300 dark:bg-gray-800">
-              <th>
-                <span className="flex-1 text-center">No.crt.</span>
+              <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-center relative border border-gray-400">
+                <span className="flex-1 text-center">Project ID</span>
               </th>
               <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                 <div className="flex items-center justify-between">
@@ -369,15 +369,13 @@ const ProposalsList = () => {
           )}
 
           <tbody className="text-center gap-2 p-2">
-            {proposals?.content.map((proposal, index) => (
+            {proposals?.content.map((proposal) => (
               <tr
                 key={proposal.id}
                 className="h-[40px] bg-gray-200 dark:bg-gray-700 border-1 border-gray-300 dark:border-gray-600 items-center justify-items-center hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer"
                 onClick={() => handleProposalClick(proposal.id)}
               >
-                <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
-                  {index + 1}
-                </td>
+                <td>{proposal.projectId}</td>
                 <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
                   {formatCurrency(Number(proposal.amount))}
                 </td>

@@ -22,9 +22,7 @@ import InputErrorMessage from "../InputErrorMessage";
 import SubmitButton from "@/components/SubmitButton";
 import type { Role } from "@/types/UserDTO";
 import {
-  PaymentStatusLabels,
   PriorityLabels,
-  ProposalStatusLabels,
 } from "@/types/formLabels/proposalLabels";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -344,10 +342,15 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                   {...register("coverLetter", {
                     onChange: () => clearFieldError("coverLetter"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
                   aria-invalid={!!errors.coverLetter}
                   aria-describedby={
                     errors.coverLetter ? "coverLetter-error" : undefined
+                  }
+                  disabled={
+                    existingProposal?.status === "ACCEPTED" ||
+                    existingProposal?.status === "REJECTED" ||
+                    existingProposal?.status === "WITHDRAWN"
                   }
                 />
                 {(errors.coverLetter || validationErrors?.coverLetter) && (
@@ -383,9 +386,14 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                     },
                     onChange: () => clearFieldError("amount"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-2 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-2 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.amount}
                   aria-describedby={errors.amount ? "amount-error" : undefined}
+                  disabled={
+                    existingProposal?.status === "ACCEPTED" ||
+                    existingProposal?.status === "REJECTED" ||
+                    existingProposal?.status === "WITHDRAWN"
+                  }
                 />
                 {(errors.amount?.message || validationErrors?.amount) && (
                   <InputErrorMessage
@@ -416,7 +424,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                     },
                     onChange: () => clearFieldError("penaltyAmount"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.penaltyAmount}
                   aria-describedby={
                     errors.penaltyAmount ? "penaltyAmount-error" : undefined
@@ -455,7 +463,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                     },
                     onChange: () => clearFieldError("bonusAmount"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.bonusAmount}
                   aria-describedby={
                     errors.bonusAmount ? "bonusAmount-error" : undefined
@@ -494,12 +502,16 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                     onChange: () => clearFieldError("estimatedDuration"),
                     valueAsNumber: true, // important: ensures RHF gives a number
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.estimatedDuration}
                   aria-describedby={
                     errors.estimatedDuration
                       ? "estimatedDuration-error"
                       : undefined
+                  }
+                  disabled={
+                    existingProposal?.status === "REJECTED" ||
+                    existingProposal?.status === "WITHDRAWN"
                   }
                 />
                 {(errors.estimatedDuration?.message ||
@@ -510,82 +522,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                       validationErrors?.estimatedDuration
                     }
                     label="estimatedDuration"
-                  />
-                )}
-              </div>
-            )}
-
-            {editableFields.includes("status") && (
-              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
-                <label
-                  htmlFor="status"
-                  className="font-semibold text-sm xl:text-base"
-                >
-                  Status
-                </label>
-                <select
-                  id="status"
-                  {...register("status", {
-                    onChange: () => clearFieldError("status"),
-                  })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
-                  aria-invalid={!!errors.status}
-                  aria-describedby={errors.status ? "status-error" : undefined}
-                >
-                  {Object.values(ProposalStatus).map((status) => (
-                    <option key={status} value={status}>
-                      {ProposalStatusLabels[status]}
-                    </option>
-                  ))}
-                </select>
-                {(typeof errors.status?.message === "string" ||
-                  validationErrors?.status) && (
-                  <InputErrorMessage
-                    message={
-                      (typeof errors.status?.message === "string"
-                        ? errors.status.message
-                        : undefined) ?? validationErrors?.status
-                    }
-                    label={"status"}
-                  />
-                )}
-              </div>
-            )}
-
-            {editableFields.includes("paymentStatus") && (
-              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
-                <label
-                  htmlFor="paymentStatus"
-                  className="font-semibold text-sm xl:text-base"
-                >
-                  Payment Status
-                </label>
-                <select
-                  id="paymentStatus"
-                  {...register("paymentStatus", {
-                    onChange: () => clearFieldError("paymentStatus"),
-                  })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
-                  aria-invalid={!!errors.paymentStatus}
-                  aria-describedby={
-                    errors.paymentStatus ? "paymentStatus-error" : undefined
-                  }
-                >
-                  {Object.values(PaymentStatus).map((paymentStatus) => (
-                    <option key={paymentStatus} value={paymentStatus}>
-                      {PaymentStatusLabels[paymentStatus]}
-                    </option>
-                  ))}
-                </select>
-                {(typeof errors.paymentStatus?.message === "string" ||
-                  validationErrors?.paymentStatus) && (
-                  <InputErrorMessage
-                    message={
-                      (typeof errors.paymentStatus?.message === "string"
-                        ? errors.paymentStatus.message
-                        : undefined) ?? validationErrors?.paymentStatus
-                    }
-                    label={"paymentStatus"}
                   />
                 )}
               </div>
@@ -604,7 +540,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                   {...register("notes", {
                     onChange: () => clearFieldError("notes"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
                   aria-invalid={!!errors.notes}
                   aria-describedby={errors.notes ? "notes-error" : undefined}
                 />
@@ -635,12 +571,17 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                   {...register("plannedStartDate", {
                     onChange: () => clearFieldError("plannedStartDate"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.plannedStartDate}
                   aria-describedby={
                     errors.plannedStartDate
                       ? "plannedStartDate-error"
                       : undefined
+                  }
+                  disabled={
+                    existingProposal?.status === "ACCEPTED" ||
+                    existingProposal?.status === "REJECTED" ||
+                    existingProposal?.status === "WITHDRAWN"
                   }
                 />
                 {(errors.plannedStartDate?.message ||
@@ -651,39 +592,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                       validationErrors?.plannedStartDate
                     }
                     label="plannedStartDate"
-                  />
-                )}
-              </div>
-            )}
-
-            {editableFields.includes("plannedEndDate") && (
-              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
-                <label
-                  htmlFor="plannedEndDate"
-                  className="font-semibold text-sm xl:text-base"
-                >
-                  Planned End Date
-                </label>
-                <input
-                  id="plannedEndDate"
-                  type="date"
-                  {...register("plannedEndDate", {
-                    onChange: () => clearFieldError("plannedEndDate"),
-                  })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
-                  aria-invalid={!!errors.plannedEndDate}
-                  aria-describedby={
-                    errors.plannedEndDate ? "plannedEndDate-error" : undefined
-                  }
-                />
-                {(errors.plannedEndDate?.message ||
-                  validationErrors?.plannedEndDate) && (
-                  <InputErrorMessage
-                    message={
-                      errors.plannedEndDate?.message ??
-                      validationErrors?.plannedEndDate
-                    }
-                    label="plannedEndDate"
                   />
                 )}
               </div>
@@ -703,10 +611,15 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                   {...register("actualStartDate", {
                     onChange: () => clearFieldError("actualStartDate"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.actualStartDate}
                   aria-describedby={
                     errors.actualStartDate ? "actualStartDate-error" : undefined
+                  }
+                  disabled={
+                    existingProposal?.status === "ACCEPTED" ||
+                    existingProposal?.status === "REJECTED" ||
+                    existingProposal?.status === "WITHDRAWN"
                   }
                 />
                 {(errors.actualStartDate?.message ||
@@ -717,39 +630,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                       validationErrors?.actualStartDate
                     }
                     label="actualStartDate"
-                  />
-                )}
-              </div>
-            )}
-
-            {editableFields.includes("actualEndDate") && (
-              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
-                <label
-                  htmlFor="actualEndDate"
-                  className="font-semibold text-sm xl:text-base"
-                >
-                  Actual End Date
-                </label>
-                <input
-                  id="actualEndDate"
-                  type="date"
-                  {...register("actualEndDate", {
-                    onChange: () => clearFieldError("actualEndDate"),
-                  })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
-                  aria-invalid={!!errors.actualEndDate}
-                  aria-describedby={
-                    errors.actualEndDate ? "actualEndDate-error" : undefined
-                  }
-                />
-                {(errors.actualEndDate?.message ||
-                  validationErrors?.actualEndDate) && (
-                  <InputErrorMessage
-                    message={
-                      errors.actualEndDate?.message ??
-                      validationErrors?.actualEndDate
-                    }
-                    label="actualEndDate"
                   />
                 )}
               </div>
@@ -768,7 +648,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                   {...register("priority", {
                     onChange: () => clearFieldError("priority"),
                   })}
-                  className="bg-gray-200 text-gray-950 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.priority}
                   aria-describedby={
                     errors.priority ? "priority-error" : undefined
@@ -797,11 +677,15 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
             <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
               <SubmitButton
                 type="submit"
-                disabled={isUpdating}
+                disabled={
+                  isUpdating ||
+                  existingProposal?.status === "REJECTED" ||
+                  existingProposal?.status === "WITHDRAWN"
+                }
                 label={buttonText}
                 className="cursor-pointer"
               />
-              {(existingProposal && (existingProposal.status !== "REJECTED" && existingProposal?.status !== "ACCEPTED")) && (
+              {existingProposal && existingProposal.status === "PENDING" && (
                 <Button
                   variant="default"
                   onClick={() => handleProposalAction("accept")}
@@ -811,7 +695,7 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                   Accept Proposal
                 </Button>
               )}
-              {(existingProposal && (existingProposal.status !== "REJECTED" && existingProposal?.status !== "ACCEPTED")) && (
+              {existingProposal && existingProposal.status === "PENDING" && (
                 <Button
                   variant="destructive"
                   onClick={() => handleProposalAction("reject")}

@@ -56,7 +56,7 @@ const ProposalDetails = ({ id }: ProposalProps) => {
   }
 
   return (
-    <div className="max-w-4xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+    <div className="w-full sm:max-w-xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
       {isLoading && <LoadingSpinner fullScreen={false} size={24} />}
       {error && (
         <div>
@@ -78,11 +78,11 @@ const ProposalDetails = ({ id }: ProposalProps) => {
             : updateError.message || "Unknown error"}
         </div>
       )}
-      <div className="space-y-2 m-4 w-full text-center border-b pb-4 font-bold text-xl">
+      <div className="space-y-2 p-4 w-full text-center border-b pb-4 font-bold text-xl">
         <h2 className="text-start">
           <b>Project: {project?.title}</b>{" "}
         </h2>
-        <section className="text-sm font-medium text-start">
+        <section className="text-sm font-medium text-start ">
           Project ID:{" "}
           <Link
             to={`/projects/${proposal?.projectId}`}
@@ -144,9 +144,17 @@ const ProposalDetails = ({ id }: ProposalProps) => {
           </span>
         </section>
       </div>
-      <div className="space-y-2 m-4 w-full text-start border-b pb-4 text-lg">
-        <h3>
-          <b>Freelancer: {proposal?.freelancer?.username}</b>{" "}
+      <div className="space-y-2 p-4 w-full text-start border-b pb-4 text-lg">
+        <h3 className="text-start">
+          <b>
+            Freelancer:{" "}
+            <Link
+              to={`/public_profile/freelancer/${proposal?.freelancer?.profileId}`}
+              className="underline text-blue-500 hover:text-blue-400 italic font-light"
+            >
+              {proposal?.freelancer?.username}
+            </Link>
+          </b>{" "}
         </h3>
         <section className="text-sm text-start">
           <p>
@@ -184,10 +192,6 @@ const ProposalDetails = ({ id }: ProposalProps) => {
           <p>
             <b>Payment Status:</b>{" "}
             <span className="font-light">{proposal?.paymentStatus}</span>
-          </p>
-          <p>
-            <b>Notes:</b>
-            <br /> <span className="font-light">{proposal?.notes}</span>
           </p>
           <p>
             <b>Planned Start Date:</b>{" "}
@@ -241,8 +245,15 @@ const ProposalDetails = ({ id }: ProposalProps) => {
                 : "N/A"}
             </span>
           </p>
+
+          <p>
+            <b>Notes:</b>
+            <br /> <span className="font-light">{proposal?.notes}</span>
+          </p>
         </section>
-        <section className="flex space-x-4 mt-4 justify-center w-full">
+      </div>
+      <div className="space-y-2 p-4 w-full text-start border-b pb-4 text-lg">
+        <section className="flex mt-4 justify-center gap-2">
           {proposal?.status !== "REJECTED" &&
             proposal?.status !== "WITHDRAWN" && (
               <Button
@@ -250,19 +261,30 @@ const ProposalDetails = ({ id }: ProposalProps) => {
                 className="cursor-pointer"
                 onClick={handleEdit}
               >
-                Edit
+                Edit Proposal
               </Button>
             )}
 
-          {role === "STAFF" && (
-            <Button
-              variant="destructive"
-              className="cursor-pointer"
-              onClick={handleWithdraw}
-            >
-              Withdraw
-            </Button>
-          )}
+            {proposal?.status === "ACCEPTED" && role === "STAFF" && (
+              <Button
+                variant="default"
+                className="cursor-pointer"
+                onClick={() => navigate(`/proposals/${proposal?.id}/add-milestones`)}
+              >
+                Milestones
+              </Button>
+            )}
+
+          {role === "STAFF" &&
+            ["ACCEPTED", "PENDING"].includes(proposal?.status ?? "") && (
+              <Button
+                variant="destructive"
+                className="cursor-pointer"
+                onClick={handleWithdraw}
+              >
+                Withdraw
+              </Button>
+            )}
         </section>
       </div>
     </div>

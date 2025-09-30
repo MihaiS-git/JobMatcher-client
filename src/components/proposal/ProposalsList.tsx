@@ -210,7 +210,7 @@ const ProposalsList = ({ projectId }: { projectId: string }) => {
         <table className="w-full p-4 bg-gray-200 dark:bg-gray-900 border-collapse border border-gray-400 table-fixed text-xs min-w-[1100px]">
           <thead>
             <tr className="bg-gray-300 dark:bg-gray-800">
-              <th>
+              <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-center relative border border-gray-400">
                 <span className="flex-1 text-center">No.crt.</span>
               </th>
               <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">

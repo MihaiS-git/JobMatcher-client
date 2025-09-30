@@ -53,6 +53,10 @@ const ProposalDetailsPage = lazy(
   () => import("./pages/proposals/ProposalDetailsPage")
 );
 
+const AddMilestonesPage = lazy(
+  () => import("./pages/proposals/milestones/AddMilestonesPage")
+);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -229,6 +233,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <EditProposalPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/proposals/:proposalId/add-milestones",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <AddMilestonesPage />
           </Suspense>
         ),
       },

@@ -22,11 +22,15 @@ import {
   ProjectStatusLabels,
 } from "@/types/formLabels/projectLabels";
 import { useEffect } from "react";
+import useAuth from "@/hooks/useAuth";
 
 const ProjectList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const auth = useAuth();
+  const role = auth?.user?.role;
 
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
@@ -512,11 +516,13 @@ const ProjectList = () => {
                     <span className="flex-1 text-center">Subcategories</span>
                   </div>
                 </th>
-                <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-center relative border border-gray-400">
-                  <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Actions</span>
-                  </div>
-                </th>
+                {role === "CUSTOMER" && (
+                  <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-center relative border border-gray-400">
+                    <div className="flex items-center justify-between">
+                      <span className="flex-1 text-center">Actions</span>
+                    </div>
+                  </th>
+                )}
               </tr>
             </thead>
 
@@ -524,7 +530,7 @@ const ProjectList = () => {
               {projects?.content?.map((project) => (
                 <tr
                   key={project.id}
-                  className="bg-gray-200 dark:bg-gray-700 border-1 border-gray-300 dark:border-gray-600 items-center justify-items-center hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer"
+                  className="h-15 bg-gray-200 dark:bg-gray-700 border-1 border-gray-300 dark:border-gray-600 items-center justify-items-center hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer"
                   onClick={() => handleProjectClick(project.id)}
                 >
                   <td className="truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
@@ -573,33 +579,37 @@ const ProjectList = () => {
                       <div>No Subcategories</div>
                     )}
                   </td>
-
-                  <td className=" truncate max-w-[150px] overflow-hidden whitespace-nowrap mx-auto flex flex-col gap-1 p-1">
-                    <div className="flex flex-row justify-center items-center gap-2 w-full">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditProject(project.id);
-                        }}
-                        className="bg-green-500 hover:bg-green-600 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                    </div>
-                    <div className="flex flex-row justify-center items-center gap-2 w-full">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteProject(project.id);
-                        }}
-                        className="bg-red-500 hover:bg-red-600 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+                  {role === "CUSTOMER" && (
+                    <td className=" truncate max-w-[150px] overflow-hidden whitespace-nowrap mx-auto flex flex-col gap-1 p-1">
+                      <div className="flex flex-row justify-center items-center gap-2 w-full">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditProject(project.id);
+                          }}
+                          className="bg-green-500 hover:bg-green-600 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                      <div className="flex flex-row justify-center items-center gap-2 w-full">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteProject(project.id);
+                          }}
+                          className="bg-red-500 hover:bg-red-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
+                          disabled={!["NONE", "OPEN"].includes(
+                            project.status ?? ""
+                          )}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
