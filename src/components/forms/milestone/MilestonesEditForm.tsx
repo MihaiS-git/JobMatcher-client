@@ -11,6 +11,7 @@ import { milestoneSchema, type MilestoneItem } from "@/schemas/milestoneSchema";
 import { PriorityLabels } from "@/types/formLabels/proposalLabels";
 import { Priority } from "@/types/ProposalDTO";
 import type { Role } from "@/types/UserDTO";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
@@ -221,16 +222,16 @@ const MilestonesEditForm = ({ milestoneId, role, proposalId }: MilestoneFormProp
         {isLoadingMilestone && <LoadingSpinner fullScreen={false} size={24} />}
         {milestoneError && <FeedbackMessage message={apiError} />}
         <section className="w-full max-w-2xl my-4 border border-gray-400 rounded-sm p-4 bg-gray-600">
-          <div><span className="font-semibold">Title</span><p className="ms-4 font-light text-sm">{milestoneData?.title}</p></div>
-          <div><span className="font-semibold">Description</span><p className="ms-4 font-light text-sm">{milestoneData?.description}</p></div>
-          <div><span className="font-semibold">Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.amount}</p></div>
-          <div><span className="font-semibold">Penalty Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.penaltyAmount}</p></div>
-          <div><span className="font-semibold">Bonus Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.bonusAmount}</p></div>
-          <div><span className="font-semibold">Estimated Duration (in days)</span><p className="ms-4 font-light text-sm">{milestoneData?.estimatedDuration}</p></div>
-          <div><span className="font-semibold">Planned Start Date</span><p className="ms-4 font-light text-sm">{milestoneData?.plannedStartDate}</p></div>
-          <div><span className="font-semibold">Actual Start Date</span><p className="ms-4 font-light text-sm">{milestoneData?.actualStartDate}</p></div>
+          <div><span className="font-semibold">Title</span><p className="ms-4 font-light text-sm">{milestoneData?.title || "N/A"}</p></div>
+          <div><span className="font-semibold">Description</span><p className="ms-4 font-light text-sm">{milestoneData?.description || "N/A"}</p></div>
+          <div><span className="font-semibold">Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.amount ? formatCurrency(milestoneData?.amount) : "N/A"}</p></div>
+          <div><span className="font-semibold">Penalty Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.penaltyAmount ? formatCurrency(milestoneData?.penaltyAmount) : "N/A"}</p></div>
+          <div><span className="font-semibold">Bonus Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.bonusAmount ? formatCurrency(milestoneData?.bonusAmount) : "N/A"}</p></div>
+          <div><span className="font-semibold">Estimated Duration (in days)</span><p className="ms-4 font-light text-sm">{milestoneData?.estimatedDuration || "N/A"}</p></div>
+          <div><span className="font-semibold">Planned Start Date</span><p className="ms-4 font-light text-sm">{milestoneData?.plannedStartDate || "N/A"}</p></div>
+          <div><span className="font-semibold">Actual Start Date</span><p className="ms-4 font-light text-sm">{milestoneData?.actualStartDate || "N/A"}</p></div>
           <div><span className="font-semibold">Priority</span><p className="ms-4 font-light text-sm">{PriorityLabels[milestoneData?.priority || "NONE"]}</p></div>
-          <div><span className="font-semibold">Notes</span><p className="ms-4 font-light text-sm">{milestoneData?.notes}</p></div>
+          <div><span className="font-semibold">Notes</span><p className="ms-4 font-light text-sm">{milestoneData?.notes || "N/A"}</p></div>
         </section>
         <fieldset
           className="w-full flex flex-col items-center"
@@ -267,7 +268,6 @@ const MilestonesEditForm = ({ milestoneId, role, proposalId }: MilestoneFormProp
                 )}
               </div>
             )}
-
             {editableFields.includes("description") && (
               <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
                 <label

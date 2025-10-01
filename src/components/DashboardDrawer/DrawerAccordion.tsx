@@ -1,7 +1,23 @@
 import { Accordion } from "@radix-ui/react-accordion";
 import DrawerAccordionItem from "./DrawerAccordionItem";
+import useAuth from "@/hooks/useAuth";
 
 const DrawerAccordion = () => {
+  const auth = useAuth();
+  const role = auth?.user?.role;
+
+  const projectItems = [{ targetUrl: "/projects", itemTag: "Projects List" }];
+  if (role === "CUSTOMER") {
+    projectItems.push({ targetUrl: "/projects/create", itemTag: "Create Project" });
+  }
+
+  const profileItems = [{ targetUrl: "/profile", itemTag: "Profile" }, { targetUrl: "/edit_public_profile", itemTag: "Public Profile" }];
+  if( role === "STAFF" ) {
+    profileItems.push({ targetUrl: "/portfolio", itemTag: "Portfolio" });
+  }
+
+  const financialItems = [{ targetUrl: "/contracts", itemTag: "Contracts List" }, { targetUrl: "/invoices", itemTag: "Invoices" }, { targetUrl: "/payments", itemTag: "Payments" }];
+
   return (
     <Accordion
       type="single"
@@ -12,10 +28,7 @@ const DrawerAccordion = () => {
       <DrawerAccordionItem
         value="item-1"
         label="Projects"
-        items={[
-          { targetUrl: "/projects", itemTag: "Projects List" },
-          { targetUrl: "/projects/create", itemTag: "Create Project" },
-        ]}
+        items={projectItems}
       />
 
       <DrawerAccordionItem
@@ -27,17 +40,13 @@ const DrawerAccordion = () => {
       <DrawerAccordionItem
         value="item-3"
         label="Financial"
-        items={[{ targetUrl: "/financial", itemTag: "Financial" }]}
+        items={financialItems}
       />
 
       <DrawerAccordionItem
         value="item-4"
         label="Profile"
-        items={[
-          { targetUrl: "/profile", itemTag: "Profile" },
-          { targetUrl: "/edit_public_profile", itemTag: "Public Profile" },
-          { targetUrl: "/portfolio", itemTag: "Portfolio" },
-        ]}
+        items={profileItems}
       />
     </Accordion>
   );

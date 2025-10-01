@@ -53,9 +53,6 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 <li onClick={handleClose}>
                   <NavLink to={"/job-feed"} className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer">Job Feed</NavLink>
                 </li>
-                <li onClick={handleClose}>
-                  <button className="hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer">Chat</button>
-                </li>
                 <li>
                   <button
                     type="button"

@@ -31,14 +31,6 @@ const MainNavigation = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink
-                to="/"
-                className="text-blue-100 hover:text-blue-950 dark:hover:text-blue-400 cursor-pointer"
-              >
-                Chat
-              </NavLink>
-            </li>
-            <li>
               <button
                 type="button"
                 onClick={handleLogout}
