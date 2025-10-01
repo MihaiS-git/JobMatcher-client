@@ -1,10 +1,8 @@
 import FeedbackMessage from "@/components/FeedbackMessage";
 import InputErrorMessage from "@/components/forms/InputErrorMessage";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import {
   useCreateMilestoneMutation,
-  useGetMilestonesByProposalIdQuery,
 } from "@/features/proposal/milestone/milestoneApi";
 import useAuth from "@/hooks/useAuth";
 import {
@@ -13,7 +11,6 @@ import {
   type MilestoneItem,
 } from "@/schemas/milestoneSchema";
 import { PriorityLabels } from "@/types/formLabels/proposalLabels";
-import type { MilestoneResponseDTO } from "@/types/MilestoneDTO";
 import { Priority } from "@/types/ProposalDTO";
 import type { Role } from "@/types/UserDTO";
 import { parseValidationErrors } from "@/utils/parseApiError";
@@ -44,7 +41,7 @@ const EditableFieldsByRole: Record<Role, (keyof MilestoneItem)[]> = {
   ADMIN: [],
 };
 
-const AddMilestonesForm = ({ proposalId }: MilestoneFormProps) => {
+const MilestonesAddForm = ({ proposalId }: MilestoneFormProps) => {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<Record<
@@ -83,11 +80,6 @@ const AddMilestonesForm = ({ proposalId }: MilestoneFormProps) => {
 
   const [createMilestone, { isLoading: isCreating }] =
     useCreateMilestoneMutation();
-  const {
-    data: existentMilestones,
-    isLoading: areMilestonesLoading,
-    error: milestonesError,
-  } = useGetMilestonesByProposalIdQuery({ proposalId, page: 0, size: 100 });
 
   const clearFieldError = (fieldName: FieldPath<MilestoneFormValues>) => {
     clearErrors(fieldName);
@@ -145,28 +137,6 @@ const AddMilestonesForm = ({ proposalId }: MilestoneFormProps) => {
 
   return (
     <>
-      {areMilestonesLoading && <LoadingSpinner fullScreen={false} size={24} />}
-
-      {existentMilestones && existentMilestones.totalElements > 0 && (
-        <div>
-          <h3>Existent Milestones</h3>
-          {milestonesError && (
-            <FeedbackMessage
-              id="existing-milestones-error"
-              message={apiError}
-              type="error"
-            />
-          )}
-          <ul>
-            {existentMilestones.content.map(
-              (milestone: MilestoneResponseDTO) => (
-                <li key={milestone.id}>{milestone.title}</li>
-              )
-            )}
-          </ul>
-        </div>
-      )}
-
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full px-4 pb-40 flex flex-col items-center"
@@ -576,4 +546,4 @@ const AddMilestonesForm = ({ proposalId }: MilestoneFormProps) => {
   );
 };
 
-export default AddMilestonesForm;
+export default MilestonesAddForm;

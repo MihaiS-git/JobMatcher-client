@@ -5,7 +5,7 @@ import {
 import LoadingSpinner from "../LoadingSpinner";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useGetProjectByIdQuery } from "@/features/projects/projectsApi";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import type { ProposalStatus } from "@/types/ProposalDTO";
 import useAuth from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ type ProposalProps = {
 };
 
 const ProposalDetails = ({ id }: ProposalProps) => {
+  const location = useLocation();
   const navigate = useNavigate();
   const auth = useAuth();
   const role = auth?.user?.role;
@@ -49,6 +50,12 @@ const ProposalDetails = ({ id }: ProposalProps) => {
       console.error("Failed to withdraw proposal:", e);
     }
     navigate("/proposals");
+  };
+
+  const handleMilestonesClick = (id: string) => {
+    const from = location.pathname;
+    sessionStorage.setItem("lastProposalURL", from);
+    navigate(`/proposals/${id}/add-milestones`);
   };
 
   if (!id) {
@@ -265,11 +272,11 @@ const ProposalDetails = ({ id }: ProposalProps) => {
               </Button>
             )}
 
-            {proposal?.status === "ACCEPTED" && role === "STAFF" && (
+            {proposal?.status === "ACCEPTED" && (
               <Button
                 variant="default"
                 className="cursor-pointer"
-                onClick={() => navigate(`/proposals/${proposal?.id}/add-milestones`)}
+                onClick={() => handleMilestonesClick(proposal.id)}
               >
                 Milestones
               </Button>

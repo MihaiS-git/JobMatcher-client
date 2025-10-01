@@ -56,7 +56,8 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
   const handleView = () => {
     const from = location.pathname + location.search;
     sessionStorage.setItem("lastProjectURL", from);
-    navigate(`/proposals/edit/${existingProposal?.id}`);
+    navigate(`/proposals/${existingProposal?.id}`);
+
   };
 
   if (existingProposalLoading) {

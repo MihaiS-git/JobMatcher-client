@@ -1,29 +1,32 @@
 import BackButton from "@/components/BackButton";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import AddMilestonesForm from "@/components/forms/milestone/AddMilestonesForm";
+import MilestonesAddForm from "@/components/forms/milestone/MilestonesAddForm";
+import MilestonesTable from "@/components/milestone/milestonesTable";
 import { useParams } from "react-router-dom";
 
-const AddMilestonesPage = () => {
+const MilestonesPage = () => {
   const { proposalId } = useParams();
 
-
-  if(!proposalId) {
+  if (!proposalId) {
     return <div className="text-red-500">Invalid proposal ID.</div>;
   }
-  
+
   return (
-    <PageContent className="pb-16">
+    <PageContent className="pb-16 px-4">
       <section
         className="flex flex-col items-center p-0 pt-4 pb-16 w-full"
         aria-labelledby="add-milestones-heading"
       >
         <PageTitle title="Proposal Milestones" id="add-milestones-heading" />
         <BackButton label={"lastProposalURL"} />
-        <AddMilestonesForm proposalId={proposalId} />
+        <MilestonesTable proposalId={proposalId} />
+        <hr className="w-full border-t border-gray-400 my-4" />
+        <PageTitle title="Add New Milestones" id="add-milestones-heading" />
+        <MilestonesAddForm proposalId={proposalId} />
       </section>
     </PageContent>
   );
 };
 
-export default AddMilestonesPage;
+export default MilestonesPage;

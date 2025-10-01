@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const milestoneSchema = z.object({
+export const milestoneSchema = z.object({
   title: z.string().min(1, "Title is required").optional(),
   description: z.string().min(1, "Description is required").optional(),
   amount: z
