@@ -11,14 +11,14 @@ export const ProposalStatus = {
 export type ProposalStatus =
   (typeof ProposalStatus)[keyof typeof ProposalStatus];
 
-export const PaymentStatus = {
+/* export const PaymentStatus = {
   UNPAID: "UNPAID",
   PAID: "PAID",
   OVERDUE: "OVERDUE",
   NONE: "NONE",
 } as const;
 
-export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]; */
 
 export const Priority = {
   LOW: "LOW",
@@ -39,7 +39,7 @@ export type ProposalRequestDTO = {
   bonusAmount?: string;
   estimatedDuration?: number; // in days
   status?: ProposalStatus;
-  paymentStatus?: PaymentStatus;
+/*   paymentStatus?: PaymentStatus; */
   notes?: string;
   plannedStartDate?: string; // ISO date string
   plannedEndDate?: string; // ISO date string
@@ -58,7 +58,7 @@ export type ProposalDetailDTO = {
   bonusAmount: number;
   estimatedDuration: number; // in days
   status: ProposalStatus;
-  paymentStatus: PaymentStatus;
+/*   paymentStatus: PaymentStatus; */
   notes: string;
   plannedStartDate: string; // ISO date string
   plannedEndDate: string; // ISO date string
@@ -79,7 +79,7 @@ export type ProposalSummaryDTO = {
   bonusAmount: number;
   estimatedDuration: number; // in days
   status: ProposalStatus;
-  paymentStatus: PaymentStatus;
+/*   paymentStatus: PaymentStatus; */
   notes: string;
   plannedStartDate: string; // ISO date string
   plannedEndDate: string; // ISO date string

@@ -16,7 +16,7 @@ const DrawerAccordion = () => {
     profileItems.push({ targetUrl: "/portfolio", itemTag: "Portfolio" });
   }
 
-  const financialItems = [{ targetUrl: "/contracts", itemTag: "Contracts List" }, { targetUrl: "/invoices", itemTag: "Invoices" }, { targetUrl: "/payments", itemTag: "Payments" }];
+  const financialItems = [{ targetUrl: "/contracts", itemTag: "Contracts" }, { targetUrl: "/invoices", itemTag: "Invoices" }, { targetUrl: "/payments", itemTag: "Payments" }];
 
   return (
     <Accordion
@@ -39,7 +39,7 @@ const DrawerAccordion = () => {
 
       <DrawerAccordionItem
         value="item-3"
-        label="Financial"
+        label="Financials"
         items={financialItems}
       />
 
