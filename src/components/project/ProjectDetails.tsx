@@ -53,12 +53,17 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
     navigate(`/projects/${projectId}/proposals/new`);
   };
 
-  const handleView = () => {
+  const navigateToProposal = () => {
     const from = location.pathname + location.search;
     sessionStorage.setItem("lastProjectURL", from);
     navigate(`/proposals/${existingProposal?.id}`);
-
   };
+
+  function navigateToContract(contractId: string): void {
+    const from = location.pathname + location.search;
+    sessionStorage.setItem("lastProjectURL", from);
+    navigate(`/contracts/${contractId}`);
+  }
 
   if (existingProposalLoading) {
     return <LoadingSpinner fullScreen={false} size={36} />;
@@ -161,15 +166,29 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
           </div>
         )}
         {role === "STAFF" && profile && (
-          <div className="col-span-2 space-y-2 my-8 text-center">
+          <div className="col-span-2 space-y-2 my-8 text-center gap-2 flex justify-center">
             <Button
               variant="default"
               size="sm"
-              onClick={existingProposal ? handleView : handleApply}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              onClick={existingProposal ? navigateToProposal : handleApply}
+              className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
             >
               {existingProposal ? "View Proposal" : "Create Proposal"}
             </Button>
+
+            {project?.contractId && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() =>
+                  project?.contractId && navigateToContract(project.contractId)
+                }
+                className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
+                disabled={!project?.contractId}
+              >
+                View Contract
+              </Button>
+            )}
           </div>
         )}
       </div>

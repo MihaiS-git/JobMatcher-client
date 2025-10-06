@@ -11,6 +11,7 @@ import { persistedReducer } from "./rootReducer";
 import { persistStore } from "redux-persist";
 import { proposalApi } from "./features/proposal/proposalApi";
 import { milestoneApi } from "./features/proposal/milestone/milestoneApi";
+import { contractsApi } from "./features/contracts/contractsApi";
 
 export const store: EnhancedStore = configureStore({
     reducer: persistedReducer,
@@ -27,7 +28,8 @@ export const store: EnhancedStore = configureStore({
     .concat(portfolioApi.middleware)
     .concat(projectsApi.middleware)
     .concat(proposalApi.middleware)
-    .concat(milestoneApi.middleware),
+    .concat(milestoneApi.middleware)
+    .concat(contractsApi.middleware),
 });
 
 export const persistor = persistStore(store);

@@ -197,10 +197,6 @@ const ProposalDetails = ({ id }: ProposalProps) => {
             <span className="font-light">{proposal?.status}</span>
           </p>
           <p>
-            <b>Payment Status:</b>{" "}
-            <span className="font-light">{proposal?.paymentStatus}</span>
-          </p>
-          <p>
             <b>Planned Start Date:</b>{" "}
             <span className="font-light">
               {proposal?.plannedStartDate

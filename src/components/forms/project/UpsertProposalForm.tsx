@@ -10,7 +10,6 @@ import useAuth from "@/hooks/useAuth";
 import useAutoClear from "@/hooks/useAutoClear";
 import type { ProposalFormValues } from "@/schemas/proposalSchema";
 import {
-  PaymentStatus,
   Priority,
   ProposalStatus,
   type ProposalRequestDTO,
@@ -103,7 +102,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
       bonusAmount: "0",
       estimatedDuration: 0,
       status: ProposalStatus.PENDING,
-      paymentStatus: PaymentStatus.NONE,
       notes: "",
       plannedStartDate: "",
       plannedEndDate: "",
@@ -139,7 +137,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
         bonusAmount: existingProposal.bonusAmount.toString() ?? "0",
         estimatedDuration: existingProposal.estimatedDuration ?? 0,
         status: existingProposal.status ?? ProposalStatus.PENDING,
-        paymentStatus: existingProposal.paymentStatus ?? PaymentStatus.NONE,
         notes: existingProposal.notes ?? "",
         plannedStartDate: existingProposal.plannedStartDate ?? "",
         plannedEndDate: existingProposal.plannedEndDate ?? "",
@@ -195,18 +192,17 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
     const payload: ProposalRequestDTO = {
       ...data,
       status: data.status as ProposalStatus,
-      paymentStatus: data.paymentStatus as PaymentStatus,
       plannedStartDate: data.plannedStartDate
-        ? new Date(data.plannedStartDate).toISOString().slice(0, 10)
+        ? new Date(data.plannedStartDate).toISOString()
         : undefined,
       plannedEndDate: data.plannedEndDate
-        ? new Date(data.plannedEndDate).toISOString().slice(0, 10)
+        ? new Date(data.plannedEndDate).toISOString()
         : undefined,
       actualStartDate: data.actualStartDate
-        ? new Date(data.actualStartDate).toISOString().slice(0, 10)
+        ? new Date(data.actualStartDate).toISOString()
         : undefined,
       actualEndDate: data.actualEndDate
-        ? new Date(data.actualEndDate).toISOString().slice(0, 10)
+        ? new Date(data.actualEndDate).toISOString()
         : undefined,
       priority: data.priority as Priority,
     };

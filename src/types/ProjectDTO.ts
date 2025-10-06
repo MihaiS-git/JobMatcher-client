@@ -76,6 +76,8 @@ export type ProjectDetailDTO = {
   category?: JobCategoryDTO;
   subcategories?: JobSubcategoryDTO[];
   proposals?: ProposalSummaryDTO[];
+  acceptedProposalId?: string;
+  contractId?: string ;
   createdAt: Date;
   lastUpdate: Date;
 };
