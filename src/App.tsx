@@ -53,16 +53,16 @@ const ProposalDetailsPage = lazy(
   () => import("./pages/proposals/ProposalDetailsPage")
 );
 
+const ContractDetailPage = lazy(
+  () => import("./pages/contracts/ContractDetailPage")
+);
+
 const MilestonesPage = lazy(
-  () => import("./pages/proposals/milestones/MilestonesPage")
+  () => import("./pages/contracts/milestones/MilestonesPage")
 );
 
 const MilestoneEditPage = lazy(
-  () => import("./pages/proposals/milestones/MilestoneEditPage")
-);
-
-const ContractDetailPage = lazy(
-  () => import("./pages/contracts/ContractDetailPage")
+  () => import("./pages/contracts/milestones/MilestoneEditPage")
 );
 
 const router = createBrowserRouter([
@@ -245,7 +245,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/proposals/:proposalId/add-milestones",
+        path: "/contracts/:contractId/add-milestones",
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <MilestonesPage />
@@ -253,7 +253,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/proposals/:proposalId/milestones/:milestoneId/edit",
+        path: "/contracts/:contractId/milestones/:milestoneId/edit",
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <MilestoneEditPage />

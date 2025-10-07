@@ -10,7 +10,7 @@ import { projectsApi } from "./features/projects/projectsApi";
 import { persistedReducer } from "./rootReducer";
 import { persistStore } from "redux-persist";
 import { proposalApi } from "./features/proposal/proposalApi";
-import { milestoneApi } from "./features/proposal/milestone/milestoneApi";
+import { milestoneApi } from "./features/contracts/milestone/milestoneApi";
 import { contractsApi } from "./features/contracts/contractsApi";
 
 export const store: EnhancedStore = configureStore({

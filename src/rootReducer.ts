@@ -11,7 +11,7 @@ import { projectsApi } from "./features/projects/projectsApi";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage
 import { persistReducer, type PersistConfig } from "redux-persist";
 import { proposalApi } from "./features/proposal/proposalApi";
-import { milestoneApi } from "./features/proposal/milestone/milestoneApi";
+import { milestoneApi } from "./features/contracts/milestone/milestoneApi";
 import { contractsApi } from "./features/contracts/contractsApi";
 
 const appReducer = combineReducers({

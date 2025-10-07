@@ -10,14 +10,14 @@ export const milestoneApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ["Milestone"],
   endpoints: (builder) => ({
-    getMilestonesByProposalId: builder.query<
+    getMilestonesByContractId: builder.query<
       {
         content: MilestoneResponseDTO[];
         totalElements: number;
         totalPages: number;
       },
       {
-        proposalId: string;
+        contractId: string;
         page?: number;
         size?: number;
         status?: string;
@@ -92,7 +92,7 @@ export const milestoneApi = createApi({
 });
 
 export const {
-  useGetMilestonesByProposalIdQuery,
+  useGetMilestonesByContractIdQuery,
   useGetMilestoneByIdQuery,
   useCreateMilestoneMutation,
   useUpdateMilestoneByIdMutation,

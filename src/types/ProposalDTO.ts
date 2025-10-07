@@ -67,6 +67,7 @@ export type ProposalDetailDTO = {
   actualStartDate: string;
   actualEndDate: string;
   priority: Priority;
+  milestonesIds: string[];
   createdAt: string; // ISO date string
   lastUpdate: string; // ISO date string
 };

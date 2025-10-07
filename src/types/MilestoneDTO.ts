@@ -1,7 +1,7 @@
 import type { PaymentStatus, Priority } from "./ProposalDTO";
 
 export type MilestoneRequestDTO = {
-  proposalId: string;
+  contractId: string;
   title?: string;
   description?: string;
   amount?: number;
@@ -20,14 +20,14 @@ export type MilestoneRequestDTO = {
 
 export type MilestoneResponseDTO = {
   id: string;
-  proposalId: string;
-  title: string;
-  description: string;
-  amount: number;
+  contractId: string;
+  title?: string;
+  description?: string;
+  amount?: number;
   penaltyAmount?: number;
   bonusAmount?: number;
-  estimatedDuration: number; // in days
-  status?: MilestoneStatus  ;
+  estimatedDuration?: number; // in days
+  status?: MilestoneStatus;
   paymentStatus?: PaymentStatus;
   notes?: string;
   plannedStartDate?: string; // ISO date string

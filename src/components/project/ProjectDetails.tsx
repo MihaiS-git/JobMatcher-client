@@ -165,8 +165,9 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
             </p>
           </div>
         )}
-        {role === "STAFF" && profile && (
-          <div className="col-span-2 space-y-2 my-8 text-center gap-2 flex justify-center">
+
+        <section className="col-span-2 space-y-2 my-8 text-center gap-2 flex justify-center">
+          {role === "STAFF" && profile && (
             <Button
               variant="default"
               size="sm"
@@ -175,22 +176,22 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
             >
               {existingProposal ? "View Proposal" : "Create Proposal"}
             </Button>
+          )}
 
-            {project?.contractId && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() =>
-                  project?.contractId && navigateToContract(project.contractId)
-                }
-                className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-                disabled={!project?.contractId}
-              >
-                View Contract
-              </Button>
-            )}
-          </div>
-        )}
+          {project?.contractId && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() =>
+                project?.contractId && navigateToContract(project.contractId)
+              }
+              className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
+              disabled={!project?.contractId}
+            >
+              View Contract
+            </Button>
+          )}
+        </section>
       </div>
       {role === "CUSTOMER" && <ProposalsList projectId={projectId} />}
     </>

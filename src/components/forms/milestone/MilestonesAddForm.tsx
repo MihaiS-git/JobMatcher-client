@@ -3,7 +3,7 @@ import InputErrorMessage from "@/components/forms/InputErrorMessage";
 import { Button } from "@/components/ui/button";
 import {
   useCreateMilestoneMutation,
-} from "@/features/proposal/milestone/milestoneApi";
+} from "@/features/contracts/milestone/milestoneApi";
 import useAuth from "@/hooks/useAuth";
 import {
   milestonesFormSchema,
@@ -19,7 +19,7 @@ import { useMemo, useState } from "react";
 import { useFieldArray, useForm, type FieldPath } from "react-hook-form";
 
 type MilestoneFormProps = {
-  proposalId: string;
+  contractId: string;
 };
 
 const EditableFieldsByRole: Record<Role, (keyof MilestoneItem)[]> = {
@@ -41,7 +41,7 @@ const EditableFieldsByRole: Record<Role, (keyof MilestoneItem)[]> = {
   ADMIN: [],
 };
 
-const MilestonesAddForm = ({ proposalId }: MilestoneFormProps) => {
+const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<Record<
@@ -121,8 +121,10 @@ const MilestonesAddForm = ({ proposalId }: MilestoneFormProps) => {
         plannedStartDate: milestone.plannedStartDate || "",
       };
 
+      console.log("Submitting milestone:", payload);
+
       try {
-        await createMilestone({ ...payload, proposalId }).unwrap();
+        await createMilestone({ ...payload, contractId }).unwrap();
         setSuccessMessage("Milestones added successfully.");
         setApiError("");
         setValidationErrors(null);

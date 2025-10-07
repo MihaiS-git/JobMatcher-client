@@ -6,7 +6,7 @@ import {
   useDeleteMilestoneByIdMutation,
   useGetMilestoneByIdQuery,
   useUpdateMilestoneByIdMutation,
-} from "@/features/proposal/milestone/milestoneApi";
+} from "@/features/contracts/milestone/milestoneApi";
 import { milestoneSchema, type MilestoneItem } from "@/schemas/milestoneSchema";
 import { PriorityLabels } from "@/types/formLabels/proposalLabels";
 import { Priority } from "@/types/ProposalDTO";
@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 type MilestoneFormProps = {
   milestoneId: string;
   role: Role;
-  proposalId: string;
+  contractId: string;
 };
 
 const EditableFieldsByRole: Record<Role, (keyof MilestoneItem)[]> = {
@@ -43,7 +43,7 @@ const EditableFieldsByRole: Record<Role, (keyof MilestoneItem)[]> = {
   ADMIN: [],
 };
 
-const MilestonesEditForm = ({ milestoneId, role, proposalId }: MilestoneFormProps) => {
+const MilestonesEditForm = ({ milestoneId, role, contractId }: MilestoneFormProps) => {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
@@ -201,7 +201,7 @@ const MilestonesEditForm = ({ milestoneId, role, proposalId }: MilestoneFormProp
       setSuccessMessage("Milestone deleted successfully.");
       setApiError("");
       setValidationErrors(null);
-      navigate(`/proposals/${proposalId}/add-milestones`)
+      navigate(`/contracts/${contractId}/add-milestones`)
     } catch (err: unknown) {
       handleValidationApiError(err, setValidationErrors, setApiError);
     }

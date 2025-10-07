@@ -1,4 +1,4 @@
-import { useGetMilestonesByProposalIdQuery } from "@/features/proposal/milestone/milestoneApi";
+import { useGetMilestonesByContractIdQuery } from "@/features/contracts/milestone/milestoneApi";
 import type { MilestoneResponseDTO } from "@/types/MilestoneDTO";
 import { formatDate } from "@/utils/formatDate";
 import { parseApiError } from "@/utils/parseApiError";
@@ -8,10 +8,10 @@ import LoadingSpinner from "../LoadingSpinner";
 import FeedbackMessage from "../FeedbackMessage";
 
 type MilestonesTableProps = {
-  proposalId: string;
+  contractId: string;
 };
 
-const MilestonesTable = ({ proposalId }: MilestonesTableProps) => {
+const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [apiError, setApiError] = useState<string>("");
@@ -20,9 +20,9 @@ const MilestonesTable = ({ proposalId }: MilestonesTableProps) => {
     data: existentMilestones,
     isLoading: areMilestonesLoading,
     error: milestonesError,
-  } = useGetMilestonesByProposalIdQuery(
-    { proposalId: proposalId as string, page: 0, size: 100 },
-    { skip: !proposalId }
+  } = useGetMilestonesByContractIdQuery(
+    { contractId: contractId as string, page: 0, size: 100 },
+    { skip: !contractId }
   );
 
   useEffect(() => {
@@ -33,8 +33,8 @@ const MilestonesTable = ({ proposalId }: MilestonesTableProps) => {
 
   const handleMilestoneClick = (id: string): void => {
     const from = location.pathname;
-    sessionStorage.setItem("lastProposalMilestonesURL", from);
-    navigate(`/proposals/${proposalId}/milestones/${id}/edit`);
+    sessionStorage.setItem("lastContractMilestonesURL", from);
+    navigate(`/contracts/${contractId}/milestones/${id}/edit`);
   };
   
   return (

@@ -15,8 +15,8 @@ type ProposalProps = {
 };
 
 const ProposalDetails = ({ id }: ProposalProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const location = useLocation();
   const auth = useAuth();
   const role = auth?.user?.role;
 
@@ -36,7 +36,9 @@ const ProposalDetails = ({ id }: ProposalProps) => {
   const isLoading = isLoadingProposal || isProjectLoading || isUpdating;
   const error = proposalError || projectError || updateError;
 
-  const handleEdit = () => {
+  const navigateToEditProposal = () => {
+    const from = location.pathname;
+    sessionStorage.setItem("lastProposalDetailsURL", from);
     navigate(`/proposals/edit/${id}`);
   };
 
@@ -50,12 +52,6 @@ const ProposalDetails = ({ id }: ProposalProps) => {
       console.error("Failed to withdraw proposal:", e);
     }
     navigate("/proposals");
-  };
-
-  const handleMilestonesClick = (id: string) => {
-    const from = location.pathname;
-    sessionStorage.setItem("lastProposalURL", from);
-    navigate(`/proposals/${id}/add-milestones`);
   };
 
   if (!id) {
@@ -262,19 +258,9 @@ const ProposalDetails = ({ id }: ProposalProps) => {
               <Button
                 variant="default"
                 className="cursor-pointer"
-                onClick={handleEdit}
+                onClick={navigateToEditProposal}
               >
                 Edit Proposal
-              </Button>
-            )}
-
-            {proposal?.status === "ACCEPTED" && (
-              <Button
-                variant="default"
-                className="cursor-pointer"
-                onClick={() => handleMilestonesClick(proposal.id)}
-              >
-                Milestones
               </Button>
             )}
 

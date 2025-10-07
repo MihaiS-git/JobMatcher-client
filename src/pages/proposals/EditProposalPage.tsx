@@ -14,7 +14,7 @@ const EditProposalPage = () => {
         aria-labelledby="edit-proposal-heading"
       >
         <PageTitle title="Edit Proposal" id="edit-proposal-heading" />
-        <BackButton label={"lastProjectURL"}/>
+        <BackButton label={"lastProposalDetailsURL"}/>
         <UpsertProposalForm proposalId={id} />
       </section>
     </PageContent>

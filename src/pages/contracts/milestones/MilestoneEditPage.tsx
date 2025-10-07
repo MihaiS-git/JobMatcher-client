@@ -7,14 +7,14 @@ import type { Role } from "@/types/UserDTO";
 import { useParams } from "react-router-dom";
 
 const MilestoneEditPage = () => {
-  const { proposalId, milestoneId } = useParams();
+  const { contractId, milestoneId } = useParams();
 
   const auth = useAuth();
   const role = auth?.user?.role as Role;
 
-  if (!proposalId || !milestoneId) {
+  if (!contractId || !milestoneId) {
     return (
-      <div className="text-red-500">Invalid proposal ID or milestone ID.</div>
+      <div className="text-red-500">Invalid contract ID or milestone ID.</div>
     );
   }
 
@@ -25,11 +25,11 @@ const MilestoneEditPage = () => {
         aria-labelledby="add-milestones-heading"
       >
         <PageTitle title="Edit Milestone" id="edit-milestone-heading" />
-        <BackButton label={"lastProposalMilestonesURL"} />
+        <BackButton label={"lastContractMilestonesURL"} />
         <MilestonesEditForm
           milestoneId={milestoneId}
           role={role}
-          proposalId={proposalId}
+          contractId={contractId}
         />
       </section>
     </PageContent>
