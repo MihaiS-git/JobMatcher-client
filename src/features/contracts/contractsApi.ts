@@ -10,21 +10,26 @@ export const contractsApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ["Contract"],
   endpoints: (builder) => ({
-    getAllContractsByProfileId: builder.query<
+    getAllContracts: builder.query<
       {
         content: ContractSummaryDTO[];
         totalElements: number;
         totalPages: number;
       },
       {
-        profileId: string;
         page?: number;
         size?: number;
+        customerName?: string;
+        freelancerName?: string;
         status?: string;
+        startDate?: string;
+        endDate?: string;
+        paymentType?: string;
+        searchTerm?: string;
         sort?: string[];
       }
     >({
-      query: (sort, ...rest) => ({
+      query: ({sort, ...rest}) => ({
         url: "/contracts",
         params: {
           ...rest,
@@ -77,7 +82,7 @@ export const contractsApi = createApi({
 });
 
 export const {
-  useGetAllContractsByProfileIdQuery,
+  useGetAllContractsQuery,
   useGetContractByIdQuery,
   useGetContractByProjectIdQuery,
   useDeleteContractByIdMutation,

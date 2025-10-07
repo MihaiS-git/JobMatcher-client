@@ -40,6 +40,7 @@ export const projectsApi = createApi({
               { type: "Project", id: "LIST" },
             ]
           : [{ type: "Project", id: "LIST" }],
+      keepUnusedDataFor: 300,
     }),
     getJobFeedProjects: builder.query<
       {
@@ -74,6 +75,7 @@ export const projectsApi = createApi({
               { type: "Project", id: "LIST" },
             ]
           : [{ type: "Project", id: "LIST" }],
+      keepUnusedDataFor: 300,
     }),
     getProjectById: builder.query<ProjectDetailDTO, string>({
       query: (id) => ({
