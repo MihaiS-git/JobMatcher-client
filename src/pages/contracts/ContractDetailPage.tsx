@@ -14,7 +14,7 @@ const ContractDetailPage = () => {
         aria-labelledby="new-contract-heading"
       >
         <PageTitle title="Contract Details" id="contract-detail-page" />
-        <BackButton label={"lastProjectURL"} />
+        <BackButton label={"contractListURL"} />
         <ContractDetails contractId={contractId!} />
       </section>
     </PageContent>

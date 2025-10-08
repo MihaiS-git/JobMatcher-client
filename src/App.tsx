@@ -69,6 +69,10 @@ const ContractsListPage = lazy(
   () => import("./pages/contracts/ContractsListPage")
 );
 
+const InvoicesListPage = lazy(
+  () => import("./pages/invoices/InvoicesListPage")
+);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -277,6 +281,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <ContractDetailPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/invoices",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <InvoicesListPage />
           </Suspense>
         ),
       },

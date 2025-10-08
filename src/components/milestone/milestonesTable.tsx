@@ -36,7 +36,7 @@ const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
     sessionStorage.setItem("lastContractMilestonesURL", from);
     navigate(`/contracts/${contractId}/milestones/${id}/edit`);
   };
-  
+
   return (
     <section className="w-full overflow-x-auto 2xl:overflow-x-visible my-4 p-4">
       {existentMilestones && existentMilestones.totalElements > 0 && (

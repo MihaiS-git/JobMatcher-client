@@ -13,6 +13,7 @@ import { persistReducer, type PersistConfig } from "redux-persist";
 import { proposalApi } from "./features/proposal/proposalApi";
 import { milestoneApi } from "./features/contracts/milestone/milestoneApi";
 import { contractsApi } from "./features/contracts/contractsApi";
+import { invoiceApi } from "./features/invoices/invoiceApi";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -27,6 +28,7 @@ const appReducer = combineReducers({
   [proposalApi.reducerPath]: proposalApi.reducer,
   [milestoneApi.reducerPath]: milestoneApi.reducer,
   [contractsApi.reducerPath]: contractsApi.reducer,
+  [invoiceApi.reducerPath]: invoiceApi.reducer,
 });
 
 const persistConfig: PersistConfig<ReturnType<typeof appReducer>> = {

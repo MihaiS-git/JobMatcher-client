@@ -7,6 +7,7 @@ import {
   useGetMilestoneByIdQuery,
   useUpdateMilestoneByIdMutation,
 } from "@/features/contracts/milestone/milestoneApi";
+import { useCreateInvoiceMutation } from "@/features/invoices/invoiceApi";
 import { milestoneSchema, type MilestoneItem } from "@/schemas/milestoneSchema";
 import { PriorityLabels } from "@/types/formLabels/proposalLabels";
 import { Priority } from "@/types/ProposalDTO";
@@ -43,7 +44,11 @@ const EditableFieldsByRole: Record<Role, (keyof MilestoneItem)[]> = {
   ADMIN: [],
 };
 
-const MilestonesEditForm = ({ milestoneId, role, contractId }: MilestoneFormProps) => {
+const MilestonesEditForm = ({
+  milestoneId,
+  role,
+  contractId,
+}: MilestoneFormProps) => {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
@@ -68,6 +73,9 @@ const MilestonesEditForm = ({ milestoneId, role, contractId }: MilestoneFormProp
       setApiError(parseApiError(milestoneError));
     }
   }, [milestoneError]);
+
+  const [createInvoice, { isLoading: isCreatingInvoice }] =
+    useCreateInvoiceMutation();
 
   const editableFields = EditableFieldsByRole[role];
 
@@ -201,16 +209,32 @@ const MilestonesEditForm = ({ milestoneId, role, contractId }: MilestoneFormProp
       setSuccessMessage("Milestone deleted successfully.");
       setApiError("");
       setValidationErrors(null);
-      navigate(`/contracts/${contractId}/add-milestones`)
+      navigate(`/contracts/${contractId}/add-milestones`);
     } catch (err: unknown) {
       handleValidationApiError(err, setValidationErrors, setApiError);
+    }
+  };
+
+  const handleCreateInvoice = async (milestoneId: string) => {
+    try {
+      const invoice = await createInvoice({ contractId, milestoneId }).unwrap();
+      const from = location.pathname;
+      sessionStorage.setItem("lastContractMilestonesURL", from);
+      setSuccessMessage("Invoice created successfully.");
+      setApiError("");
+      setValidationErrors(null);
+      navigate(`/invoices/${invoice.id}`);
+    } catch (error: unknown) {
+      setApiError(parseApiError(error));
+      setSuccessMessage("");
+      setValidationErrors(null);
     }
   };
 
   useEffect(() => {
     if (deleteError) {
       handleValidationApiError(deleteError, setValidationErrors, setApiError);
-    } 
+    }
   }, [deleteError]);
 
   return (
@@ -222,16 +246,72 @@ const MilestonesEditForm = ({ milestoneId, role, contractId }: MilestoneFormProp
         {isLoadingMilestone && <LoadingSpinner fullScreen={false} size={24} />}
         {milestoneError && <FeedbackMessage message={apiError} />}
         <section className="w-full max-w-2xl my-4 border border-gray-400 rounded-sm p-4 bg-gray-600">
-          <div><span className="font-semibold">Title</span><p className="ms-4 font-light text-sm">{milestoneData?.title || "N/A"}</p></div>
-          <div><span className="font-semibold">Description</span><p className="ms-4 font-light text-sm">{milestoneData?.description || "N/A"}</p></div>
-          <div><span className="font-semibold">Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.amount ? formatCurrency(milestoneData?.amount) : "N/A"}</p></div>
-          <div><span className="font-semibold">Penalty Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.penaltyAmount ? formatCurrency(milestoneData?.penaltyAmount) : "N/A"}</p></div>
-          <div><span className="font-semibold">Bonus Amount</span><p className="ms-4 font-light text-sm">{milestoneData?.bonusAmount ? formatCurrency(milestoneData?.bonusAmount) : "N/A"}</p></div>
-          <div><span className="font-semibold">Estimated Duration (in days)</span><p className="ms-4 font-light text-sm">{milestoneData?.estimatedDuration || "N/A"}</p></div>
-          <div><span className="font-semibold">Planned Start Date</span><p className="ms-4 font-light text-sm">{milestoneData?.plannedStartDate || "N/A"}</p></div>
-          <div><span className="font-semibold">Actual Start Date</span><p className="ms-4 font-light text-sm">{milestoneData?.actualStartDate || "N/A"}</p></div>
-          <div><span className="font-semibold">Priority</span><p className="ms-4 font-light text-sm">{PriorityLabels[milestoneData?.priority || "NONE"]}</p></div>
-          <div><span className="font-semibold">Notes</span><p className="ms-4 font-light text-sm">{milestoneData?.notes || "N/A"}</p></div>
+          <div>
+            <span className="font-semibold">Title</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.title || "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Description</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.description || "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Amount</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.amount
+                ? formatCurrency(milestoneData?.amount)
+                : "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Penalty Amount</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.penaltyAmount
+                ? formatCurrency(milestoneData?.penaltyAmount)
+                : "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Bonus Amount</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.bonusAmount
+                ? formatCurrency(milestoneData?.bonusAmount)
+                : "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Estimated Duration (in days)</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.estimatedDuration || "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Planned Start Date</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.plannedStartDate || "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Actual Start Date</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.actualStartDate || "N/A"}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Priority</span>
+            <p className="ms-4 font-light text-sm">
+              {PriorityLabels[milestoneData?.priority || "NONE"]}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Notes</span>
+            <p className="ms-4 font-light text-sm">
+              {milestoneData?.notes || "N/A"}
+            </p>
+          </div>
         </section>
         <fieldset
           className="w-full flex flex-col items-center"
@@ -538,8 +618,37 @@ const MilestonesEditForm = ({ milestoneId, role, contractId }: MilestoneFormProp
               isLoadingMilestone || isUpdating || isDeletingMilestone
             }
           >
+            {role === "STAFF" && (
+              <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={() => {
+                    handleCreateInvoice(milestoneData!.id);
+                  }}
+                  className="cursor-pointer"
+                  disabled={
+                    isUpdating ||
+                    isLoadingMilestone ||
+                    isDeletingMilestone ||
+                    isCreatingInvoice ||
+                    ["TERMINATED", "CANCELLED"].includes(milestoneData!.status!)
+                  }
+                >
+                  Create Invoice
+                </Button>
+              </div>
+            )}
+
             <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
-              <Button type="submit" variant="default">
+              <Button
+                type="submit"
+                variant="default"
+                className="cursor-pointer"
+                disabled={
+                  isUpdating || isLoadingMilestone || isDeletingMilestone
+                }
+              >
                 Update
               </Button>
             </div>
@@ -547,6 +656,10 @@ const MilestonesEditForm = ({ milestoneId, role, contractId }: MilestoneFormProp
               <Button
                 type="button"
                 variant="destructive"
+                className="cursor-pointer"
+                disabled={
+                  isUpdating || isLoadingMilestone || isDeletingMilestone
+                }
                 onClick={() => handleDeleteMilestone(milestoneId)}
               >
                 Delete
