@@ -7,6 +7,9 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { Button } from "../ui/button";
 import FeedbackMessage from "../FeedbackMessage";
+import { PaymentType } from "@/types/ProjectDTO";
+import { useCreateInvoiceMutation } from "@/features/invoices/invoiceApi";
+import useAuth from "@/hooks/useAuth";
 
 type ContractDetailsProps = {
   contractId: string;
@@ -15,13 +18,20 @@ type ContractDetailsProps = {
 const ContractDetails = ({ contractId }: ContractDetailsProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [successMessage, setSuccessMessage] = useState<string | null>("");
+  const [apiError, setApiError] = useState<string>("");
 
-  const [apiError, setApiError] = useState<string | null>(null);
+  const auth = useAuth();
+  const role = auth.user.role;
+
   const {
     data: contract,
     error,
     isLoading,
   } = useGetContractByIdQuery(contractId);
+
+  const [createInvoice, { isLoading: isCreatingInvoice }] =
+    useCreateInvoiceMutation();
 
   useEffect(() => {
     if (error) {
@@ -66,6 +76,20 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
       </div>
     );
   }
+
+  const handleCreateInvoice = async (contractId: string) => {
+    try {
+      const invoice = await createInvoice({ contractId }).unwrap();
+      const from = location.pathname;
+      sessionStorage.setItem("lastContractURL", from);
+      setSuccessMessage("Invoice created successfully.");
+      setApiError("");
+      navigate(`/invoices/${invoice.id}`);
+    } catch (error: unknown) {
+      setApiError(parseApiError(error));
+      setSuccessMessage("");
+    }
+  };
 
   return (
     <>
@@ -184,44 +208,47 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
           </section>
 
           {/* Milestones Section */}
-          <section className="my-4">
-            <h4 className="text-start font-semibold text-sm mb-2">
-              Milestones
-            </h4>
-            <ul className="space-y-2 ">
-              {milestones.length > 0 &&
-                milestones.map((milestone) => (
-                  <li key={milestone.id} className="mb-2 text-sm">
-                    <p>
-                      <b>Milestone ID:</b> {milestone.id}
-                    </p>
-                    <p>
-                      <b>Title:</b> {milestone.title}
-                    </p>
-                    <p>
-                      <b>Description:</b> {milestone.description}
-                    </p>
-                    <p>
-                      <b>Amount:</b> {formatCurrency(Number(milestone.amount))}
-                    </p>
-                    <p>
-                      <b>Estimated Duration:</b> {milestone.estimatedDuration}{" "}
-                      days
-                    </p>
-                    <p>
-                      <b>Notes:</b> {milestone.notes || "N/A"}
-                    </p>
-                    <p>
-                      <b>Start Date:</b>{" "}
-                      {formatDate(milestone.plannedStartDate!)}
-                    </p>
-                    <p>
-                      <b>Due Date:</b> {formatDate(milestone.plannedEndDate!)}
-                    </p>
-                  </li>
-                ))}
-            </ul>
-          </section>
+          {contract.paymentType === PaymentType.MILESTONE && (
+            <section className="my-4">
+              <h4 className="text-start font-semibold text-sm mb-2">
+                Milestones
+              </h4>
+              <ul className="space-y-2 ">
+                {milestones.length > 0 &&
+                  milestones.map((milestone) => (
+                    <li key={milestone.id} className="mb-2 text-sm">
+                      <p>
+                        <b>Milestone ID:</b> {milestone.id}
+                      </p>
+                      <p>
+                        <b>Title:</b> {milestone.title}
+                      </p>
+                      <p>
+                        <b>Description:</b> {milestone.description}
+                      </p>
+                      <p>
+                        <b>Amount:</b>{" "}
+                        {formatCurrency(Number(milestone.amount))}
+                      </p>
+                      <p>
+                        <b>Estimated Duration:</b> {milestone.estimatedDuration}{" "}
+                        days
+                      </p>
+                      <p>
+                        <b>Notes:</b> {milestone.notes || "N/A"}
+                      </p>
+                      <p>
+                        <b>Start Date:</b>{" "}
+                        {formatDate(milestone.plannedStartDate!)}
+                      </p>
+                      <p>
+                        <b>Due Date:</b> {formatDate(milestone.plannedEndDate!)}
+                      </p>
+                    </li>
+                  ))}
+              </ul>
+            </section>
+          )}
 
           {/* Signatures Section */}
           <section className="flex flex-row justify-between mt-4">
@@ -241,16 +268,54 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
           </section>
         </div>
       </div>
-      <div className="w-full flex flex-row justify-center align-middle gap-2 sm:max-w-xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-        <Button
-          variant="default"
-          size="sm"
-          className="cursor-pointer font-light text-xs"
-          onClick={() => handleMilestonesClick(contract.id)}
-        >
-          Edit Milestones
-        </Button>
-      </div>
+      {contract.paymentType === PaymentType.MILESTONE && (
+        <div className="w-full flex flex-row justify-center align-middle gap-2 sm:max-w-xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+          <Button
+            variant="default"
+            size="sm"
+            className="cursor-pointer font-light text-xs"
+            onClick={() => handleMilestonesClick(contract.id)}
+          >
+            Edit Milestones
+          </Button>
+        </div>
+      )}
+      {contract.paymentType !== PaymentType.MILESTONE && role === "STAFF" && (
+        <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
+          <Button
+            type="button"
+            variant="default"
+            onClick={() => {
+              handleCreateInvoice(contract.id);
+            }}
+            className="cursor-pointer"
+            disabled={
+              isCreatingInvoice ||
+              ["TERMINATED", "ON_HOLD", "CANCELLED"].includes(contract.status!)
+            }
+          >
+            Create Invoice
+          </Button>
+        </div>
+      )}
+      {successMessage && successMessage !== "" && (
+        <div className="p-4 w-full text-start font-light text-sm">
+          <FeedbackMessage
+            id="invoice-success-feedback"
+            type="success"
+            message={successMessage}
+          />
+        </div>
+      )}
+      {apiError && (
+        <div className="p-4 w-full text-start font-light text-sm">
+          <FeedbackMessage
+            id="invoice-error-feedback"
+            type="error"
+            message={apiError}
+          />
+        </div>
+      )}
     </>
   );
 };

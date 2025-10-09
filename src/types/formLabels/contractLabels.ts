@@ -10,9 +10,9 @@ export const ContractStatusLabels: Record<ContractStatus, string> = {
 };
 
 export const PaymentTypeLabels: Record<PaymentType, string> = {
-  UPFRONT: "UPFRONT",
-  MILESTONE: "MILESTONE",
-  UPON_COMPLETION: "UPON_COMPLETION",
-  COMMISSION: "COMMISSION",
-  NONE: "NONE",
+  UPFRONT: "Upfront",
+  MILESTONE: "Milestone",
+  UPON_COMPLETION: "Upon Completion",
+  COMMISSION: "Commission",
+  NONE: "None",
 };

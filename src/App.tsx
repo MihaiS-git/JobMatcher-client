@@ -3,7 +3,6 @@ import "./App.css";
 import RootLayout from "./components/RootLayout";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
-import ProposalsListPage from "./pages/proposals/ProposalsListPage";
 
 // Lazy-loaded pages
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -49,6 +48,10 @@ const CreateProposalPage = lazy(
   () => import("./pages/proposals/CreateProposalPage")
 );
 
+const ProposalsListPage = lazy(
+  () => import("./pages/proposals/ProposalsListPage")
+);
+
 const ProposalDetailsPage = lazy(
   () => import("./pages/proposals/ProposalDetailsPage")
 );
@@ -71,6 +74,10 @@ const ContractsListPage = lazy(
 
 const InvoicesListPage = lazy(
   () => import("./pages/invoices/InvoicesListPage")
+);
+
+const InvoiceDetailsPage = lazy(
+  () => import("./pages/invoices/InvoiceDetailsPage")
 );
 
 const router = createBrowserRouter([
@@ -289,6 +296,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <InvoicesListPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/invoices/:invoiceId",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <InvoiceDetailsPage />
           </Suspense>
         ),
       },

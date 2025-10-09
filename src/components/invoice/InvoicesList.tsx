@@ -1,10 +1,8 @@
 import {
-  useDeleteInvoiceByIdMutation,
   useGetAllInvoicesQuery,
 } from "@/features/invoices/invoiceApi";
 import { InvoiceStatusLabels } from "@/types/formLabels/invoiceLabels";
 import { InvoiceStatus } from "@/types/InvoiceDTO";
-import { parseApiError } from "@/utils/parseApiError";
 import { useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
@@ -17,7 +15,6 @@ import {
 import SortButton from "../InvoicesSortButton";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
-import { Button } from "../ui/button";
 import PagePagination from "../PagePagination";
 
 const InvoicesList = () => {
@@ -160,20 +157,6 @@ const InvoicesList = () => {
     const from = location.pathname + location.search;
     sessionStorage.setItem("invoicesListPage", from);
     navigate(`/invoices/${id}`);
-  };
-
-  const [deleteInvoiceById, { isLoading: isDeletingInvoice }] =
-    useDeleteInvoiceByIdMutation();
-
-  const handleDeleteInvoice = async (id: string): Promise<void> => {
-    if (!window.confirm("Are you sure you want to delete this invoice?"))
-      return;
-    if (!id) return;
-    try {
-      await deleteInvoiceById(id).unwrap();
-    } catch (error: unknown) {
-      alert("Failed to delete invoice: " + parseApiError(error));
-    }
   };
 
   return (
@@ -409,16 +392,6 @@ const InvoicesList = () => {
                     </div>
                   </div>
                 </th>
-                <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
-                  <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Payment</span>
-                  </div>
-                </th>
-                <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-center relative border border-gray-400">
-                  <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Actions</span>
-                  </div>
-                </th>
               </tr>
             </thead>
             <tbody className="text-center gap-2 p-2">
@@ -446,27 +419,6 @@ const InvoicesList = () => {
                   </td>
                   <td className="border border-gray-400">
                     {InvoiceStatusLabels[invoice.status]}
-                  </td>
-                  <td className="border border-gray-400">
-                    <div className="flex flex-col justify-center items-center gap-2 w-full">
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteInvoice(invoice.id);
-                        }}
-                        className="cursor-pointer font-light text-xs"
-                        disabled={
-                          ["PAID", "CANCELLED"].includes(
-                            invoice.status ?? ""
-                          ) || isDeletingInvoice
-                        }
-                      >
-                        Delete
-                      </Button>
-                    </div>
                   </td>
                 </tr>
               ))}
