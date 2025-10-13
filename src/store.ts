@@ -13,6 +13,7 @@ import { proposalApi } from "./features/proposal/proposalApi";
 import { milestoneApi } from "./features/contracts/milestone/milestoneApi";
 import { contractsApi } from "./features/contracts/contractsApi";
 import { invoiceApi } from "./features/invoices/invoiceApi";
+import { paymentApi } from "./features/payment/paymentApi";
 
 export const store: EnhancedStore = configureStore({
     reducer: persistedReducer,
@@ -31,7 +32,8 @@ export const store: EnhancedStore = configureStore({
     .concat(proposalApi.middleware)
     .concat(milestoneApi.middleware)
     .concat(contractsApi.middleware)
-    .concat(invoiceApi.middleware),
+    .concat(invoiceApi.middleware)
+    .concat(paymentApi.middleware),
 });
 
 export const persistor = persistStore(store);

@@ -14,6 +14,7 @@ import { proposalApi } from "./features/proposal/proposalApi";
 import { milestoneApi } from "./features/contracts/milestone/milestoneApi";
 import { contractsApi } from "./features/contracts/contractsApi";
 import { invoiceApi } from "./features/invoices/invoiceApi";
+import { paymentApi } from "./features/payment/paymentApi";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -29,6 +30,7 @@ const appReducer = combineReducers({
   [milestoneApi.reducerPath]: milestoneApi.reducer,
   [contractsApi.reducerPath]: contractsApi.reducer,
   [invoiceApi.reducerPath]: invoiceApi.reducer,
+  [paymentApi.reducerPath]: paymentApi.reducer,
 });
 
 const persistConfig: PersistConfig<ReturnType<typeof appReducer>> = {

@@ -80,6 +80,14 @@ const InvoiceDetailsPage = lazy(
   () => import("./pages/invoices/InvoiceDetailsPage")
 );
 
+const InvoiceSuccessPage = lazy(
+  () => import("./pages/invoices/InvoiceSuccessPage")
+);
+
+const InvoiceCancelPage = lazy(
+  () => import("./pages/invoices/InvoiceCancelPage")
+);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -304,6 +312,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <InvoiceDetailsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/invoice-success",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <InvoiceSuccessPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/invoice-cancel",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <InvoiceCancelPage />
           </Suspense>
         ),
       },

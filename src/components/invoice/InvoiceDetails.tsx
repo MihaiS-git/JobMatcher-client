@@ -4,8 +4,8 @@ import LoadingSpinner from "../LoadingSpinner";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { PaymentTypeLabels } from "@/types/formLabels/contractLabels";
-import { Button } from "../ui/button";
 import useAuth from "@/hooks/useAuth";
+import PayInvoiceButton from "./PayInvoiceButton";
 
 const InvoiceDetails = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
@@ -18,12 +18,6 @@ const InvoiceDetails = () => {
     error: invoiceError,
     isLoading: isInvoiceLoading,
   } = useGetInvoiceByIdQuery(invoiceId!);
-
-  const handlePayInvoice = (id: string) => {
-    // Implement payment logic here
-    console.log(`Paying invoice with ID: ${id}`);
-    alert(`Paying invoice with ID: ${id}`);
-  };
 
   if (isInvoiceLoading) {
     return (
@@ -174,17 +168,7 @@ const InvoiceDetails = () => {
       </div>
       {role === "CUSTOMER" && invoice.status === "PENDING" && (
         <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
-          <Button
-            type="button"
-            variant="default"
-            onClick={() => {
-              handlePayInvoice(invoice.id);
-            }}
-            className="cursor-pointer"
-            disabled={["PAID", "CANCELLED"].includes(invoice.status!)}
-          >
-            Pay Invoice
-          </Button>
+          <PayInvoiceButton invoiceId={invoice.id} />
         </div>
       )}
     </>
