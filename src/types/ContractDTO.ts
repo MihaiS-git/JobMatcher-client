@@ -38,7 +38,7 @@ export type ContractDetailDTO = {
   endDate: string;
   paymentType: PaymentType;
   milestones: Set<MilestoneResponseDTO>;
-  invoiceId: string;
+  invoices: Set<string>;
   paymentId: string;
   totalPaid: string;
   remainingBalance: string;
