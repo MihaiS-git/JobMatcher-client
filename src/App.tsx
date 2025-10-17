@@ -88,6 +88,14 @@ const InvoiceCancelPage = lazy(
   () => import("./pages/invoices/InvoiceCancelPage")
 );
 
+const PaymentsListPage = lazy(
+  () => import("./pages/payments/PaymentsListPage")
+);
+
+const PaymentDetailsPage = lazy(
+  () => import("./pages/payments/PaymentDetailsPage")
+);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -328,6 +336,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <InvoiceCancelPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/payments",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <PaymentsListPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/payments/:paymentId",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <PaymentDetailsPage />
           </Suspense>
         ),
       },
