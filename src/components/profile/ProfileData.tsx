@@ -1,5 +1,6 @@
 import type { CustomerDetailDTO } from "@/types/CustomerDTO";
 import type { FreelancerDetailDTO } from "@/types/FreelancerDTO";
+import { Link } from "react-router";
 
 type CustomerProfileProps = {
   type: "customer";
@@ -16,12 +17,12 @@ const ProfileData = ({
   profile,
 }: CustomerProfileProps | FreelancerProfileProps) => {
   console.log("profile data:", profile);
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 max-w-4xl p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
       <div className="flex justify-center w-full md:w-auto">
         <img
-          className="m-4 w-80 h-80 object-cover"
+          className="m-4 w-60 h-60 object-cover rounded-sm border border-gray-300 dark:border-gray-600"
           src={profile.pictureUrl || "user_icon.png"}
           alt="User profile picture"
           aria-label="user-profile-picture"
@@ -33,23 +34,26 @@ const ProfileData = ({
           {profile.username}
         </h2>
         <section className="flex flex-col items-start w-full px-4">
-          <p>Rating: {profile.rating}</p>
+          <p>
+            <span className="font-bold">Rating: </span>
+            {profile.rating}
+          </p>
           {type === "customer" && (
             <p>
               <span className="font-bold">Company: </span>
-              {profile.company}
+              {profile.company ?? "N/A"}
             </p>
           )}
           {type === "freelancer" && (
             <p>
               <span className="font-bold">Headline: </span>
-              {profile.headline}
+              {profile.headline ?? "N/A"}
             </p>
           )}
 
           <p>
             <span className="font-bold">About: </span>
-            {profile.about}
+            {profile.about ?? "N/A"}
           </p>
 
           <p>
@@ -84,20 +88,38 @@ const ProfileData = ({
 
           <p>
             <span className="font-bold">Website: </span>
-            <a href={profile.websiteUrl} className="text-blue-500 hover:underline">{profile.websiteUrl}</a>
+            <a
+              href={profile.websiteUrl}
+              className="text-blue-500 hover:underline"
+            >
+              {profile.websiteUrl}
+            </a>
           </p>
           <div>
             <span className="font-bold">Social Media: </span>
             <ul>
               {profile.socialMedia.map((link, index) => (
                 <li key={index}>
-                  <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
                     {link}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
+          {type === "freelancer" && (
+            <Link
+              to={`/portfolio/freelancer/${profile.profileId}`}
+              className="text-blue-500 hover:underline mt-8"
+            >
+              View Portfolio
+            </Link>
+          )}
         </section>
       </div>
     </div>

@@ -57,8 +57,6 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
     if (isProfileLoading) return;
   }, [isProfileLoading, profileError]);
 
-  console.log("Profile ID:", profileId);
-
   const [apiError, setApiError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [textCounter, setTextCounter] = useState(0);
@@ -247,6 +245,24 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
     return errors;
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      description: "",
+      selectedCategory: 1,
+      selectedSubcategories: [],
+      demoUrl: "",
+      sourceUrl: "",
+      clientName: "",
+    });
+    setTextCounter(0);
+    setTouchedFields({});
+    setErrors({});
+    setValidationErrors(null);
+    setApiError("");
+    setSuccessMessage("");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiError("");
@@ -284,6 +300,7 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         setSuccessMessage("Portfolio item saved successfully.");
         setApiError("");
         setValidationErrors(null);
+        setTimeout(() => resetForm(), 2000);
       } else {
         await updateItem({ id: portfolioItem.id, data: payload }).unwrap();
         setSuccessMessage("Portfolio item updated successfully.");
@@ -295,7 +312,7 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
     }
   };
 
-  const buttonText = itemId ? "Update Item" : "Add Item";
+  const buttonText = itemId ? "Update Item" : "Save Item";
 
   if (isProfileLoading || isLoading || isLoadingCategories)
     return <LoadingSpinner fullScreen={true} size={36} />;
@@ -413,9 +430,7 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         value={formData.demoUrl}
         onChange={(e) => {
           const rawValue = e.target.value;
-          const normalizedValue = rawValue.trim()
-            ? normalizeUrl(rawValue)
-            : "";
+          const normalizedValue = rawValue.trim() ? normalizeUrl(rawValue) : "";
           setFormData((prev) => ({
             ...prev,
             demoUrl: normalizedValue,
@@ -440,9 +455,7 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         value={formData.sourceUrl}
         onChange={(e) => {
           const rawValue = e.target.value;
-          const normalizedValue = rawValue.trim()
-            ? normalizeUrl(rawValue)
-            : "";
+          const normalizedValue = rawValue.trim() ? normalizeUrl(rawValue) : "";
           setFormData((prev) => ({
             ...prev,
             sourceUrl: normalizedValue,
@@ -482,13 +495,6 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
         disabled={isLoading}
       />
 
-      <SubmitButton
-        type={"submit"}
-        label={buttonText}
-        disabled={isSaving || isUpdating || isLoading || isProfileLoading}
-        className="mx-auto"
-      />
-
       <section className="flex flex-col items-center mt-4">
         {successMessage && (
           <FeedbackMessage
@@ -515,6 +521,13 @@ const PortfolioItemUpsertForm = ({ itemId }: Props) => {
           </div>
         )}
       </section>
+
+      <SubmitButton
+        type={"submit"}
+        label={buttonText}
+        disabled={isSaving || isUpdating || isLoading || isProfileLoading}
+        className="mx-auto"
+      />
     </form>
   );
 };

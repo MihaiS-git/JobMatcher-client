@@ -5,12 +5,12 @@ import {
   useCreateProposalMutation,
   useGetProposalByIdQuery,
   useUpdateProposalByIdMutation,
+  useUpdateProposalStatusByIdMutation,
 } from "@/features/proposal/proposalApi";
 import useAuth from "@/hooks/useAuth";
 import useAutoClear from "@/hooks/useAutoClear";
 import type { ProposalFormValues } from "@/schemas/proposalSchema";
 import {
-  Priority,
   ProposalStatus,
   type ProposalRequestDTO,
 } from "@/types/ProposalDTO";
@@ -20,9 +20,6 @@ import { useForm } from "react-hook-form";
 import InputErrorMessage from "../InputErrorMessage";
 import SubmitButton from "@/components/SubmitButton";
 import type { Role } from "@/types/UserDTO";
-import {
-  PriorityLabels,
-} from "@/types/formLabels/proposalLabels";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -91,6 +88,8 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
     useCreateProposalMutation();
   const [updateProposal, { isLoading: isUpdating }] =
     useUpdateProposalByIdMutation();
+  const [updateProposalStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateProposalStatusByIdMutation();
 
   const defaultValues = useMemo<ProposalFormValues>(
     () => ({
@@ -107,7 +106,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
       plannedEndDate: "",
       actualStartDate: "",
       actualEndDate: "",
-      priority: Priority.NONE,
     }),
     [existingProposal?.projectId, freelancer?.profileId, projectId]
   );
@@ -142,7 +140,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
         plannedEndDate: existingProposal.plannedEndDate ?? "",
         actualStartDate: existingProposal.actualStartDate ?? "",
         actualEndDate: existingProposal.actualEndDate ?? "",
-        priority: existingProposal.priority ?? Priority.NONE,
       });
     }
   }, [existingProposal, projectId, reset]);
@@ -204,7 +201,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
       actualEndDate: data.actualEndDate
         ? new Date(data.actualEndDate).toISOString()
         : undefined,
-      priority: data.priority as Priority,
     };
 
     if (proposalId) {
@@ -242,12 +238,12 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
   function handleProposalAction(action: "accept" | "reject") {
     if (!existingProposal) return;
 
-    const updatedProposal = {
+    const updatedProposalStatus = {
       status:
         action === "accept" ? ProposalStatus.ACCEPTED : ProposalStatus.REJECTED,
     };
 
-    updateProposal({ id: existingProposal.id, updatedProposal })
+    updateProposalStatus({ id: existingProposal.id, updatedProposalStatus })
       .unwrap()
       .then(() => {
         setSuccessMessage(`Proposal ${action}ed successfully.`);
@@ -631,45 +627,6 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
               </div>
             )}
 
-            {editableFields.includes("priority") && (
-              <div className="flex flex-col items-start w-full max-w-2xl my-2 px-2">
-                <label
-                  htmlFor="priority"
-                  className="font-semibold text-sm xl:text-base"
-                >
-                  Priority
-                </label>
-                <select
-                  id="priority"
-                  {...register("priority", {
-                    onChange: () => clearFieldError("priority"),
-                  })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
-                  aria-invalid={!!errors.priority}
-                  aria-describedby={
-                    errors.priority ? "priority-error" : undefined
-                  }
-                >
-                  {Object.values(Priority).map((priority) => (
-                    <option key={priority} value={priority}>
-                      {PriorityLabels[priority]}
-                    </option>
-                  ))}
-                </select>
-                {(typeof errors.priority?.message === "string" ||
-                  validationErrors?.priority) && (
-                  <InputErrorMessage
-                    message={
-                      (typeof errors.priority?.message === "string"
-                        ? errors.priority.message
-                        : undefined) ?? validationErrors?.priority
-                    }
-                    label={"priority"}
-                  />
-                )}
-              </div>
-            )}
-
             <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
               <SubmitButton
                 type="submit"
@@ -682,24 +639,24 @@ const UpsertProposalForm = ({ projectId, proposalId }: ProposalProps) => {
                 className="cursor-pointer"
               />
               {existingProposal && existingProposal.status === "PENDING" && (
-                <Button
-                  variant="default"
-                  onClick={() => handleProposalAction("accept")}
-                  disabled={isUpdating}
-                  className="w-80 bg-green-600 text-gray-100 hover:bg-green-500 cursor-pointer"
-                >
-                  Accept Proposal
-                </Button>
-              )}
-              {existingProposal && existingProposal.status === "PENDING" && (
-                <Button
-                  variant="destructive"
-                  onClick={() => handleProposalAction("reject")}
-                  disabled={isUpdating}
-                  className="w-80 cursor-pointer"
-                >
-                  Reject Proposal
-                </Button>
+                <>
+                  <Button
+                    variant="default"
+                    onClick={() => handleProposalAction("accept")}
+                    disabled={isUpdatingStatus}
+                    className="w-80 bg-green-600 text-gray-100 hover:bg-green-500 cursor-pointer"
+                  >
+                    Accept Proposal
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleProposalAction("reject")}
+                    disabled={isUpdatingStatus}
+                    className="w-80 cursor-pointer"
+                  >
+                    Reject Proposal
+                  </Button>
+                </>
               )}
             </div>
           </form>

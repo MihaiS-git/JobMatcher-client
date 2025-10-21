@@ -1,5 +1,6 @@
+import type { InvoiceSummaryDTO } from "./InvoiceDTO";
 import type { MilestoneResponseDTO } from "./MilestoneDTO";
-import type { PaymentType } from "./ProjectDTO";
+import type { PaymentType } from "./PaymentDTO";
 import type { PaymentStatus } from "./ProposalDTO";
 import type { AddressResponseDTO } from "./UserDTO";
 
@@ -20,6 +21,10 @@ export const ContractStatus = {
 export type ContractStatus =
   (typeof ContractStatus)[keyof typeof ContractStatus];
 
+  export type ContractStatusRequestDTO ={
+    status: ContractStatus;
+  };
+
 export type ContractDetailDTO = {
   id: string;
   proposalId: string;
@@ -37,8 +42,8 @@ export type ContractDetailDTO = {
   startDate: string;
   endDate: string;
   paymentType: PaymentType;
-  milestones: Set<MilestoneResponseDTO>;
-  invoices: Set<string>;
+  milestones: MilestoneResponseDTO[];
+  invoices: InvoiceSummaryDTO[];
   paymentId: string;
   totalPaid: string;
   remainingBalance: string;

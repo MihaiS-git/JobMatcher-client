@@ -1,4 +1,7 @@
-import { useGetProjectByIdQuery } from "@/features/projects/projectsApi";
+import {
+  useGetProjectByIdQuery,
+  useUpdateProjectStatusMutation,
+} from "@/features/projects/projectsApi";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { toTitleCase } from "@/utils/stringEdit";
@@ -10,6 +13,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi";
 import { useGetProposalByFreelancerIdAndProjectIdQuery } from "@/features/proposal/proposalApi";
 import useFreelancerId from "@/hooks/useFreelancerId";
+import { ProjectStatus } from "@/types/ProjectDTO";
 
 type ProjectDetailsProps = {
   projectId: string;
@@ -47,6 +51,9 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
     { skip: !freelancerId || !projectId }
   );
 
+  const [updateProjectStatus, { isLoading: isUpdating }] =
+    useUpdateProjectStatusMutation();
+
   const handleApply = () => {
     const from = location.pathname + location.search;
     sessionStorage.setItem("lastProjectURL", from);
@@ -79,6 +86,17 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
 
   if (freelancerError) {
     return <div>Error loading freelancer data</div>;
+  }
+
+  function handlePublishProject(): void {
+    if (project?.id) {
+      updateProjectStatus({
+        id: project.id,
+        data: { status: ProjectStatus.OPEN },
+      });
+    } else {
+      console.error("Project ID is undefined.");
+    }
   }
 
   return (
@@ -145,6 +163,19 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
             <b>Description:</b> {project?.description}
           </p>
         </div>
+
+        {role === "CUSTOMER" && project?.status === ProjectStatus.DRAFT && (
+          <div className="space-y-2 my-4 w-full text-center">
+            <Button
+              variant="default"
+              size="lg"
+              onClick={() => handlePublishProject()}
+            >
+              Publish
+            </Button>
+          </div>
+        )}
+
         {role === "STAFF" && !profileLoading && !profileError && !profile && (
           <div className="col-span-2 space-y-2 my-8 text-center">
             <p className="text-red-500">
@@ -166,13 +197,13 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
           </div>
         )}
 
-        <section className="col-span-2 space-y-2 my-8 text-center gap-2 flex justify-center">
+        <section className="col-span-2 space-y-2 my-4 text-center gap-2 flex justify-center">
           {role === "STAFF" && profile && (
             <Button
               variant="default"
               size="sm"
               onClick={existingProposal ? navigateToProposal : handleApply}
-              className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
+              className="bg-blue-500 hover:bg-blue-600 text-white"
             >
               {existingProposal ? "View Proposal" : "Create Proposal"}
             </Button>
@@ -185,8 +216,12 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
               onClick={() =>
                 project?.contractId && navigateToContract(project.contractId)
               }
-              className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-              disabled={!project?.contractId}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+              disabled={
+                !project?.contractId ||
+                isUpdating ||
+                project?.status === ProjectStatus.DRAFT
+              }
             >
               View Contract
             </Button>

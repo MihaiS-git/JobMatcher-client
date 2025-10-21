@@ -3,9 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
-import { PaymentTypeLabels } from "@/types/formLabels/contractLabels";
 import useAuth from "@/hooks/useAuth";
 import PayInvoiceButton from "./PayInvoiceButton";
+import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const InvoiceDetails = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();

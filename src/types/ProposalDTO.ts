@@ -5,34 +5,18 @@ export const ProposalStatus = {
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
   WITHDRAWN: "WITHDRAWN",
-  NONE: "NONE",
 } as const;
 
 export type ProposalStatus =
   (typeof ProposalStatus)[keyof typeof ProposalStatus];
 
 export const PaymentStatus = {
-  NOT_APPLICABLE: "NOT_APPLICABLE",
-  NOT_STARTED: "NOT_STARTED",
-  PENDING: "PENDING",
-  PROCESSING: "PROCESSING",
   PAID: "PAID",
-  PARTIALLY_PAID: "PARTIALLY_PAID",
-  OVERDUE: "OVERDUE",
   REFUNDED: "REFUNDED",
+  FAILED: "FAILED",
 } as const;
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
-
-export const Priority = {
-  LOW: "LOW",
-  MEDIUM: "MEDIUM",
-  HIGH: "HIGH",
-  URGENT: "URGENT",
-  NONE: "NONE",
-} as const;
-
-export type Priority = (typeof Priority)[keyof typeof Priority];
 
 export type ProposalRequestDTO = {
   projectId: string;
@@ -48,7 +32,10 @@ export type ProposalRequestDTO = {
   plannedEndDate?: string; // ISO date string
   actualStartDate?: string; // ISO date string
   actualEndDate?: string; // ISO date string
-  priority?: Priority;
+};
+
+export type ProposalStatusRequestDTO = {
+  status?: ProposalStatus;
 };
 
 export type ProposalDetailDTO = {
@@ -66,7 +53,6 @@ export type ProposalDetailDTO = {
   plannedEndDate: string; // ISO date string
   actualStartDate: string;
   actualEndDate: string;
-  priority: Priority;
   milestonesIds: string[];
   createdAt: string; // ISO date string
   lastUpdate: string; // ISO date string
@@ -87,7 +73,6 @@ export type ProposalSummaryDTO = {
   plannedEndDate: string; // ISO date string
   actualStartDate: string;
   actualEndDate: string;
-  priority: Priority;
   createdAt: string; // ISO date string
   lastUpdate: string; // ISO date string
 };

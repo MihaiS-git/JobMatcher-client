@@ -19,6 +19,7 @@ export type PortfolioItemSummaryDTO = {
   description: string;
   category: JobCategoryDTO;
   subcategories: JobCategoryDTO[];
+  imageUrls?: string[];
   freelancerProfileId?: string;
 }
 

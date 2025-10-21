@@ -1,14 +1,16 @@
 import {
   useDeleteContractByIdMutation,
   useGetAllContractsQuery,
+  useUpdateContractStatusByIdMutation,
 } from "@/features/contracts/contractsApi";
 import useAuth from "@/hooks/useAuth";
-import { ContractStatus, type ContractSummaryDTO } from "@/types/ContractDTO";
 import {
-  ContractStatusLabels,
-  PaymentTypeLabels,
-} from "@/types/formLabels/contractLabels";
-import { PaymentType } from "@/types/ProjectDTO";
+  ContractStatus,
+  type ContractStatusRequestDTO,
+  type ContractSummaryDTO,
+} from "@/types/ContractDTO";
+import { ContractStatusLabels } from "@/types/formLabels/contractLabels";
+import { PaymentType } from "@/types/PaymentDTO";
 import { parseApiError } from "@/utils/parseApiError";
 import { useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -23,6 +25,7 @@ import {
 import { formatDate } from "@/utils/formatDate";
 import { formatCurrency } from "@/utils/formatCurrency";
 import PagePagination from "../PagePagination";
+import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const ContractsList = () => {
   const navigate = useNavigate();
@@ -215,6 +218,7 @@ const ContractsList = () => {
   }
 
   const [deleteContract] = useDeleteContractByIdMutation();
+  const [updateContractStatus] = useUpdateContractStatusByIdMutation();
 
   const handleDeleteContract = async (id: string): Promise<void> => {
     if (!window.confirm("Are you sure you want to delete this contract?"))
@@ -225,6 +229,25 @@ const ContractsList = () => {
       await deleteContract(id).unwrap();
     } catch (err: unknown) {
       alert("Failed to delete contract:" + parseApiError(err));
+    }
+  };
+
+  const handleUpdateContractStatus = async (
+    id: string,
+    status: ContractStatusRequestDTO
+  ): Promise<void> => {
+    if (
+      !window.confirm(
+        "Are you sure you want to change the status of this contract?"
+      )
+    )
+      return;
+    if (!id) return;
+
+    try {
+      await updateContractStatus({ id, status }).unwrap();
+    } catch (err: unknown) {
+      alert("Failed to update contract status:" + parseApiError(err));
     }
   };
 
@@ -546,27 +569,6 @@ const ContractsList = () => {
                     </div>
                   </div>
                 </th>
-                <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
-                  <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Payment Type</span>
-                    <div className="flex gap-1">
-                      <SortButton
-                        column="paymentType"
-                        direction="asc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowDownAZ}
-                      />
-                      <SortButton
-                        column="paymentType"
-                        direction="desc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowUpAZ}
-                      />
-                    </div>
-                  </div>
-                </th>
                 <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-center relative border border-gray-400">
                   <div className="flex items-center justify-between">
                     <span className="flex-1 text-center">Actions</span>
@@ -606,22 +608,92 @@ const ContractsList = () => {
                     {formatDate(contract.endDate)}
                   </td>
                   <td className="border border-gray-400">
-                    {PaymentTypeLabels[contract.paymentType]}
-                  </td>
-                  <td className="border border-gray-400">
-                    <div className="flex flex-row justify-center items-center gap-2 w-full">
+                    <div className="flex flex-col justify-center items-center gap-0.5 m-0.5 w-full">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteContract(contract.id);
                         }}
-                        className="bg-red-500 hover:bg-red-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
-                        disabled={["COMPLETED", "TERMINATED"].includes(
-                          contract.status ?? ""
-                        )}
+                        className="bg-red-500 hover:bg-red-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-xs rounded py-0.5 px-4 w-25 cursor-pointer"
+                        disabled={[
+                          "ACTIVE",
+                          "CANCELED",
+                          "COMPLETED",
+                          "TERMINATED",
+                        ].includes(contract.status ?? "")}
                       >
                         Delete
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUpdateContractStatus(contract.id, {
+                            status: ContractStatus.TERMINATED,
+                          });
+                        }}
+                        className="bg-red-500 hover:bg-red-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-xs rounded py-0.5 px-4 w-25 cursor-pointer"
+                        disabled={[
+                          "CANCELED",
+                          "COMPLETED",
+                          "TERMINATED",
+                        ].includes(contract.status ?? "")}
+                      >
+                        Terminate
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUpdateContractStatus(contract.id, {
+                            status: ContractStatus.CANCELLED,
+                          });
+                        }}
+                        className="bg-red-500 hover:bg-red-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-xs rounded py-0.5 px-4 w-25 cursor-pointer"
+                        disabled={[
+                          "CANCELED",
+                          "COMPLETED",
+                          "TERMINATED",
+                        ].includes(contract.status ?? "")}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUpdateContractStatus(contract.id, {
+                            status: ContractStatus.ON_HOLD,
+                          });
+                        }}
+                        className="bg-gray-900 hover:bg-gray-800 disabled:bg-gray-500 disabled:text-gray-400 text-white text-xs rounded py-0.5 px-4 w-25 cursor-pointer"
+                        disabled={[
+                          "ON_HOLD",
+                          "CANCELED",
+                          "COMPLETED",
+                          "TERMINATED",
+                        ].includes(contract.status ?? "")}
+                      >
+                        On Hold
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUpdateContractStatus(contract.id, {
+                            status: ContractStatus.ACTIVE,
+                          });
+                        }}
+                        className="bg-green-700 hover:bg-green-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-xs rounded py-0.5 px-4 w-25 cursor-pointer"
+                        disabled={[
+                          "ACTIVE",
+                          "CANCELED",
+                          "COMPLETED",
+                          "TERMINATED",
+                        ].includes(contract.status ?? "")}
+                      >
+                        Activate
                       </button>
                     </div>
                   </td>
@@ -629,7 +701,9 @@ const ContractsList = () => {
               ))}
               {contracts?.totalElements === 0 && !isLoadingContracts && (
                 <tr className="w-full text-center mt-24 text-sm text-gray-500">
-                  <td colSpan={8}>No contracts found for the selected filters.</td>
+                  <td colSpan={8}>
+                    No contracts found for the selected filters.
+                  </td>
                 </tr>
               )}
             </tbody>

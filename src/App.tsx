@@ -23,11 +23,15 @@ const PublicProfileFormPage = lazy(
   () => import("./pages/profile/PublicProfileFormPage")
 );
 const PortfolioPage = lazy(() => import("./pages/profile/PortfolioPage"));
+const FreelancerPortfolioPage = lazy(() => import("./pages/profile/FreelancerPortfolioPage"));
 const PortfolioItemPage = lazy(
   () => import("./pages/profile/PortfolioItemPage")
 );
 const PortfolioNewItemPage = lazy(
   () => import("./pages/profile/PortfolioNewItemPage")
+);
+const PortfolioItemDetailPage = lazy(
+  () => import("./pages/profile/PortfolioItemDetailPage")
 );
 const CreateProjectPage = lazy(
   () => import("./pages/projects/CreateProjectPage")
@@ -174,6 +178,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/portfolio/freelancer/:id",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <FreelancerPortfolioPage />
+          </Suspense>
+        ),
+      },
+      {
         path: "/portfolio",
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
@@ -202,6 +214,14 @@ const router = createBrowserRouter([
             ),
           },
         ],
+      },
+      {
+        path: "/portfolio/item/:itemId",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <PortfolioItemDetailPage />
+          </Suspense>
+        ),
       },
       {
         path: "/projects/create",

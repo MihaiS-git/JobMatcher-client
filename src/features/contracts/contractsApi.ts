@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "../baseQueryWithReauth";
 import type {
   ContractDetailDTO,
+  ContractStatusRequestDTO,
   ContractSummaryDTO,
 } from "@/types/ContractDTO";
 
@@ -68,6 +69,20 @@ export const contractsApi = createApi({
       ],
       keepUnusedDataFor: 300,
     }),
+    updateContractStatusById: builder.mutation<
+    ContractDetailDTO, 
+    {id: string; status: ContractStatusRequestDTO}
+    >({
+      query: ({ id, status }) => ({
+        url: `/contracts/status/${id}`,
+        method: "PATCH",
+        body: status,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "Contract", id },
+        { type: "Contract", id: "LIST" },
+      ],
+    }),
     deleteContractById: builder.mutation<void, string>({
       query: (id: string) => ({
         url: `/contracts/${id}`,
@@ -85,5 +100,6 @@ export const {
   useGetAllContractsQuery,
   useGetContractByIdQuery,
   useGetContractByProjectIdQuery,
+  useUpdateContractStatusByIdMutation,
   useDeleteContractByIdMutation,
 } = contractsApi;

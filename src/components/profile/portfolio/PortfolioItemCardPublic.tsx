@@ -1,6 +1,4 @@
-import { useDeletePortfolioItemMutation } from "@/features/profile/portfolio/portfolioApi";
 import type { PortfolioItemSummaryDTO } from "@/types/PortfolioDTO";
-import { Trash2 } from "lucide-react";
 import fallbackImage from "@/assets/react.svg";
 
 type Props = {
@@ -8,13 +6,7 @@ type Props = {
   selected?: boolean;
 };
 
-const PortfolioItemCard = ({ item, selected }: Props) => {
-  const [deletePortfolioItem] = useDeletePortfolioItemMutation();
-
-  const handleDeleteItem = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    deletePortfolioItem(item.id);
-  };
+const PortfolioItemCardPublic = ({ item, selected }: Props) => {
 
   return (
     <div
@@ -36,11 +28,8 @@ const PortfolioItemCard = ({ item, selected }: Props) => {
             {item.subcategories?.map((s) => s.name).join(", ") || "None"}
           </p>
         </div>
-        <div className="flex flex-col justify-center items-end">
-          <Trash2 className="text-red-500 w-5 h-5" onClick={handleDeleteItem} />
-        </div>
     </div>
   );
 };
 
-export default PortfolioItemCard;
+export default PortfolioItemCardPublic;

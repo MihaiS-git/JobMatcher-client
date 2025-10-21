@@ -7,9 +7,10 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { Button } from "../ui/button";
 import FeedbackMessage from "../FeedbackMessage";
-import { PaymentType } from "@/types/ProjectDTO";
 import { useCreateInvoiceMutation } from "@/features/invoices/invoiceApi";
 import useAuth from "@/hooks/useAuth";
+import { PaymentType } from "@/types/PaymentDTO";
+import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 type ContractDetailsProps = {
   contractId: string;
@@ -202,7 +203,7 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
                   : "N/A"}
               </p>
               <p className="ms-2">
-                <b>Payment Type:</b> {contract?.paymentType}
+                <b>Payment Type:</b> {PaymentTypeLabels[contract?.paymentType]}
               </p>
             </div>
           </section>
@@ -273,31 +274,35 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
           <Button
             variant="default"
             size="sm"
-            className="cursor-pointer font-light text-xs"
+            className="bg-blue-500 hover:bg-blue-600 text-white"
             onClick={() => handleMilestonesClick(contract.id)}
           >
-            Edit Milestones
+            Milestones
           </Button>
         </div>
       )}
-      {contract.paymentType !== PaymentType.MILESTONE && role === "STAFF" && (
-        <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
-          <Button
-            type="button"
-            variant="default"
-            onClick={() => {
-              handleCreateInvoice(contract.id);
-            }}
-            className="cursor-pointer"
-            disabled={
-              isCreatingInvoice ||
-              ["TERMINATED", "ON_HOLD", "CANCELLED"].includes(contract.status!)
-            }
-          >
-            Create Invoice
-          </Button>
-        </div>
-      )}
+      {contract.paymentType !== PaymentType.MILESTONE &&
+        role === "STAFF" &&
+        contract.invoices.length === 0 && (
+          <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
+            <Button
+              type="button"
+              variant="default"
+              onClick={() => {
+                handleCreateInvoice(contract.id);
+              }}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+              disabled={
+                isCreatingInvoice ||
+                ["TERMINATED", "ON_HOLD", "CANCELLED", "COMPLETED"].includes(
+                  contract.status!
+                )
+              }
+            >
+              Create Invoice
+            </Button>
+          </div>
+        )}
       {successMessage && successMessage !== "" && (
         <div className="p-4 w-full text-start font-light text-sm">
           <FeedbackMessage

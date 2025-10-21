@@ -18,11 +18,11 @@ import {
 import SortButton from "../ProjectsSortButton";
 import PagePagination from "../PagePagination";
 import {
-  ProjectPaymentTypeLabel,
   ProjectStatusLabels,
 } from "@/types/formLabels/projectLabels";
 import { useEffect } from "react";
 import useAuth from "@/hooks/useAuth";
+import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -549,7 +549,7 @@ const ProjectList = () => {
                   </td>
                   <td className=" truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
                     {project.paymentType
-                      ? ProjectPaymentTypeLabel[project.paymentType]
+                      ? PaymentTypeLabels[project.paymentType]
                       : "N/A"}
                   </td>
                   <td className=" truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">

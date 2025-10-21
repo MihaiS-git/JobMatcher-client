@@ -11,7 +11,7 @@ import {
   type MilestoneItem,
 } from "@/schemas/milestoneSchema";
 import { PriorityLabels } from "@/types/formLabels/proposalLabels";
-import { Priority } from "@/types/ProposalDTO";
+import { Priority } from "@/types/MilestoneDTO";
 import type { Role } from "@/types/UserDTO";
 import { parseValidationErrors } from "@/utils/parseApiError";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -134,7 +134,6 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
       }
     }
     reset({ milestones: [] });
-    alert("Milestones added successfully!");
   };
 
   return (
@@ -487,6 +486,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                   type="button"
                   onClick={() => remove(index)}
                   variant="destructive"
+                  className="w-40"
                 >
                   Remove Milestone
                 </Button>
@@ -498,6 +498,8 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
         <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
           <Button
             type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white w-40"
+            variant="default"
             onClick={() =>
               append({
                 title: "",
@@ -508,7 +510,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                 penaltyAmount: "0",
                 bonusAmount: "0",
                 notes: "",
-                priority: "NONE",
+                priority: "LOW" as Priority,
               })
             }
           >
@@ -516,7 +518,12 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
           </Button>
 
           {fields.length > 0 && (
-            <Button type="submit">Save All Milestones</Button>
+            <Button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white w-40"
+            >
+              Save All Milestones
+            </Button>
           )}
         </div>
       </form>

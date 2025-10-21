@@ -13,7 +13,7 @@ const SubmitButton = ({type, disabled, className, label, onClick}: Props) => {
         <Button
           type={type}
           disabled={disabled}
-          className={`bg-blue-500 text-gray-200 p-2 rounded-sm border border-gray-200 hover:bg-blue-400 mt-4 w-80 disabled:bg-gray-400 disabled:cursor-not-allowed ${className}`}
+          className={`bg-blue-500 text-gray-200 p-2 rounded-sm border border-gray-200 hover:bg-blue-400 mt-4 w-80 disabled:bg-gray-400 disabled:cursor-not-allowed ${className} cursor-pointer`}
           onClick={onClick}
         >
           {label}

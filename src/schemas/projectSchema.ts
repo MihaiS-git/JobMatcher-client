@@ -1,12 +1,9 @@
-import { PaymentType, ProjectStatus } from "@/types/ProjectDTO";
+import { PaymentType } from "@/types/PaymentDTO";
 import { z } from "zod";
 
 const projectSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  status: z
-    .enum(Object.values(ProjectStatus) as [string, ...string[]])
-    .optional(),
   budget: z
     .string()
     .refine(

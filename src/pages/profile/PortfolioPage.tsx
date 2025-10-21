@@ -3,6 +3,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import PortfolioItemCard from "@/components/profile/portfolio/PortfolioItemCard";
+import { Button } from "@/components/ui/button";
 import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi";
 import { useGetPortfolioItemsByProfileIdQuery } from "@/features/profile/portfolio/portfolioApi";
 import useAuth from "@/hooks/useAuth";
@@ -56,12 +57,12 @@ const PortfolioPage = () => {
   if (isLoading || isProfileLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <LoadingSpinner size={48} />
+        <LoadingSpinner fullScreen={true} size={48} />
       </div>
     );
   }
   if (profileError || portfolioError) {
-    return <div>Error loading portfolio items.</div>;
+    return <FeedbackMessage message={apiError ?? "Error loading portfolio items."} type="error" />;
   }
 
   return (
@@ -96,13 +97,14 @@ const PortfolioPage = () => {
           ))}
         </ul>
 
-        <button
+        <Button
+          variant="default"
           type="submit"
-          className="bg-blue-500 text-gray-200 p-2 rounded-sm border border-gray-200 hover:bg-blue-400 mt-4 w-80 disabled:bg-gray-400"
-          onClick={() => navigate("/portfolio/new")}
+          className="bg-blue-500 text-gray-200 p-2 rounded-sm border border-gray-200 hover:bg-blue-400 mt-4 w-40 disabled:bg-gray-400"
+          onClick={() => navigate("/portfolio/new", { replace: false, state: { reset: Date.now() } })}
         >
           Add New Item
-        </button>
+        </Button>
 
         <Outlet />
 

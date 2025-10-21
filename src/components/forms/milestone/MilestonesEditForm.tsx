@@ -10,7 +10,7 @@ import {
 import { useCreateInvoiceMutation } from "@/features/invoices/invoiceApi";
 import { milestoneSchema, type MilestoneItem } from "@/schemas/milestoneSchema";
 import { PriorityLabels } from "@/types/formLabels/proposalLabels";
-import { Priority } from "@/types/ProposalDTO";
+import { Priority } from "@/types/MilestoneDTO";
 import type { Role } from "@/types/UserDTO";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { parseApiError, parseValidationErrors } from "@/utils/parseApiError";
@@ -99,7 +99,7 @@ const MilestonesEditForm = ({
       notes: milestoneData?.notes || "",
       plannedStartDate: milestoneData?.plannedStartDate || "",
       actualStartDate: milestoneData?.actualStartDate || "",
-      priority: milestoneData?.priority || "NONE",
+      priority: milestoneData?.priority || "LOW" as Priority,
     }),
     [milestoneData]
   );
@@ -139,7 +139,7 @@ const MilestonesEditForm = ({
         notes: milestoneData.notes || "",
         plannedStartDate: milestoneData.plannedStartDate || "",
         actualStartDate: milestoneData.actualStartDate || "",
-        priority: milestoneData.priority || "NONE",
+        priority: milestoneData.priority || "LOW" as Priority,
       });
     }
   }, [milestoneData, reset]);
@@ -184,7 +184,7 @@ const MilestonesEditForm = ({
       notes: data.notes || "",
       plannedStartDate: data.plannedStartDate || "",
       actualStartDate: data.actualStartDate || "",
-      priority: data.priority || "NONE",
+      priority: data.priority || "LOW" as Priority,
     };
 
     try {
@@ -241,77 +241,77 @@ const MilestonesEditForm = ({
     <>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full px-4 pb-40 flex flex-col items-center"
+        className="w-full px-4 flex flex-col items-center"
       >
         {isLoadingMilestone && <LoadingSpinner fullScreen={false} size={24} />}
         {milestoneError && <FeedbackMessage message={apiError} />}
-        <section className="w-full max-w-2xl my-4 border border-gray-400 rounded-sm p-4 bg-gray-600">
-          <div>
-            <span className="font-semibold">Title</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.title || "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Description</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.description || "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Amount</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.amount
-                ? formatCurrency(milestoneData?.amount)
-                : "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Penalty Amount</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.penaltyAmount
-                ? formatCurrency(milestoneData?.penaltyAmount)
-                : "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Bonus Amount</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.bonusAmount
-                ? formatCurrency(milestoneData?.bonusAmount)
-                : "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Estimated Duration (in days)</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.estimatedDuration || "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Planned Start Date</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.plannedStartDate || "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Actual Start Date</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.actualStartDate || "N/A"}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Priority</span>
-            <p className="ms-4 font-light text-sm">
-              {PriorityLabels[milestoneData?.priority || "NONE"]}
-            </p>
-          </div>
-          <div>
-            <span className="font-semibold">Notes</span>
-            <p className="ms-4 font-light text-sm">
-              {milestoneData?.notes || "N/A"}
-            </p>
-          </div>
+        <section className="w-full max-w-2xl my-4 border border-gray-400 rounded-sm p-4 bg-gray-200 grid grid-cols-2">
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Title: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.title || "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Description: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.description || "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Amount: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.amount
+              ? formatCurrency(milestoneData?.amount)
+              : "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Penalty Amount: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.penaltyAmount
+              ? formatCurrency(milestoneData?.penaltyAmount)
+              : "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Bonus Amount: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.bonusAmount
+              ? formatCurrency(milestoneData?.bonusAmount)
+              : "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Estimated Duration: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.estimatedDuration || "N/A"} days
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Planned Start Date: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.plannedStartDate || "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Actual Start Date: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.actualStartDate || "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Priority: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {PriorityLabels[milestoneData?.priority || "LOW" as Priority] || "N/A"}
+          </p>
+          <p className="ms-4 font-light text-sm">
+            <span className="font-semibold">Notes: </span>
+          </p>
+          <p className="ms-4 font-light text-sm">
+            {milestoneData?.notes || "N/A"}
+          </p>
         </section>
         <fieldset
           className="w-full flex flex-col items-center"
@@ -626,7 +626,7 @@ const MilestonesEditForm = ({
                   onClick={() => {
                     handleCreateInvoice(milestoneData!.id);
                   }}
-                  className="cursor-pointer"
+                  className="bg-blue-500 hover:bg-blue-600 text-white w-35"
                   disabled={
                     isUpdating ||
                     isLoadingMilestone ||
@@ -644,7 +644,7 @@ const MilestonesEditForm = ({
               <Button
                 type="submit"
                 variant="default"
-                className="cursor-pointer"
+                className="bg-blue-500 hover:bg-blue-600 text-white w-35"
                 disabled={
                   isUpdating || isLoadingMilestone || isDeletingMilestone
                 }
@@ -656,7 +656,7 @@ const MilestonesEditForm = ({
               <Button
                 type="button"
                 variant="destructive"
-                className="cursor-pointer"
+                className="w-35"
                 disabled={
                   isUpdating || isLoadingMilestone || isDeletingMilestone
                 }

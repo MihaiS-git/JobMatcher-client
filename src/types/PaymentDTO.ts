@@ -3,6 +3,15 @@ import type { InvoiceSummaryDTO } from "./InvoiceDTO";
 import type { MilestoneResponseDTO } from "./MilestoneDTO";
 import { PaymentStatus } from "./ProposalDTO";
 
+export const PaymentType = {
+  UPFRONT: "UPFRONT",
+  MILESTONE: "MILESTONE",
+  UPON_COMPLETION: "UPON_COMPLETION",
+  COMMISSION: "COMMISSION",
+} as const;
+
+export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType];
+
 export type StripeCheckoutRequestDTO = {
   invoiceId: string;
 };
@@ -31,3 +40,4 @@ export type PaymentDetailDTO = {
   paidAt: string;
   notes: string
 };
+

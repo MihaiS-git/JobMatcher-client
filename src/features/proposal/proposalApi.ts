@@ -3,6 +3,7 @@ import { baseQueryWithReauth } from "../baseQueryWithReauth";
 import type {
   ProposalDetailDTO,
   ProposalRequestDTO,
+  ProposalStatusRequestDTO,
   ProposalSummaryDTO,
 } from "@/types/ProposalDTO";
 
@@ -118,6 +119,20 @@ export const proposalApi = createApi({
         { type: "Proposal", id: "LIST" },
       ],
     }),
+    updateProposalStatusById: builder.mutation<
+      ProposalSummaryDTO,
+      { id: string; updatedProposalStatus: ProposalStatusRequestDTO }
+    >({
+      query: ({ id, updatedProposalStatus }) => ({
+        url: `/proposals/status/${id}`,
+        method: "PATCH",
+        body: updatedProposalStatus,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "Proposal", id },
+        { type: "Proposal", id: "LIST" },
+      ],
+    }),
     deleteProposalById: builder.mutation<
       { success: boolean; id: string },
       string
@@ -141,5 +156,6 @@ export const {
   useGetProposalByFreelancerIdAndProjectIdQuery,
   useCreateProposalMutation,
   useUpdateProposalByIdMutation,
+  useUpdateProposalStatusByIdMutation,
   useDeleteProposalByIdMutation,
 } = proposalApi;

@@ -42,7 +42,7 @@ export const milestoneSchema = z.object({
       return !isNaN(date.getTime());
     }, "Actual Start Date must be a valid date")
     .optional(),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT", "NONE"]).optional(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
 });
 
 export const milestonesFormSchema = z.object({

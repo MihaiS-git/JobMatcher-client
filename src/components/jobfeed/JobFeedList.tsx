@@ -3,7 +3,7 @@ import {
 } from "@/features/projects/projectsApi";
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
-import { JobFeederProjectStatus, ProjectStatus } from "@/types/ProjectDTO";
+import { ProjectStatus } from "@/types/ProjectDTO";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
@@ -17,10 +17,10 @@ import {
 import SortButton from "../ProjectsSortButton";
 import PagePagination from "../PagePagination";
 import {
-  ProjectPaymentTypeLabel,
   ProjectStatusLabels,
 } from "@/types/formLabels/projectLabels";
 import { useEffect } from "react";
+import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const JobFeedList = () => {
   const navigate = useNavigate();
@@ -321,7 +321,7 @@ const JobFeedList = () => {
               >
                 <option value={""}>All Statuses</option>
 
-                {Object.values(JobFeederProjectStatus).map((status) => (
+                {Object.values(ProjectStatus).map((status) => (
                   <option key={status} value={status}>
                     {ProjectStatusLabels[status]}
                   </option>
@@ -517,7 +517,7 @@ const JobFeedList = () => {
                   </td>
                   <td className=" truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">
                     {project.paymentType
-                      ? ProjectPaymentTypeLabel[project.paymentType]
+                      ? PaymentTypeLabels[project.paymentType]
                       : "N/A"}
                   </td>
                   <td className=" truncate max-w-[110px] overflow-hidden whitespace-nowrap mx-auto">

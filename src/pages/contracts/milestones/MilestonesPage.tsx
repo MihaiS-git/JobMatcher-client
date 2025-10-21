@@ -16,9 +16,9 @@ const MilestonesPage = () => {
     <PageContent className="pb-16 px-4">
       <section
         className="flex flex-col items-center p-0 pt-4 pb-16 w-full"
-        aria-labelledby="add-milestones-heading"
+        aria-labelledby="milestones-heading"
       >
-        <PageTitle title="Contract Milestones" id="add-milestones-heading" />
+        <PageTitle title="Milestones" id="milestones-heading" />
         <BackButton label={"lastContractURL"} />
         <MilestonesTable contractId={contractId} />
         <hr className="w-full border-t border-gray-400 my-4" />

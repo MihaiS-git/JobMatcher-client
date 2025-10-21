@@ -8,15 +8,25 @@ const DrawerAccordion = () => {
 
   const projectItems = [{ targetUrl: "/projects", itemTag: "Projects List" }];
   if (role === "CUSTOMER") {
-    projectItems.push({ targetUrl: "/projects/create", itemTag: "Create Project" });
+    projectItems.push({
+      targetUrl: "/projects/create",
+      itemTag: "Create Project",
+    });
   }
 
-  const profileItems = [{ targetUrl: "/profile", itemTag: "Profile" }, { targetUrl: "/edit_public_profile", itemTag: "Public Profile" }];
-  if( role === "STAFF" ) {
+  const profileItems = [
+    { targetUrl: "/profile", itemTag: "Profile" },
+    { targetUrl: "/edit_public_profile", itemTag: "Public Profile" },
+  ];
+  if (role === "STAFF") {
     profileItems.push({ targetUrl: "/portfolio", itemTag: "Portfolio" });
   }
 
-  const financialItems = [{ targetUrl: "/contracts", itemTag: "Contracts" }, { targetUrl: "/invoices", itemTag: "Invoices" }, { targetUrl: "/payments", itemTag: "Payments" }];
+  const financialItems = [
+    { targetUrl: "/contracts", itemTag: "Contracts" },
+    { targetUrl: "/invoices", itemTag: "Invoices" },
+    { targetUrl: "/payments", itemTag: "Payments" },
+  ];
 
   return (
     <Accordion
@@ -31,15 +41,17 @@ const DrawerAccordion = () => {
         items={projectItems}
       />
 
-      <DrawerAccordionItem
-        value="item-2"
-        label="Proposals"
-        items={[{ targetUrl: "/proposals", itemTag: "Proposals List" }]}
-      />
+      {role === "STAFF" && (
+        <DrawerAccordionItem
+          value="item-2"
+          label="Proposals"
+          items={[{ targetUrl: "/proposals", itemTag: "Proposals List" }]}
+        />
+      )}
 
       <DrawerAccordionItem
         value="item-3"
-        label="Financials"
+        label="Financial"
         items={financialItems}
       />
 

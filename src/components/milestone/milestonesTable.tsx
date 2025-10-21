@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FeedbackMessage from "../FeedbackMessage";
+import { MilestoneStatusLabels } from "@/types/formLabels/milestoneLabels";
+import { PriorityLabels } from "@/types/formLabels/proposalLabels";
 
 type MilestonesTableProps = {
   contractId: string;
@@ -24,6 +26,11 @@ const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
     { contractId: contractId as string, page: 0, size: 100 },
     { skip: !contractId }
   );
+
+  useEffect(() => {
+    console.log("Milestones: ", existentMilestones);
+    
+  }, [existentMilestones]);
 
   useEffect(() => {
     if (milestonesError) {
@@ -134,10 +141,10 @@ const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
                     {milestone.estimatedDuration}
                   </td>
                   <td className="border border-gray-300 p-2 truncate max-w-[150px]">
-                    {milestone.status}
+                    {MilestoneStatusLabels[milestone.status!]}
                   </td>
                   <td className="border border-gray-300 p-2 truncate max-w-[150px]">
-                    {milestone.paymentStatus}
+                    {milestone.paymentId ? "Paid" : "Unpaid"}
                   </td>
                   <td className="border border-gray-300 p-2 truncate max-w-[150px]">
                     {milestone.notes}
@@ -163,7 +170,7 @@ const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
                       : "N/A"}
                   </td>
                   <td className="border border-gray-300 p-2 truncate max-w-[150px]">
-                    {milestone.priority}
+                    {PriorityLabels[milestone.priority!]}
                   </td>
                 </tr>
               )

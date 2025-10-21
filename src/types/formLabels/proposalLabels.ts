@@ -5,14 +5,12 @@ export const ProposalStatusLabels: Record<ProposalStatus, string> = {
   ACCEPTED: "Accepted",
   REJECTED: "Rejected",
   WITHDRAWN: "Withdrawn",
-  NONE: "None",
 };
 
 export const PaymentStatusLabels: Record<PaymentStatus, string> = {
-  UNPAID: "Unpaid",
   PAID: "Paid",
-  OVERDUE: "Overdue",
-  NONE: "None",
+  REFUNDED: "Refunded",
+  FAILED: "Failed",
 };
 
 export const PriorityLabels: Record<Priority, string> = {

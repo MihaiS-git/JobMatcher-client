@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "../baseQueryWithReauth";
-import type { ProjectDetailDTO, ProjectRequestDTO, ProjectSummaryDTO } from "@/types/ProjectDTO";
+import type { ProjectDetailDTO, ProjectRequestDTO, ProjectStatusRequestDTO, ProjectSummaryDTO } from "@/types/ProjectDTO";
 
 export const projectsApi = createApi({
   reducerPath: "projectsApi",
@@ -106,6 +106,20 @@ export const projectsApi = createApi({
         { type: "Project", id: "LIST" },
       ],
     }),
+        updateProjectStatus: builder.mutation<
+      ProjectDetailDTO,
+      { id: string; data: ProjectStatusRequestDTO }
+    >({
+      query: ({ id, data }) => ({
+        url: `/projects/status/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "Project", id },
+        { type: "Project", id: "LIST" },
+      ],
+    }),
     deleteProject: builder.mutation<void, string>({
       query: (id) => ({
         url: `/projects/${id}`,
@@ -125,5 +139,6 @@ export const {
   useGetProjectByIdQuery,
   useCreateProjectMutation,
   useUpdateProjectMutation,
+  useUpdateProjectStatusMutation,
   useDeleteProjectMutation,
 } = projectsApi;

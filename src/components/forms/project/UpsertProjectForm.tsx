@@ -1,7 +1,6 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  PaymentType,
   ProjectStatus,
   type ProjectRequestDTO,
 } from "@/types/ProjectDTO";
@@ -25,10 +24,8 @@ import InputErrorMessage from "../InputErrorMessage";
 import useAutoClear from "@/hooks/useAutoClear";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import SubmitButton from "@/components/SubmitButton";
-import {
-  ProjectPaymentTypeLabel,
-  ProjectStatusLabels,
-} from "@/types/formLabels/projectLabels";
+import { PaymentType } from "@/types/PaymentDTO";
+import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 type ProjectProps = {
   projectId?: string;
@@ -92,9 +89,9 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
     () => ({
       title: "",
       description: "",
-      status: ProjectStatus.NONE,
+      status: ProjectStatus.DRAFT,
       budget: "0",
-      paymentType: PaymentType.NONE,
+      paymentType: PaymentType.UPON_COMPLETION,
       deadline: new Date().toISOString().slice(0, 10),
       categoryId: null,
       subcategoryIds: [],
@@ -121,9 +118,8 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
       reset({
         title: existingProject.title ?? "",
         description: existingProject.description ?? "",
-        status: existingProject.status ?? ProjectStatus.NONE,
         budget: existingProject.budget?.toString() ?? "0",
-        paymentType: existingProject.paymentType ?? PaymentType.NONE,
+        paymentType: existingProject.paymentType ?? PaymentType.UPON_COMPLETION,
         deadline: existingProject.deadline
           ? new Date(existingProject.deadline).toISOString().slice(0, 10)
           : new Date().toISOString().slice(0, 10),
@@ -155,7 +151,6 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
     const payload: ProjectRequestDTO = {
       ...data,
       budget: data.budget.toString(),
-      status: data.status as ProjectStatus,
       paymentType: data.paymentType as PaymentType,
       deadline: data.deadline
         ? new Date(data.deadline).toISOString().slice(0, 10)
@@ -409,41 +404,6 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
 
           <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
             <label
-              htmlFor="status"
-              className="font-semibold text-sm xl:text-base"
-            >
-              Status
-            </label>
-            <select
-              id="status"
-              {...register("status", {
-                onChange: () => clearFieldError("status"),
-              })}
-              className="bg-gray-200 text-gray-950 py-2 px-4 w-80 rounded-sm border border-gray-950 text-sm xl:text-base"
-              aria-invalid={!!errors.status}
-              aria-describedby={errors.status ? "status-error" : undefined}
-            >
-              {Object.values(ProjectStatus).map((status) => (
-                <option key={status} value={status}>
-                  {ProjectStatusLabels[status]}
-                </option>
-              ))}
-            </select>
-            {(typeof errors.status?.message === "string" ||
-              validationErrors?.status) && (
-              <InputErrorMessage
-                message={
-                  (typeof errors.status?.message === "string"
-                    ? errors.status.message
-                    : undefined) ?? validationErrors?.status
-                }
-                label={"status"}
-              />
-            )}
-          </div>
-
-          <div className="flex flex-col items-start w-full my-2 px-2 xl:px-16">
-            <label
               htmlFor="paymentType"
               className="font-semibold text-sm xl:text-base"
             >
@@ -462,7 +422,7 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
             >
               {Object.values(PaymentType).map((type) => (
                 <option key={type} value={type}>
-                  {ProjectPaymentTypeLabel[type]}
+                  {PaymentTypeLabels[type]}
                 </option>
               ))}
             </select>

@@ -1,4 +1,13 @@
-import type { PaymentStatus, Priority } from "./ProposalDTO";
+import type { PaymentStatus } from "./ProposalDTO";
+
+export const Priority = {
+  LOW: "LOW",
+  MEDIUM: "MEDIUM",
+  HIGH: "HIGH",
+  URGENT: "URGENT",
+} as const;
+
+export type Priority = (typeof Priority)[keyof typeof Priority];
 
 export type MilestoneRequestDTO = {
   contractId: string;
@@ -20,7 +29,6 @@ export type MilestoneRequestDTO = {
 
 export type MilestoneResponseDTO = {
   id: string;
-  contractId: string;
   title?: string;
   description?: string;
   amount?: number;
@@ -28,22 +36,20 @@ export type MilestoneResponseDTO = {
   bonusAmount?: number;
   estimatedDuration?: number; // in days
   status?: MilestoneStatus;
-  paymentStatus?: PaymentStatus;
   notes?: string;
   plannedStartDate?: string; // ISO date string
   plannedEndDate?: string; // ISO date string
   actualStartDate?: string; // ISO date string
   actualEndDate?: string; // ISO date string
   priority?: Priority;
+  contractId: string;
+  invoiceId?: string;
+  paymentId?: string;
 };
 
 export type MilestoneStatus =
-  | "PROPOSED"
-  | "APPROVED"
-  | "REJECTED"
   | "PENDING"
-  | "PROGRESS"
+  | "IN_PROGRESS"
   | "COMPLETED"
-  | "CANCELED"
-  | "OVERDUE"
-  | "NONE";
+  | "PAID"
+  | "CANCELLED";

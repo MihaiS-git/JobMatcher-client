@@ -5,6 +5,7 @@ import {
 import LoadingSpinner from "../LoadingSpinner";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useGetProjectByIdQuery } from "@/features/projects/projectsApi";
+import { skipToken } from "@reduxjs/toolkit/query/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import type { ProposalStatus } from "@/types/ProposalDTO";
@@ -29,7 +30,8 @@ const ProposalDetails = ({ id }: ProposalProps) => {
     data: project,
     isLoading: isProjectLoading,
     error: projectError,
-  } = useGetProjectByIdQuery(proposal?.projectId || "");
+  } = useGetProjectByIdQuery(proposal?.projectId ?? skipToken);
+
   const [updateProposal, { isLoading: isUpdating, error: updateError }] =
     useUpdateProposalByIdMutation();
 

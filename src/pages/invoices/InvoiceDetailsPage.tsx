@@ -9,9 +9,9 @@ const InvoiceDetailsPage = () => {
     <PageContent className="pb-16">
       <section
         className="flex flex-col items-center p-0 pt-4 pb-16 w-full"
-        aria-labelledby="invoices-list-heading"
+        aria-labelledby="invoice-details-heading"
       >
-        <PageTitle title="Invoices List" id="invoices-list-page" />
+        <PageTitle title="Invoice Details" id="invoice-details-page" />
 
         <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
           <InvoiceDetails />
