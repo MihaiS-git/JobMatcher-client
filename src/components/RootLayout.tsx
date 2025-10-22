@@ -1,10 +1,12 @@
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
 import Header from "./Header";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useDashboardDrawer } from "../hooks/useDashboardDrawer";
 import useAuth from "../hooks/useAuth";
-import DashboardDrawer from "./DashboardDrawer/DashboardDrawer";
+import LoadingSpinner from "./LoadingSpinner";
+
+const DashboardDrawer = lazy(() => import("./DashboardDrawer/DashboardDrawer"));
 
 const RootLayout = () => {
   const { isDashboardDrawerOpen, close } = useDashboardDrawer();
@@ -26,7 +28,11 @@ const RootLayout = () => {
         >
           <Outlet />
         </main>
-        {isDashboardDrawerOpen && <DashboardDrawer />}
+        {isDashboardDrawerOpen && (
+          <Suspense fallback={<LoadingSpinner fullScreen={false} size={24} />}>
+            <DashboardDrawer />
+          </Suspense>
+        )}
       </div>
 
       <Footer />

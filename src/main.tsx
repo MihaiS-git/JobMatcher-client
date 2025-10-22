@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
@@ -7,6 +6,7 @@ import { persistor, store } from "./store.ts";
 import { DashboardDrawerProvider } from "./contexts/DrawerContext.tsx";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
+import LoadingSpinner from "./components/LoadingSpinner.tsx";
 
 const VITE_GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -17,9 +17,8 @@ if (!VITE_GOOGLE_CLIENT_ID) {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
+      <PersistGate loading={<LoadingSpinner fullScreen={true} size={36}/>} persistor={persistor}>
         <ThemeProvider>
           <DashboardDrawerProvider>
             <App />
@@ -27,5 +26,4 @@ createRoot(document.getElementById("root")!).render(
         </ThemeProvider>
       </PersistGate>
     </Provider>
-  </StrictMode>
 );

@@ -1,4 +1,3 @@
-import { Priority } from "@/types/ProposalDTO";
 import { z } from "zod";
 import { PaymentStatus, ProposalStatus } from "@/types/ProposalDTO";
 
@@ -67,7 +66,6 @@ const proposalSchema = z.object({
       return !isNaN(date.getTime());
     }, "Actual End Date must be a valid date")
     .optional(),
-  priority: z.enum(Object.values(Priority) as [string, ...string[]]).optional(),
 });
 
 export default proposalSchema;

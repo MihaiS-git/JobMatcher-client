@@ -1,4 +1,5 @@
-import type { PaymentStatus, Priority, ProposalStatus } from "../ProposalDTO";
+import type { Priority } from "../MilestoneDTO";
+import type { PaymentStatus, ProposalStatus } from "../ProposalDTO";
 
 export const ProposalStatusLabels: Record<ProposalStatus, string> = {
   PENDING: "Pending",
@@ -18,5 +19,4 @@ export const PriorityLabels: Record<Priority, string> = {
   MEDIUM: "Medium",
   HIGH: "High",
   URGENT: "Urgent",
-  NONE: "None",
 };

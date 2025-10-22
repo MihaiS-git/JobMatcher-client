@@ -41,7 +41,6 @@ const EditableFieldsByRole: Record<Role, (keyof ProposalFormValues)[]> = {
     "bonusAmount",
     "notes",
     "actualStartDate",
-    "priority",
   ],
   ADMIN: [],
 };

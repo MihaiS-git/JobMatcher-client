@@ -19,6 +19,7 @@ export default defineConfig({
   build: {
     /* sourcemap: true, */
     target: "es2017", // avoid legacy JS if you don't need IE
+    
   },
   resolve: {
     alias: {

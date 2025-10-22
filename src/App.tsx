@@ -3,9 +3,9 @@ import "./App.css";
 import RootLayout from "./components/RootLayout";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
+import HomePage from "./pages/HomePage";
 
 // Lazy-loaded pages
-const HomePage = lazy(() => import("./pages/HomePage"));
 const AuthPage = lazy(() => import("./pages/auth/AuthPage"));
 const RegistrationPage = lazy(() => import("./pages/auth/RegistrationPage"));
 const PasswordRecoveryPage = lazy(
