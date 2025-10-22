@@ -1,9 +1,7 @@
 import FeedbackMessage from "@/components/FeedbackMessage";
 import InputErrorMessage from "@/components/forms/InputErrorMessage";
 import { Button } from "@/components/ui/button";
-import {
-  useCreateMilestoneMutation,
-} from "@/features/contracts/milestone/milestoneApi";
+import { useCreateMilestoneMutation } from "@/features/contracts/milestone/milestoneApi";
 import useAuth from "@/hooks/useAuth";
 import {
   milestonesFormSchema,
@@ -137,16 +135,32 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
   };
 
   return (
-    <>
+    <div className="w-full sm:max-w-6xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full px-4 pb-40 flex flex-col items-center"
+        className="w-full pb-24 flex flex-col items-center"
       >
         {fields.map((field, index) => (
-          <fieldset key={field.id} className="w-full" disabled={isCreating}>
+          <fieldset
+            key={field.id}
+            className="flex flex-col items-center mt-1 w-full mx-auto"
+            disabled={isCreating}
+          >
+            {(errors?.milestones?.[index]?.title ||
+              validationErrors?.[`milestones.${index}.title`]) && (
+              <InputErrorMessage
+                message={
+                  typeof errors?.milestones?.[index]?.title?.message ===
+                  "string"
+                    ? errors.milestones[index]!.title!.message
+                    : validationErrors?.[`milestones.${index}.title`]
+                }
+                label="title"
+              />
+            )}
             <div className="space-y-2 border-b border-gray-400 w-full flex flex-col items-center">
               {editableFields.includes("title") && (
-                <div className="flex flex-col w-full max-w-2xl items-start my-2 px-2">
+                <div className="flex flex-col w-full max-w-2xl items-start my-1 px-2">
                   <label
                     htmlFor="title"
                     className="font-semibold text-sm xl:text-base"
@@ -160,7 +174,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                         clearFieldError(`milestones.${index}.title`),
                       required: "Title required",
                     })}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={!!errors.milestones?.[index]?.title}
                     aria-describedby={
                       errors.milestones?.[index]?.title
@@ -168,18 +182,6 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                         : undefined
                     }
                   />
-                  {(errors?.milestones?.[index]?.title ||
-                    validationErrors?.[`milestones.${index}.title`]) && (
-                    <InputErrorMessage
-                      message={
-                        typeof errors?.milestones?.[index]?.title?.message ===
-                        "string"
-                          ? errors.milestones[index]!.title!.message
-                          : validationErrors?.[`milestones.${index}.title`]
-                      }
-                      label="title"
-                    />
-                  )}
                 </div>
               )}
 
@@ -197,7 +199,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                         clearFieldError(`milestones.${index}.description`),
                       required: "Description required",
                     })}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
                     aria-invalid={!!errors.milestones?.[index]?.description}
                     aria-describedby={
                       errors.milestones?.[index]?.description
@@ -236,7 +238,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                       required: "Amount required",
                       min: 0.01,
                     })}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={!!errors.milestones?.[index]?.amount}
                     aria-describedby={
                       errors.milestones?.[index]?.amount
@@ -270,7 +272,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                   <input
                     type="text"
                     {...register(`milestones.${index}.penaltyAmount`)}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={!!errors.milestones?.[index]?.penaltyAmount}
                     aria-describedby={
                       errors.milestones?.[index]?.penaltyAmount
@@ -298,7 +300,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                   <input
                     type="text"
                     {...register(`milestones.${index}.bonusAmount`)}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={!!errors.milestones?.[index]?.bonusAmount}
                     aria-describedby={
                       errors.milestones?.[index]?.bonusAmount
@@ -330,7 +332,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                       min: 1,
                       valueAsNumber: true,
                     })}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={
                       !!errors.milestones?.[index]?.estimatedDuration
                     }
@@ -364,7 +366,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                     {...register(`milestones.${index}.plannedStartDate`, {
                       required: "Planned start date required",
                     })}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={
                       !!errors.milestones?.[index]?.plannedStartDate
                     }
@@ -398,7 +400,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                     {...register(`milestones.${index}.actualStartDate`, {
                       required: "Actual start date required",
                     })}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={!!errors.milestones?.[index]?.actualStartDate}
                     aria-describedby={
                       errors.milestones?.[index]?.actualStartDate
@@ -427,7 +429,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                   </label>
                   <textarea
                     {...register(`milestones.${index}.notes`)}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
                     aria-invalid={!!errors.milestones?.[index]?.notes}
                     aria-describedby={
                       errors.milestones?.[index]?.notes
@@ -458,7 +460,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
                       onChange: () =>
                         clearFieldError(`milestones.${index}.priority`),
                     })}
-                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                    className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                     aria-invalid={!!errors.milestones?.[index]?.priority}
                     aria-describedby={
                       errors.milestones?.[index]?.priority
@@ -551,7 +553,7 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
           </div>
         )}
       </fieldset>
-    </>
+    </div>
   );
 };
 

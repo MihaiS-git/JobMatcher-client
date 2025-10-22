@@ -93,15 +93,13 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
   };
 
   return (
-    <>
-      <div className="w-full sm:max-w-xl p-4 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-        {/* Header Section */}
+    <div className="w-full sm:max-w-6xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+      <div className="w-full text-center border-b px-1 md:px-2 py-1 md:py-4">
         <div className="space-y-2 m-4 mb-0 w-full text-center border-b pb-2 font-bold text-lg">
           {contract && <h2 className="text-center">Contract #{contractId}</h2>}
         </div>
 
         <div className="p-4 pt-0 w-full text-start font-light text-sm">
-          {/* Contract Overview Section */}
           <section>
             <h3 className="text-xs text-center font-light italic mb-4">
               {contract?.title}
@@ -128,7 +126,6 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
             </p>
           </section>
 
-          {/* Parties Section */}
           <section className="mt-4">
             <p>
               <span className="font-semibold">
@@ -186,7 +183,6 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
             </div>
           </section>
 
-          {/* Contract Details Section */}
           <section className="mt-4">
             <div className="mb-4">
               <p className="font-bold">Contract Details:</p>
@@ -208,14 +204,13 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
             </div>
           </section>
 
-          {/* Milestones Section */}
           {contract.paymentType === PaymentType.MILESTONE && (
             <section className="my-4">
               <h4 className="text-start font-semibold text-sm mb-2">
                 Milestones
               </h4>
               <ul className="space-y-2 ">
-                {milestones.length > 0 &&
+                {milestones.length > 0 ? (
                   milestones.map((milestone) => (
                     <li key={milestone.id} className="mb-2 text-sm">
                       <p>
@@ -246,12 +241,14 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
                         <b>Due Date:</b> {formatDate(milestone.plannedEndDate!)}
                       </p>
                     </li>
-                  ))}
+                  ))
+                ) : (
+                  <p className="italic font-light">No milestones defined.</p>
+                )}
               </ul>
             </section>
           )}
 
-          {/* Signatures Section */}
           <section className="flex flex-row justify-between mt-4">
             <div className="mb-4">
               <p className="font-bold">Signatures:</p>
@@ -269,59 +266,67 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
           </section>
         </div>
       </div>
-      {contract.paymentType === PaymentType.MILESTONE && (
-        <div className="w-full flex flex-row justify-center align-middle gap-2 sm:max-w-xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-          <Button
-            variant="default"
-            size="sm"
-            className="bg-blue-500 hover:bg-blue-600 text-white"
-            onClick={() => handleMilestonesClick(contract.id)}
-          >
-            Milestones
-          </Button>
-        </div>
-      )}
-      {contract.paymentType !== PaymentType.MILESTONE &&
-        role === "STAFF" &&
-        contract.invoices.length === 0 && (
-          <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
-            <Button
-              type="button"
-              variant="default"
-              onClick={() => {
-                handleCreateInvoice(contract.id);
-              }}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
-              disabled={
-                isCreatingInvoice ||
-                ["TERMINATED", "ON_HOLD", "CANCELLED", "COMPLETED"].includes(
-                  contract.status!
-                )
-              }
-            >
-              Create Invoice
-            </Button>
+      <section>
+        {successMessage && successMessage !== "" && (
+          <div className="p-4 w-full text-start font-light text-sm">
+            <FeedbackMessage
+              id="invoice-success-feedback"
+              type="success"
+              message={successMessage}
+            />
           </div>
         )}
-      {successMessage && successMessage !== "" && (
-        <div className="p-4 w-full text-start font-light text-sm">
-          <FeedbackMessage
-            id="invoice-success-feedback"
-            type="success"
-            message={successMessage}
-          />
-        </div>
-      )}
-      {apiError && (
-        <div className="p-4 w-full text-start font-light text-sm">
-          <FeedbackMessage
-            id="invoice-error-feedback"
-            type="error"
-            message={apiError}
-          />
-        </div>
-      )}
-    </>
+        {apiError && (
+          <div className="p-4 w-full text-start font-light text-sm">
+            <FeedbackMessage
+              id="invoice-error-feedback"
+              type="error"
+              message={apiError}
+            />
+          </div>
+        )}
+      </section>
+      <div className="space-y-2 p-4 w-full text-start pb-4 text-lg">
+        <section className="flex mt-4 justify-center gap-2">
+          {contract.paymentType === PaymentType.MILESTONE && (
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-blue-500 text-gray-200 rounded-sm border border-gray-200 hover:bg-blue-400 w-35"
+              onClick={() => handleMilestonesClick(contract.id)}
+            >
+              Milestones
+            </Button>
+          )}
+
+          {contract.paymentType !== PaymentType.MILESTONE &&
+            role === "STAFF" &&
+            contract.invoices.length === 0 && (
+              <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={() => {
+                    handleCreateInvoice(contract.id);
+                  }}
+                  className="bg-blue-500 text-gray-200 rounded-sm border border-gray-200 hover:bg-blue-400 w-35"
+                  disabled={
+                    isCreatingInvoice ||
+                    [
+                      "TERMINATED",
+                      "ON_HOLD",
+                      "CANCELLED",
+                      "COMPLETED",
+                    ].includes(contract.status!)
+                  }
+                >
+                  Create Invoice
+                </Button>
+              </div>
+            )}
+        </section>
+      </div>
+    </div>
   );
 };
 

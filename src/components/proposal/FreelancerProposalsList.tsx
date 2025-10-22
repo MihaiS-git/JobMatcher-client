@@ -5,19 +5,21 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import SortButton from "../ProposalsSortButton";
-import {
-  ArrowDownNarrowWide,
-  ArrowUpNarrowWide,
-} from "lucide-react";
+import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-react";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import useFreelancerId from "@/hooks/useFreelancerId";
+import { Button } from "../ui/button";
 
 const ProposalsList = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { freelancerId, isLoading: isLoadingFreelancerId, error: freelancerIdError } = useFreelancerId();
+  const {
+    freelancerId,
+    isLoading: isLoadingFreelancerId,
+    error: freelancerIdError,
+  } = useFreelancerId();
 
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
@@ -58,13 +60,16 @@ const ProposalsList = () => {
     data: proposals,
     isLoading,
     isError,
-  } = useGetAllProposalsByFreelancerIdQuery({
-    freelancerId: freelancerId!,
-    page,
-    size,
-    status,
-    sort: sortArray,
-  }, {skip: !freelancerId || isLoadingFreelancerId});
+  } = useGetAllProposalsByFreelancerIdQuery(
+    {
+      freelancerId: freelancerId!,
+      page,
+      size,
+      status,
+      sort: sortArray,
+    },
+    { skip: !freelancerId || isLoadingFreelancerId }
+  );
 
   type ProposalListSearchParams = {
     page?: number;
@@ -142,12 +147,12 @@ const ProposalsList = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center p-0 m-0 w-full gap-2">
+      <div className="w-full flex flex-col items-center gap-1">
         <section className="w-full bg-gray-200 dark:bg-gray-900 p-2">
           <div className="gap-4 p-2 w-full">
             <fieldset className="flex flex-row gap-4 border border-gray-900 dark:border-gray-700 p-2 rounded">
               <div className="flex flex-col">
-                <label htmlFor="size" className="text-sm">
+                <label htmlFor="size" className="text-xs">
                   Page size:
                 </label>
                 <select
@@ -157,7 +162,7 @@ const ProposalsList = () => {
                   onChange={(e) =>
                     updateSearchParams({ size: Number(e.target.value) })
                   }
-                  className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
+                  className="bg-white border border-gray-600 text-gray-950 rounded cursor-pointer text-sm px-1 py-0.5"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -165,7 +170,7 @@ const ProposalsList = () => {
                 </select>
               </div>
               <div className="flex flex-col">
-                <label htmlFor="status" className="text-sm">
+                <label htmlFor="status" className="text-xs">
                   Status:
                 </label>
                 <select
@@ -178,7 +183,7 @@ const ProposalsList = () => {
                         : "",
                     })
                   }
-                  className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
+                  className="bg-white border border-gray-600 text-gray-950 rounded cursor-pointer text-sm px-1 py-0.5"
                   value={status ?? ""}
                 >
                   <option value={""}>All Statuses</option>
@@ -191,13 +196,15 @@ const ProposalsList = () => {
                 </select>
               </div>
               <div className="flex items-center justify-end flex-1">
-                <button
+                <Button
                   type="button"
                   onClick={handleResetFilters}
-                  className="bg-blue-500 hover:bg-blue-600 text-white rounded py-1 px-4 cursor-pointer text-sm min-w-[200px]"
+                  variant="default"
+                  size="sm"
+                  className="bg-blue-500 text-gray-200 rounded-sm border border-gray-200 hover:bg-blue-400 w-25 text-xs"
                 >
                   Reset filters
-                </button>
+                </Button>
               </div>
             </fieldset>
           </div>
@@ -209,7 +216,7 @@ const ProposalsList = () => {
           <LoadingSpinner fullScreen={false} size={24} />
         </div>
       )}
-      
+
       {freelancerIdError && (
         <div className="p-4 text-center">
           <p className="text-red-500">Error loading freelancer ID</p>

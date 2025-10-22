@@ -1,8 +1,10 @@
 import BackButton from "@/components/BackButton";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import MilestonesAddForm from "@/components/forms/milestone/MilestonesAddForm";
 import MilestonesTable from "@/components/milestone/milestonesTable";
+import { Suspense } from "react";
 import { useParams } from "react-router-dom";
 
 const MilestonesPage = () => {
@@ -23,7 +25,9 @@ const MilestonesPage = () => {
         <MilestonesTable contractId={contractId} />
         <hr className="w-full border-t border-gray-400 my-4" />
         <PageTitle title="Add New Milestones" id="add-milestones-heading" />
-        <MilestonesAddForm contractId={contractId} />
+        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+          <MilestonesAddForm contractId={contractId} />
+        </Suspense>
       </section>
     </PageContent>
   );

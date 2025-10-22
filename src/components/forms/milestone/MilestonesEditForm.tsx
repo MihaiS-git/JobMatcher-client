@@ -99,7 +99,7 @@ const MilestonesEditForm = ({
       notes: milestoneData?.notes || "",
       plannedStartDate: milestoneData?.plannedStartDate || "",
       actualStartDate: milestoneData?.actualStartDate || "",
-      priority: milestoneData?.priority || "LOW" as Priority,
+      priority: milestoneData?.priority || ("LOW" as Priority),
     }),
     [milestoneData]
   );
@@ -139,7 +139,7 @@ const MilestonesEditForm = ({
         notes: milestoneData.notes || "",
         plannedStartDate: milestoneData.plannedStartDate || "",
         actualStartDate: milestoneData.actualStartDate || "",
-        priority: milestoneData.priority || "LOW" as Priority,
+        priority: milestoneData.priority || ("LOW" as Priority),
       });
     }
   }, [milestoneData, reset]);
@@ -184,7 +184,7 @@ const MilestonesEditForm = ({
       notes: data.notes || "",
       plannedStartDate: data.plannedStartDate || "",
       actualStartDate: data.actualStartDate || "",
-      priority: data.priority || "LOW" as Priority,
+      priority: data.priority || ("LOW" as Priority),
     };
 
     try {
@@ -237,87 +237,128 @@ const MilestonesEditForm = ({
     }
   }, [deleteError]);
 
+  if (isLoadingMilestone) {
+    return <LoadingSpinner fullScreen={false} size={32} />;
+  }
+
   return (
-    <>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-full px-4 flex flex-col items-center"
-      >
-        {isLoadingMilestone && <LoadingSpinner fullScreen={false} size={24} />}
-        {milestoneError && <FeedbackMessage message={apiError} />}
-        <section className="w-full max-w-2xl my-4 border border-gray-400 rounded-sm p-4 bg-gray-200 grid grid-cols-2">
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Title: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.title || "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Description: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.description || "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Amount: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.amount
-              ? formatCurrency(milestoneData?.amount)
-              : "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Penalty Amount: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.penaltyAmount
-              ? formatCurrency(milestoneData?.penaltyAmount)
-              : "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Bonus Amount: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.bonusAmount
-              ? formatCurrency(milestoneData?.bonusAmount)
-              : "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Estimated Duration: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.estimatedDuration || "N/A"} days
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Planned Start Date: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.plannedStartDate || "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Actual Start Date: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.actualStartDate || "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Priority: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {PriorityLabels[milestoneData?.priority || "LOW" as Priority] || "N/A"}
-          </p>
-          <p className="ms-4 font-light text-sm">
-            <span className="font-semibold">Notes: </span>
-          </p>
-          <p className="ms-4 font-light text-sm">
-            {milestoneData?.notes || "N/A"}
-          </p>
-        </section>
-        <fieldset
-          className="w-full flex flex-col items-center"
-          disabled={isUpdating || isLoadingMilestone || isDeletingMilestone}
+    <div className="w-full sm:max-w-6xl p-4 mb-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+      {milestoneError ? (
+        <FeedbackMessage id="milestone-error" message={apiError} type="error" />
+      ) : (
+        <div className="w-full text-center px-1 md:px-2 py-1">
+          {milestoneData && (
+            <div className="w-full text-center px-1 md:px-2 py-1">
+              <h2 className="text-blue-600 mb-4 text-center">
+                <b>Milestone Data</b>
+              </h2>
+              <section className="text-sm font-medium text-start grid grid-cols-3 lg:grid-cols-5 gap-1 md:gap-2 border-b pb-4">
+                <p>Title: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.title || "N/A"}
+                </p>
+
+                <p>Description: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.description || "N/A"}
+                </p>
+
+                <p>Amount: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.amount
+                    ? formatCurrency(milestoneData?.amount)
+                    : "N/A"}
+                </p>
+
+                <p>Penalty Amount: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.penaltyAmount
+                    ? formatCurrency(milestoneData?.penaltyAmount)
+                    : "N/A"}
+                </p>
+
+                <p>Bonus Amount: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.bonusAmount
+                    ? formatCurrency(milestoneData?.bonusAmount)
+                    : "N/A"}
+                </p>
+
+                <p>Estimated Duration: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.estimatedDuration || "N/A"} days
+                </p>
+
+                <p>Planned Start Date: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.plannedStartDate || "N/A"}
+                </p>
+
+                <p>Actual Start Date: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.actualStartDate || "N/A"}
+                </p>
+
+                <p>Priority: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {
+                    PriorityLabels[
+                      milestoneData?.priority || ("LOW" as Priority)
+                    ]
+                  }
+                </p>
+
+                <p>Notes: </p>
+                <p className="font-light col-span-2 lg:col-span-4">
+                  {milestoneData?.notes || "N/A"}
+                </p>
+              </section>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="w-full text-center px-1 md:px-2 py-1">
+        <h2 className="text-blue-600 mb-2 text-center mt-8">
+          <b>Milestone Update Form</b>
+        </h2>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full pb-24 flex flex-col items-center"
         >
-          <div className="space-y-2 w-full flex flex-col items-center">
+          <fieldset
+            className="flex flex-col items-center mt-1 w-full mx-auto"
+            disabled={isUpdating || isLoadingMilestone || isDeletingMilestone}
+          >
+            <fieldset
+              className="flex flex-col items-center mt-4 space-y-4 w-full mx-auto"
+              disabled={isUpdating || isLoadingMilestone || isDeletingMilestone}
+            >
+              {successMessage && (
+                <FeedbackMessage
+                  id="success-message"
+                  message={successMessage}
+                  type="success"
+                />
+              )}
+              {apiError && (
+                <FeedbackMessage
+                  id="api-error"
+                  message={apiError}
+                  type="error"
+                />
+              )}
+              {validationErrors && (
+                <div className="text-red-600 mt-4">
+                  {Object.entries(validationErrors).map(([field, message]) => (
+                    <div key={field}>
+                      {field}: {message}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </fieldset>
+
             {editableFields.includes("title") && (
               <div className="flex flex-col w-full max-w-2xl items-start my-2 px-2">
                 <label
@@ -332,7 +373,7 @@ const MilestonesEditForm = ({
                     onChange: () => clearFieldError("title"),
                     required: "Title required",
                   })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.title}
                   aria-describedby={errors.title ? "title-error" : undefined}
                 />
@@ -361,7 +402,7 @@ const MilestonesEditForm = ({
                     onChange: () => clearFieldError("description"),
                     required: "Description required",
                   })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
                   aria-invalid={!!errors.description}
                   aria-describedby={
                     errors.description ? "description-error" : undefined
@@ -394,7 +435,7 @@ const MilestonesEditForm = ({
                     required: "Amount required",
                     min: 0.01,
                   })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.amount}
                   aria-describedby={errors.amount ? "amount-error" : undefined}
                 />
@@ -422,7 +463,7 @@ const MilestonesEditForm = ({
                 <input
                   type="text"
                   {...register("penaltyAmount")}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.penaltyAmount}
                   aria-describedby={
                     errors.penaltyAmount ? "penaltyAmount-error" : undefined
@@ -448,7 +489,7 @@ const MilestonesEditForm = ({
                 <input
                   type="text"
                   {...register("bonusAmount")}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors.bonusAmount}
                   aria-describedby={
                     errors.bonusAmount ? "bonusAmount-error" : undefined
@@ -478,7 +519,7 @@ const MilestonesEditForm = ({
                     min: 1,
                     valueAsNumber: true,
                   })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors?.estimatedDuration}
                   aria-describedby={
                     errors?.estimatedDuration
@@ -508,7 +549,7 @@ const MilestonesEditForm = ({
                   {...register("plannedStartDate", {
                     required: "Planned start date required",
                   })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors?.plannedStartDate}
                   aria-describedby={
                     errors?.plannedStartDate
@@ -538,7 +579,7 @@ const MilestonesEditForm = ({
                   {...register("actualStartDate", {
                     required: "Actual start date required",
                   })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors?.actualStartDate}
                   aria-describedby={
                     errors?.actualStartDate
@@ -565,7 +606,7 @@ const MilestonesEditForm = ({
                 </label>
                 <textarea
                   {...register("notes")}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full h-40 rounded-sm border border-gray-950 text-sm xl:text-base resize-y"
                   aria-invalid={!!errors?.notes}
                   aria-describedby={errors?.notes ? "notes-error" : undefined}
                 />
@@ -591,7 +632,7 @@ const MilestonesEditForm = ({
                   {...register("priority", {
                     onChange: () => clearFieldError("priority"),
                   })}
-                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-2 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
+                  className="bg-gray-200 text-gray-950 disabled:opacity-30 py-1 px-4 w-full rounded-sm border border-gray-950 text-sm xl:text-base"
                   aria-invalid={!!errors?.priority}
                   aria-describedby={
                     errors?.priority ? "priority-error" : undefined
@@ -611,89 +652,67 @@ const MilestonesEditForm = ({
                 )}
               </div>
             )}
-          </div>
-          <section
-            className="flex flex-row justify-center gap-2"
-            aria-disabled={
-              isLoadingMilestone || isUpdating || isDeletingMilestone
-            }
-          >
-            {role === "STAFF" && (
+
+            <section
+              className="flex flex-row justify-center gap-2"
+              aria-disabled={
+                isLoadingMilestone || isUpdating || isDeletingMilestone
+              }
+            >
+              {role === "STAFF" && (
+                <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={() => {
+                      handleCreateInvoice(milestoneData!.id);
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white w-35"
+                    disabled={
+                      isUpdating ||
+                      isLoadingMilestone ||
+                      isDeletingMilestone ||
+                      isCreatingInvoice ||
+                      ["TERMINATED", "CANCELLED"].includes(
+                        milestoneData!.status!
+                      )
+                    }
+                  >
+                    Create Invoice
+                  </Button>
+                </div>
+              )}
+
+              <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
+                <Button
+                  type="submit"
+                  variant="default"
+                  className="bg-blue-500 hover:bg-blue-600 text-white w-35"
+                  disabled={
+                    isUpdating || isLoadingMilestone || isDeletingMilestone
+                  }
+                >
+                  Update
+                </Button>
+              </div>
               <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
                 <Button
                   type="button"
-                  variant="default"
-                  onClick={() => {
-                    handleCreateInvoice(milestoneData!.id);
-                  }}
-                  className="bg-blue-500 hover:bg-blue-600 text-white w-35"
+                  variant="destructive"
+                  className="w-35"
                   disabled={
-                    isUpdating ||
-                    isLoadingMilestone ||
-                    isDeletingMilestone ||
-                    isCreatingInvoice ||
-                    ["TERMINATED", "CANCELLED"].includes(milestoneData!.status!)
+                    isUpdating || isLoadingMilestone || isDeletingMilestone
                   }
+                  onClick={() => handleDeleteMilestone(milestoneId)}
                 >
-                  Create Invoice
+                  Delete
                 </Button>
               </div>
-            )}
-
-            <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
-              <Button
-                type="submit"
-                variant="default"
-                className="bg-blue-500 hover:bg-blue-600 text-white w-35"
-                disabled={
-                  isUpdating || isLoadingMilestone || isDeletingMilestone
-                }
-              >
-                Update
-              </Button>
-            </div>
-            <div className="flex flex-col items-center gap-3 w-full max-w-2xl my-2 px-2">
-              <Button
-                type="button"
-                variant="destructive"
-                className="w-35"
-                disabled={
-                  isUpdating || isLoadingMilestone || isDeletingMilestone
-                }
-                onClick={() => handleDeleteMilestone(milestoneId)}
-              >
-                Delete
-              </Button>
-            </div>
-          </section>
-        </fieldset>
-      </form>
-
-      <fieldset
-        className="flex flex-col items-center mt-4 space-y-4 w-full mx-auto"
-        disabled={isUpdating || isLoadingMilestone || isDeletingMilestone}
-      >
-        {successMessage && (
-          <FeedbackMessage
-            id="success-message"
-            message={successMessage}
-            type="success"
-          />
-        )}
-        {apiError && (
-          <FeedbackMessage id="api-error" message={apiError} type="error" />
-        )}
-        {validationErrors && (
-          <div className="text-red-600 mt-4">
-            {Object.entries(validationErrors).map(([field, message]) => (
-              <div key={field}>
-                {field}: {message}
-              </div>
-            ))}
-          </div>
-        )}
-      </fieldset>
-    </>
+            </section>
+          </fieldset>
+        </form>
+      </div>
+    </div>
   );
 };
 

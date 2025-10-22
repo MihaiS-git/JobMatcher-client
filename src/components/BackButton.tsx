@@ -18,7 +18,7 @@ const BackButton = ({ className, label }: Props) => {
     <div className="w-full ms-8">
       <SquareArrowLeft
         onClick={handleBackClick}
-        className={`cursor-pointer text-gray-500 hover:text-gray-700 ${className}`}
+        className={`cursor-pointer text-gray-500 hover:text-gray-700 ${className} my-2`}
       />
     </div>
   );

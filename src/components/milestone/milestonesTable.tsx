@@ -26,7 +26,7 @@ const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
     { contractId: contractId as string, page: 0, size: 100 },
     { skip: !contractId }
   );
-
+  
   useEffect(() => {
     console.log("Milestones: ", existentMilestones);
     

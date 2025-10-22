@@ -7,7 +7,3 @@ export function formatDate(date: Date | string, locale = "en-US"): string {
     day: "2-digit",
   }).format(d);
 }
-
-/* console.log(formatDate("2025-09-04", "en-US")); // 09/04/2025
-console.log(formatDate("2025-09-04", "de-DE")); // 04.09.2025
-console.log(formatDate("2025-09-04", "en-GB")); // 04/09/2025 */
