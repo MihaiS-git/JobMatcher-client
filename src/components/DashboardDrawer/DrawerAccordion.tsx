@@ -28,6 +28,13 @@ const DrawerAccordion = () => {
     { targetUrl: "/payments", itemTag: "Payments" },
   ];
 
+  const analyticsItems = [];
+    if (role === "STAFF") {
+      analyticsItems.push({ targetUrl: "/analytics/freelancer", itemTag: "Staff Analytics" });
+    } else if (role === "CUSTOMER") {
+      analyticsItems.push({ targetUrl: "/analytics/customer", itemTag: "Customer Analytics" });
+    }
+
   return (
     <Accordion
       type="single"
@@ -59,6 +66,12 @@ const DrawerAccordion = () => {
         value="item-4"
         label="Profile"
         items={profileItems}
+      />
+
+      <DrawerAccordionItem
+        value="item-5"
+        label="Analytics"
+        items={analyticsItems}
       />
     </Accordion>
   );

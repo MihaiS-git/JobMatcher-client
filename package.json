@@ -27,6 +27,7 @@
     "react-router-dom": "^7.6.3",
     "react-select": "^5.10.2",
     "react-spinners": "^0.17.0",
+    "recharts": "^3.3.0",
     "redux-persist": "^6.0.0",
     "swiper": "^11.2.10",
     "tailwind-merge": "^3.3.1",

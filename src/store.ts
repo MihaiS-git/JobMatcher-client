@@ -14,6 +14,8 @@ import { milestoneApi } from "./features/contracts/milestone/milestoneApi";
 import { contractsApi } from "./features/contracts/contractsApi";
 import { invoiceApi } from "./features/invoices/invoiceApi";
 import { paymentApi } from "./features/payment/paymentApi";
+import { freelancerAnalyticsApi } from "./features/analytics/freelancerAnalyticsApi";
+import { customerAnalyticsApi } from "./features/analytics/customerAnalyticsApi";
 
 export const store: EnhancedStore = configureStore({
     reducer: persistedReducer,
@@ -33,7 +35,9 @@ export const store: EnhancedStore = configureStore({
     .concat(milestoneApi.middleware)
     .concat(contractsApi.middleware)
     .concat(invoiceApi.middleware)
-    .concat(paymentApi.middleware),
+    .concat(paymentApi.middleware)
+    .concat(freelancerAnalyticsApi.middleware)
+    .concat(customerAnalyticsApi.middleware),
 });
 
 export const persistor = persistStore(store);

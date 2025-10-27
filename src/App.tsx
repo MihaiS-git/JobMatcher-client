@@ -100,6 +100,14 @@ const PaymentDetailsPage = lazy(
   () => import("./pages/payments/PaymentDetailsPage")
 );
 
+const FreelancerAnalyticsPage = lazy(
+  () => import("./pages/analytics/FreelancerAnalyticsPage")
+);
+
+const CustomerAnalyticsPage = lazy(
+  () => import("./pages/analytics/CustomerAnalyticsPage")
+);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -372,6 +380,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
             <PaymentDetailsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/analytics/freelancer",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <FreelancerAnalyticsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/analytics/customer",
+        element: (
+          <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+            <CustomerAnalyticsPage />
           </Suspense>
         ),
       },
