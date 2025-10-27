@@ -252,6 +252,12 @@ const ProposalDetails = ({ id }: ProposalProps) => {
       )}
 
       <div className="space-y-2 p-4 w-full text-start pb-4 text-lg">
+        {project && ["COMPLETED", "STOPPED"].includes(project.status!) && (
+          <div className="text-red-500 font-medium text-xs text-center">
+            This project is {project.status!.toLowerCase()}. You can no longer
+            edit or withdraw your proposal.
+          </div>
+        )}
         <section className="flex mt-4 justify-center gap-2">
           {proposal?.status !== "REJECTED" &&
             proposal?.status !== "WITHDRAWN" && (
@@ -259,17 +265,20 @@ const ProposalDetails = ({ id }: ProposalProps) => {
                 variant="default"
                 className="bg-blue-500 text-gray-200 rounded-sm border border-gray-200 hover:bg-blue-400 w-35"
                 onClick={navigateToEditProposal}
+                disabled={isLoading || ["COMPLETED", "STOPPED"].includes(project?.status ?? "")}
               >
                 Edit Proposal
               </Button>
             )}
 
           {role === "STAFF" &&
-            ["ACCEPTED", "PENDING"].includes(proposal?.status ?? "") && (
+            ["ACCEPTED", "PENDING"].includes(proposal?.status ?? "") 
+            && (
               <Button
                 variant="destructive"
                 className="rounded-sm border border-gray-200 w-35"
                 onClick={handleWithdraw}
+                disabled={isLoading || ["COMPLETED", "STOPPED"].includes(project?.status ?? "")}
               >
                 Withdraw
               </Button>

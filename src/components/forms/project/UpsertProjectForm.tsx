@@ -26,12 +26,14 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import SubmitButton from "@/components/SubmitButton";
 import { PaymentType } from "@/types/PaymentDTO";
 import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
+import { useNavigate } from "react-router-dom";
 
 type ProjectProps = {
   projectId?: string;
 };
 
 const UpsertProjectForm = ({ projectId }: ProjectProps) => {
+  const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<Record<
@@ -159,21 +161,23 @@ const UpsertProjectForm = ({ projectId }: ProjectProps) => {
     };
     if (projectId) {
       try {
-        await updateProject({ id: projectId!, data: payload }).unwrap();
+        const updatedProject = await updateProject({ id: projectId!, data: payload }).unwrap();
         setApiError("");
         setValidationErrors(null);
         setSuccessMessage("Project updated successfully!");
         reset(defaultValues);
+        navigate(`/projects/${updatedProject.id}`);
       } catch (error: unknown) {
         handleValidationApiError(error, setValidationErrors, setApiError);
       }
     } else {
       try {
-        await createProject(payload).unwrap();
+        const createdProject = await createProject(payload).unwrap();
         setApiError("");
         setValidationErrors(null);
         setSuccessMessage("Project created successfully!");
         reset(defaultValues);
+        navigate(`/projects/${createdProject.id}`);
       } catch (error: unknown) {
         handleValidationApiError(error, setValidationErrors, setApiError);
       }

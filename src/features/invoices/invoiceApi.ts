@@ -26,13 +26,27 @@ export const invoiceApi = createApi({
         sort?: string[];
       }
     >({
-      query: ({ sort, ...rest }) => ({
-        url: "/invoices",
-        params: {
-          ...rest,
-          sort: sort ?? "issuedAt,desc",
-        },
-      }),
+      query: ({ sort, ...rest }) => {
+        const params = new URLSearchParams();
+
+        Object.entries(rest).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            params.append(key, String(value));
+          }
+        });
+
+        // Handle sort as repeated params
+        if (sort && sort.length > 0) {
+          sort.forEach((s) => params.append("sort", s));
+        } else {
+          params.append("sort", "lastUpdate,desc"); // default
+        }
+
+        return {
+          url: "/invoices",
+          params,
+        };
+      },
       providesTags: (result) =>
         result
           ? [
@@ -63,19 +77,21 @@ export const invoiceApi = createApi({
       }),
       invalidatesTags: [{ type: "Invoice", id: "LIST" }],
     }),
-    deleteInvoiceById: builder.mutation<{ success: boolean; id: string }, string>({
-        query: (id) => ({
-          url: `/invoices/${id}`,
-          method: "DELETE",
-        }),
-        invalidatesTags: (_result, _error, id) => [
-            { type: "Invoice", id: "LIST" },
-            { type: "Invoice", id },
-        ],
+    deleteInvoiceById: builder.mutation<
+      { success: boolean; id: string },
+      string
+    >({
+      query: (id) => ({
+        url: `/invoices/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_result, _error, id) => [
+        { type: "Invoice", id: "LIST" },
+        { type: "Invoice", id },
+      ],
     }),
   }),
 });
-
 
 export const {
   useGetAllInvoicesQuery,

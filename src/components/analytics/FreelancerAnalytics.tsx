@@ -90,7 +90,7 @@ const FreelancerAnalytics = () => {
                 <div className="overflow-x-auto">
                   <h2 className="mb-8">Monthly Earnings</h2>
                   <LineChart
-                    width={700}
+                    width={600}
                     height={300}
                     data={monthlyEarnings.map((me) => ({
                       name: `${me.year}-${me.month}`,
@@ -122,7 +122,7 @@ const FreelancerAnalytics = () => {
             <>
               {jobCompletion && (
                 <div className="overflow-x-auto">
-                  <h2 className="mb-8">Job Completion</h2>
+                  <h2 className="mb-8">Job Completion Rate</h2>
                   <PieChart width={400} height={300}>
                     <Pie
                       data={[
@@ -162,7 +162,7 @@ const FreelancerAnalytics = () => {
               {topClients && (
                 <div className="overflow-x-auto">
                   <h2 className="mb-8">Top Clients</h2>
-                  <BarChart width={700} height={300} data={topClients}>
+                  <BarChart width={600} height={300} data={topClients}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="clientName" />
                     <YAxis />
@@ -189,7 +189,7 @@ const FreelancerAnalytics = () => {
               {skillEarnings && (
                 <div className="overflow-x-auto">
                   <h2 className="mb-8">Earnings per Skill</h2>
-                  <BarChart width={700} height={300} data={skillEarnings}>
+                  <BarChart width={600} height={300} data={skillEarnings}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="skillName" />
                     <YAxis />

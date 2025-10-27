@@ -80,7 +80,7 @@ const CustomerAnalytics = () => {
             <div className="overflow-x-auto">
               <h2 className="mb-8">Monthly Spending</h2>
               <LineChart
-                width={700}
+                width={600}
                 height={300}
                 data={monthlySpending.map((ms) => ({
                   name: `${ms.year}-${ms.month}`,
@@ -136,7 +136,7 @@ const CustomerAnalytics = () => {
           {topFreelancers && (
             <div className="overflow-x-auto">
               <h2 className="mb-8">Top Freelancers</h2>
-              <BarChart width={700} height={300} data={topFreelancers}>
+              <BarChart width={600} height={300} data={topFreelancers}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="freelancerName" />
                 <YAxis />

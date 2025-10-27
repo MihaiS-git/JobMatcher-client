@@ -233,7 +233,7 @@ const ProjectList = () => {
       <section className="w-full bg-gray-200 dark:bg-gray-900 p-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-2 w-full">
           <fieldset className="flex flex-col gap-1 border border-gray-900 dark:border-gray-700 p-2 rounded">
-            <legend className="text-xs">General</legend>
+            <legend className="text-xs px-1">General</legend>
             <div className="flex flex-col">
               <label htmlFor="searchTerm" className="text-sm">
                 Search:
@@ -270,7 +270,7 @@ const ProjectList = () => {
           </fieldset>
 
           <fieldset className="flex flex-col gap-1 border border-gray-900 dark:border-gray-700 p-2 rounded">
-            <legend className="text-xs">Project</legend>
+            <legend className="text-xs px-1">Project</legend>
             <div className="flex flex-col">
               <label htmlFor="category" className="text-sm">
                 Category:
@@ -588,7 +588,10 @@ const ProjectList = () => {
                             e.stopPropagation();
                             handleEditProject(project.id);
                           }}
-                          className="bg-green-500 hover:bg-green-600 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
+                          className="bg-green-500 hover:bg-green-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
+                          disabled={["COMPLETED", "STOPPED"].includes(
+                            project.status ?? ""
+                          )}
                         >
                           Edit
                         </button>
@@ -601,7 +604,7 @@ const ProjectList = () => {
                             handleDeleteProject(project.id);
                           }}
                           className="bg-red-500 hover:bg-red-600 disabled:bg-gray-500 disabled:text-gray-400 text-white text-sm rounded py-0.5 px-4 w-20 cursor-pointer"
-                          disabled={!["NONE", "OPEN"].includes(
+                          disabled={!["OPEN", "DRAFT"].includes(
                             project.status ?? ""
                           )}
                         >

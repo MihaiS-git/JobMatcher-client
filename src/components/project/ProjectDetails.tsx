@@ -14,6 +14,7 @@ import { useGetFreelancerByUserIdQuery } from "@/features/profile/freelancerApi"
 import { useGetProposalByFreelancerIdAndProjectIdQuery } from "@/features/proposal/proposalApi";
 import useFreelancerId from "@/hooks/useFreelancerId";
 import { ProjectStatus } from "@/types/ProjectDTO";
+import { useEffect } from "react";
 
 type ProjectDetailsProps = {
   projectId: string;
@@ -50,6 +51,15 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
       : { freelancerId: "", projectId: "" }, // dummy value won't be used because skip=true
     { skip: !freelancerId || !projectId }
   );
+
+  useEffect(() => {
+    if(!existingProposal) {
+      return;
+    };
+  }, [existingProposal]);
+
+  console.log("Existing proposal: ", existingProposal);
+  
 
   const [updateProjectStatus, { isLoading: isUpdating }] =
     useUpdateProjectStatusMutation();

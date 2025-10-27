@@ -1,6 +1,6 @@
 import PageContent from "@/components/PageContent";
 
-const InvoiceSuccessPage = () => {
+const InvoiceFailedPage = () => {
   return (
     <PageContent className="pb-16">
       <section
@@ -8,11 +8,11 @@ const InvoiceSuccessPage = () => {
         aria-labelledby="invoices-list-heading"
       >
         <h2 className="mt-48 font-bold text-xl text-gray-800 dark:text-gray-200">
-          Invoice paid successfully!
+          Invoice payment failed!
         </h2>
       </section>
     </PageContent>
   );
 };
 
-export default InvoiceSuccessPage;
+export default InvoiceFailedPage;

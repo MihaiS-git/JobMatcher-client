@@ -24,13 +24,27 @@ export const milestoneApi = createApi({
         sort?: string[];
       }
     >({
-      query: ({ sort, ...rest }) => ({
-        url: "/milestones",
-        params: {
-          ...rest,
-          sort: sort ?? "plannedStartDate,asc", // default if nothing selected
-        },
-      }),
+      query: ({ sort, ...rest}) => {
+        const params = new URLSearchParams();
+
+        Object.entries(rest).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== ""){
+            params.append(key, String(value));
+          }
+        });
+
+        // Handle sort as repeated params
+        if(sort && sort?.length > 0){
+          sort.forEach((s) => params.append("sort", s));
+        } else {
+          params.append("sort", "lastUpdate,desc"); // default
+        }
+
+        return {
+          url: "/milestones",
+          params,
+        };
+      },
       providesTags: (result) =>
         result
           ? [

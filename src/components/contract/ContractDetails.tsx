@@ -212,32 +212,29 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
               <ul className="space-y-2 ">
                 {milestones.length > 0 ? (
                   milestones.map((milestone) => (
-                    <li key={milestone.id} className="mb-2 text-sm">
-                      <p>
-                        <b>Milestone ID:</b> {milestone.id}
-                      </p>
-                      <p>
+                    <li key={milestone.id} className="ms-4 mb-2 text-sm">
+                      <p className="font-semibold">
                         <b>Title:</b> {milestone.title}
                       </p>
-                      <p>
+                      <p className="ms-2">
                         <b>Description:</b> {milestone.description}
                       </p>
-                      <p>
+                      <p className="ms-2">
                         <b>Amount:</b>{" "}
                         {formatCurrency(Number(milestone.amount))}
                       </p>
-                      <p>
+                      <p className="ms-2">
                         <b>Estimated Duration:</b> {milestone.estimatedDuration}{" "}
                         days
                       </p>
-                      <p>
+                      <p className="ms-2">
                         <b>Notes:</b> {milestone.notes || "N/A"}
                       </p>
-                      <p>
+                      <p className="ms-2">
                         <b>Start Date:</b>{" "}
                         {formatDate(milestone.plannedStartDate!)}
                       </p>
-                      <p>
+                      <p className="ms-2">
                         <b>Due Date:</b> {formatDate(milestone.plannedEndDate!)}
                       </p>
                     </li>
@@ -261,7 +258,7 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
             </div>
             <div className="mb-4">
               <p className="font-bold">Signed at:</p>
-              <p className="ms-2">{formatDate(contract?.signedAt)}</p>
+              <p>{formatDate(contract?.signedAt)}</p>
             </div>
           </section>
         </div>

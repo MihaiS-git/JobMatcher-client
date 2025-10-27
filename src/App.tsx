@@ -89,7 +89,7 @@ const InvoiceSuccessPage = lazy(
 );
 
 const InvoiceCancelPage = lazy(
-  () => import("./pages/invoices/InvoiceCancelPage")
+  () => import("./pages/invoices/InvoiceFailedPage")
 );
 
 const PaymentsListPage = lazy(

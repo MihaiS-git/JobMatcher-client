@@ -256,7 +256,7 @@ const ContractsList = () => {
       <section className="w-full bg-gray-200 dark:bg-gray-900 p-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-2 w-full">
           <fieldset className="flex flex-col gap-1 border border-gray-900 dark:border-gray-700 p-2 rounded">
-            <legend className="text-xs">General</legend>
+            <legend className="text-xs px-1">General</legend>
             <div className="flex flex-col">
               <label htmlFor="searchTerm" className="text-sm">
                 Search:
@@ -293,7 +293,7 @@ const ContractsList = () => {
           </fieldset>
 
           <fieldset className="flex flex-col gap-1 border border-gray-900 dark:border-gray-700 p-2 rounded">
-            <legend className="text-xs">Contract</legend>
+            <legend className="text-xs px-1">Contract</legend>
             {role === "STAFF" && (
               <div className="flex flex-col">
                 <label htmlFor="customerName" className="text-sm">

@@ -30,13 +30,27 @@ export const contractsApi = createApi({
         sort?: string[];
       }
     >({
-      query: ({sort, ...rest}) => ({
-        url: "/contracts",
-        params: {
-          ...rest,
-          sort: sort ?? "startDate,asc",
-        },
-      }),
+      query: ({ sort, ...rest }) => {
+        const params = new URLSearchParams();
+
+        Object.entries(rest).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            params.append(key, String(value));
+          }
+        });
+
+        // Handle sort as repeated params
+        if (sort && sort.length > 0) {
+          sort.forEach((s) => params.append("sort", s));
+        } else {
+          params.append("sort", "lastUpdate,desc"); // default
+        }
+
+        return {
+          url: "/contracts",
+          params,
+        };
+      },
       providesTags: (result) =>
         result
           ? [
@@ -70,8 +84,8 @@ export const contractsApi = createApi({
       keepUnusedDataFor: 300,
     }),
     updateContractStatusById: builder.mutation<
-    ContractDetailDTO, 
-    {id: string; status: ContractStatusRequestDTO}
+      ContractDetailDTO,
+      { id: string; status: ContractStatusRequestDTO }
     >({
       query: ({ id, status }) => ({
         url: `/contracts/status/${id}`,

@@ -1,14 +1,30 @@
 import BackButton from "@/components/BackButton";
+import FeedbackMessage from "@/components/FeedbackMessage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import MilestonesAddForm from "@/components/forms/milestone/MilestonesAddForm";
 import MilestonesTable from "@/components/milestone/milestonesTable";
-import { Suspense } from "react";
+import { useGetContractByIdQuery } from "@/features/contracts/contractsApi";
+import { parseApiError } from "@/utils/parseApiError";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const MilestonesPage = () => {
   const { contractId } = useParams();
+  const [apiError, setApiError] = useState<string>("");
+
+  const {
+    data: contract,
+    isLoading: isLoadingContract,
+    error: contractError,
+  } = useGetContractByIdQuery(contractId as string, { skip: !contractId });
+
+  useEffect(() => {
+    if (contractError) {
+      setApiError(parseApiError(contractError));
+    }
+  }, [contractError]);
 
   if (!contractId) {
     return <div className="text-red-500">Invalid contract ID.</div>;
@@ -23,11 +39,17 @@ const MilestonesPage = () => {
         <PageTitle title="Milestones" id="milestones-heading" />
         <BackButton label={"lastContractURL"} />
         <MilestonesTable contractId={contractId} />
-        <hr className="w-full border-t border-gray-400 my-4" />
-        <PageTitle title="Add New Milestones" id="add-milestones-heading" />
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
-          <MilestonesAddForm contractId={contractId} />
-        </Suspense>
+        {contractError && <FeedbackMessage type="error" message={apiError} />}
+        {isLoadingContract && <LoadingSpinner fullScreen={false} size={24} />}
+        {contract && ["STOPPED", "COMPLETED"].includes(contract.status) && (
+          <>
+            <hr className="w-full border-t border-gray-400 my-4" />
+            <PageTitle title="Add New Milestones" id="add-milestones-heading" />
+            <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+              <MilestonesAddForm contractId={contractId} />
+            </Suspense>
+          </>
+        )}
       </section>
     </PageContent>
   );
