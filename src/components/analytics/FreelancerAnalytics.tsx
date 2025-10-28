@@ -72,7 +72,7 @@ const FreelancerAnalytics = () => {
   }
 
   return (
-    <div className="p-4 m-4 xl:p-16 xl:m-16 grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-16 bg-gray-200 dark:bg-gray-800">
+    <div className="p-4 m-4 xl:p-16 xl:m-16 grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-16 bg-gray-200 dark:bg-gray-800 dark:text-gray-500">
       {isLoadingFreelancerId && <LoadingSpinner fullScreen={true} size={36} />}
       {freelancerIdError && <FeedbackMessage type="error" message={apiError} />}
 
@@ -87,7 +87,7 @@ const FreelancerAnalytics = () => {
           ) : (
             <>
               {monthlyEarnings && (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto xl:overflow-hidden">
                   <h2 className="mb-8">Monthly Earnings</h2>
                   <LineChart
                     width={600}
@@ -121,14 +121,14 @@ const FreelancerAnalytics = () => {
           ) : (
             <>
               {jobCompletion && (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto xl:overflow-hidden">
                   <h2 className="mb-8">Job Completion Rate</h2>
                   <PieChart width={400} height={300}>
                     <Pie
                       data={[
                         { name: "Completed", value: jobCompletion.completed },
                         {
-                          name: "Pending",
+                          name: "Rejected",
                           value: jobCompletion.total - jobCompletion.completed,
                         },
                       ]}
@@ -160,7 +160,7 @@ const FreelancerAnalytics = () => {
           ) : (
             <>
               {topClients && (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto xl:overflow-hidden">
                   <h2 className="mb-8">Top Clients</h2>
                   <BarChart width={600} height={300} data={topClients}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -187,7 +187,7 @@ const FreelancerAnalytics = () => {
           ) : (
             <>
               {skillEarnings && (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto xl:overflow-hidden">
                   <h2 className="mb-8">Earnings per Skill</h2>
                   <BarChart width={600} height={300} data={skillEarnings}>
                     <CartesianGrid strokeDasharray="3 3" />

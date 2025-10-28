@@ -77,7 +77,7 @@ const CustomerAnalytics = () => {
       ) : (
         <>
           {monthlySpending && (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto xl:overflow-hidden">
               <h2 className="mb-8">Monthly Spending</h2>
               <LineChart
                 width={600}
@@ -104,7 +104,7 @@ const CustomerAnalytics = () => {
         <>
           {/* Project Stats */}
           {projectStats && (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto xl:overflow-hidden">
               <h2 className="mb-8">Project Stats</h2>
               <PieChart width={400} height={300}>
                 <Pie
@@ -134,7 +134,7 @@ const CustomerAnalytics = () => {
         <>
           {/* Top Freelancers */}
           {topFreelancers && (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto xl:overflow-hidden">
               <h2 className="mb-8">Top Freelancers</h2>
               <BarChart width={600} height={300} data={topFreelancers}>
                 <CartesianGrid strokeDasharray="3 3" />
