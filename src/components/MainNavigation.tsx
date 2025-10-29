@@ -1,12 +1,13 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../hooks/hooks";
+import { useAppDispatch } from "../hooks/hooks";
 import { clearCredentials } from "../features/authSlice";
 import DashboardDrawerToggleButton from "./DashboardDrawer/DashboardDrawerToggleButton";
+import { useIsAuth } from "@/hooks/isAuth";
 
 const MainNavigation = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const isAuth = useAppSelector((state) => state.auth.isAuthenticated);
+  const isAuth = useIsAuth();
 
   const handleLogout = () => {
     dispatch(clearCredentials());
@@ -52,5 +53,7 @@ const MainNavigation = () => {
     </nav>
   );
 };
+
+MainNavigation.displayName = "MainNavigation";
 
 export default MainNavigation;

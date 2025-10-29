@@ -53,13 +53,10 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
   );
 
   useEffect(() => {
-    if(!existingProposal) {
+    if (!existingProposal) {
       return;
-    };
+    }
   }, [existingProposal]);
-
-  console.log("Existing proposal: ", existingProposal);
-  
 
   const [updateProjectStatus, { isLoading: isUpdating }] =
     useUpdateProjectStatusMutation();

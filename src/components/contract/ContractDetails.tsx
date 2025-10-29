@@ -40,11 +40,6 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
     }
   }, [error]);
 
-  useEffect(() => {
-    console.log("Contract ID:", contractId);
-    console.log("Contract data:", contract);
-  }, [contract, contractId]);
-
   const milestones = contract?.milestones
     ? Array.from(contract.milestones)
     : [];

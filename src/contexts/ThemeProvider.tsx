@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode, useMemo } from "react";
 import { ThemeContext } from "../types/ThemeContextType";
 
 type ThemeProviderProps = {
@@ -37,8 +37,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     });
   };
 
+  const value = useMemo(() => ({ isDark, toggleTheme }), [isDark]);
+
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
