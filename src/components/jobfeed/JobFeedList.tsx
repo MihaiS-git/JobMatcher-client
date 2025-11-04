@@ -88,7 +88,6 @@ const JobFeedList = () => {
   type ProjectListSearchParams = {
     page?: number;
     size?: number;
-    status?: string;
     categoryId?: number | null;
     subcategoryId?: number | null;
     searchTerm?: string;
@@ -101,15 +100,6 @@ const JobFeedList = () => {
       size: String(newParams.size ?? size),
       searchTerm: newParams.searchTerm ?? searchTerm,
     };
-
-    // Status
-    if (newParams.status !== undefined) {
-      if (newParams.status === "") {
-        delete params.status;
-      } else {
-        params.status = newParams.status;
-      }
-    } else if (status) params.status = status;
 
     // Category
     if (newParams.categoryId !== undefined) {
@@ -155,7 +145,6 @@ const JobFeedList = () => {
     updateSearchParams({
       page: 0,
       size: 10,
-      status: "",
       categoryId: null,
       subcategoryId: null,
       searchTerm: "",
@@ -188,7 +177,6 @@ const JobFeedList = () => {
     updateSearchParams({
       page,
       size,
-      status,
       categoryId,
       subcategoryId,
       searchTerm,
@@ -297,33 +285,6 @@ const JobFeedList = () => {
                 {subcategoryOptions.map((subcategory) => (
                   <option key={subcategory.id} value={subcategory.id}>
                     {subcategory.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="status" className="text-sm">
-                Status:
-              </label>
-              <select
-                name="status"
-                id="status"
-                onChange={(e) =>
-                  updateSearchParams({
-                    status: e.target.value
-                      ? (e.target.value as ProjectStatus)
-                      : "",
-                  })
-                }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
-                value={status ?? ""}
-              >
-                <option value={""}>All Statuses</option>
-
-                {Object.values(ProjectStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {ProjectStatusLabels[status]}
                   </option>
                 ))}
               </select>
