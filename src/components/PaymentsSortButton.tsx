@@ -1,4 +1,4 @@
-type SortColumn = "contractId" | "invoiceId" | "amount" | "status" | "paidAt" ;
+type SortColumn = "amount" | "status" | "paidAt" ;
 
 type SortButtonProps = {
   column: SortColumn;

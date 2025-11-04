@@ -7,10 +7,8 @@ import useAuth from "@/hooks/useAuth";
 import {
   ContractStatus,
   type ContractStatusRequestDTO,
-  type ContractSummaryDTO,
 } from "@/types/ContractDTO";
 import { ContractStatusLabels } from "@/types/formLabels/contractLabels";
-import { PaymentType } from "@/types/PaymentDTO";
 import { parseApiError } from "@/utils/parseApiError";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -25,7 +23,6 @@ import {
 import { formatDate } from "@/utils/formatDate";
 import { formatCurrency } from "@/utils/formatCurrency";
 import PagePagination from "../PagePagination";
-import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const ContractsList = () => {
   const navigate = useNavigate();
@@ -37,23 +34,14 @@ const ContractsList = () => {
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
 
-  const customerName = searchParams.get("customerName") ?? "";
-  const freelancerName = searchParams.get("freelancerName") ?? "";
   const status = (searchParams.get("status") as ContractStatus) ?? "";
-  const startDate = searchParams.get("startDate") ?? "";
-  const endDate = searchParams.get("endDate") ?? "";
-  const paymentType = (searchParams.get("paymentType") as PaymentType) ?? "";
   const searchTerm = searchParams.get("searchTerm") ?? "";
 
   const sortColumns = [
-    "customerName",
-    "freelancerName",
     "status",
-    "title",
     "amount",
     "startDate",
     "endDate",
-    "paymentType",
   ] as const;
 
   const sortStateDefaultValues: Record<
@@ -88,32 +76,15 @@ const ContractsList = () => {
   } = useGetAllContractsQuery({
     page,
     size,
-    customerName,
-    freelancerName,
     status,
-    startDate,
-    endDate,
-    paymentType,
     searchTerm,
     sort: sortArray,
   });
 
-  const customerOptions = contracts?.content.map(
-    (c: ContractSummaryDTO) => c.customerName
-  );
-  const freelancerOptions = contracts?.content.map(
-    (c: ContractSummaryDTO) => c.freelancerName
-  );
-
   type ContractsListSearchParams = {
     page?: number;
     size?: number;
-    customerName?: string;
-    freelancerName?: string;
     status?: ContractStatus | "";
-    startDate?: string;
-    endDate?: string;
-    paymentType?: PaymentType | "";
     searchTerm?: string;
     sortState?: typeof sortState;
   };
@@ -122,12 +93,7 @@ const ContractsList = () => {
     const params: Record<string, string | string[]> = {
       page: String(newParams.page ?? page),
       size: String(newParams.size ?? size),
-      customerName: newParams.customerName ?? customerName,
-      freelancerName: newParams.freelancerName ?? freelancerName,
       status: newParams.status ?? status,
-      startDate: newParams.startDate ?? startDate,
-      endDate: newParams.endDate ?? endDate,
-      paymentType: newParams.paymentType ?? paymentType,
       searchTerm: newParams.searchTerm ?? searchTerm,
     };
 
@@ -149,12 +115,7 @@ const ContractsList = () => {
     updateSearchParams({
       page: 0,
       size: 10,
-      customerName: "",
-      freelancerName: "",
       status: "",
-      startDate: "",
-      endDate: "",
-      paymentType: "",
       searchTerm: "",
       sortState: { ...sortStateDefaultValues },
     });
@@ -169,26 +130,17 @@ const ContractsList = () => {
 
     // Only keep clicked column
     const newSortState: typeof sortState = {
-      customerName: null,
-      freelancerName: null,
       status: null,
-      title: null,
+      amount: null,
       startDate: null,
       endDate: null,
-      amount: null,
-      paymentType: null,
       [column]: next,
     };
 
     updateSearchParams({
       page: 0,
       size,
-      customerName,
-      freelancerName,
       status,
-      startDate,
-      endDate,
-      paymentType,
       searchTerm,
       sortState: newSortState,
     });
@@ -198,12 +150,7 @@ const ContractsList = () => {
     updateSearchParams({
       page,
       size,
-      customerName,
-      freelancerName,
       status,
-      startDate,
-      endDate,
-      paymentType,
       searchTerm,
       sortState,
     });
@@ -291,68 +238,6 @@ const ContractsList = () => {
 
           <fieldset className="flex flex-col gap-1 border border-gray-900 dark:border-gray-700 p-2 rounded">
             <legend className="text-xs px-1">Contract</legend>
-            {role === "STAFF" && (
-              <div className="flex flex-col">
-                <label htmlFor="customerName" className="text-sm">
-                  Customer:
-                </label>
-                <select
-                  name="customerName"
-                  id="customerName"
-                  onChange={(e) =>
-                    updateSearchParams({
-                      customerName: e.target.value ? e.target.value : "",
-                      page: 0,
-                    })
-                  }
-                  className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
-                  value={customerName ?? ""}
-                >
-                  <option value={""}>All Customers</option>
-                  {customerOptions && (
-                    <>
-                      {customerOptions.map((customerName, index) => (
-                        <option key={index} value={customerName}>
-                          {customerName}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
-              </div>
-            )}
-
-            {role === "CUSTOMER" && (
-              <div className="flex flex-col">
-                <label htmlFor="freelancerName" className="text-sm">
-                  Freelancer:
-                </label>
-                <select
-                  name="freelancerName"
-                  id="freelancerName"
-                  onChange={(e) =>
-                    updateSearchParams({
-                      freelancerName: e.target.value ? e.target.value : "",
-                      page: 0,
-                    })
-                  }
-                  className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
-                  value={freelancerName ?? ""}
-                >
-                  <option value={""}>All Freelancers</option>
-                  {freelancerOptions && (
-                    <>
-                      {freelancerOptions.map((freelancerName, index) => (
-                        <option key={index} value={freelancerName}>
-                          {freelancerName}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
-              </div>
-            )}
-
             <div className="flex flex-col">
               <label htmlFor="status" className="text-sm">
                 Status:
@@ -375,33 +260,6 @@ const ContractsList = () => {
                 {Object.values(ContractStatus).map((status) => (
                   <option key={status} value={status}>
                     {ContractStatusLabels[status]}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="paymentType" className="text-sm">
-                Payment Type:
-              </label>
-              <select
-                name="paymentType"
-                id="paymentType"
-                onChange={(e) =>
-                  updateSearchParams({
-                    paymentType: e.target.value
-                      ? (e.target.value as PaymentType)
-                      : "",
-                  })
-                }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
-                value={paymentType ?? ""}
-              >
-                <option value={""}>All Payment Types</option>
-
-                {Object.values(PaymentType).map((type) => (
-                  <option key={type} value={type}>
-                    {PaymentTypeLabels[type]}
                   </option>
                 ))}
               </select>
@@ -435,22 +293,6 @@ const ContractsList = () => {
                   <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                     <div className="flex items-center justify-between">
                       <span className="flex-1 text-center">Customer</span>
-                      <div className="flex gap-1">
-                        <SortButton
-                          column="customerName"
-                          direction="asc"
-                          sortState={sortState}
-                          toggleSort={toggleSort}
-                          icon={ArrowDownAZ}
-                        />
-                        <SortButton
-                          column="customerName"
-                          direction="desc"
-                          sortState={sortState}
-                          toggleSort={toggleSort}
-                          icon={ArrowUpAZ}
-                        />
-                      </div>
                     </div>
                   </th>
                 )}
@@ -458,22 +300,6 @@ const ContractsList = () => {
                   <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                     <div className="flex items-center justify-between">
                       <span className="flex-1 text-center">Freelancer</span>
-                      <div className="flex gap-1">
-                        <SortButton
-                          column="freelancerName"
-                          direction="asc"
-                          sortState={sortState}
-                          toggleSort={toggleSort}
-                          icon={ArrowDownAZ}
-                        />
-                        <SortButton
-                          column="freelancerName"
-                          direction="desc"
-                          sortState={sortState}
-                          toggleSort={toggleSort}
-                          icon={ArrowUpAZ}
-                        />
-                      </div>
                     </div>
                   </th>
                 )}

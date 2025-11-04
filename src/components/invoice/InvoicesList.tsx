@@ -1,6 +1,4 @@
-import {
-  useGetAllInvoicesQuery,
-} from "@/features/invoices/invoiceApi";
+import { useGetAllInvoicesQuery } from "@/features/invoices/invoiceApi";
 import { InvoiceStatusLabels } from "@/types/formLabels/invoiceLabels";
 import { InvoiceStatus } from "@/types/InvoiceDTO";
 import { useEffect } from "react";
@@ -24,30 +22,32 @@ const InvoicesList = () => {
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
 
-  const contractId = searchParams.get("contractId") ?? "";
-  const status = (searchParams.get("status") as InvoiceStatus) ?? "";
-  const searchTerm = searchParams.get("searchTerm") ?? "";
+  const normalizeParam = (value: string | null) =>
+    value && value !== "undefined" ? value : "";
 
-  // Sorting
-  const sortColumns = [
-    "contractId",
-    "amount",
-    "issuedAt",
-    "dueDate",
-    "status",
-  ] as const;
+  const contractId = normalizeParam(searchParams.get("contractId"));
+  const status = normalizeParam(searchParams.get("status")) as
+    | InvoiceStatus
+    | "";
+  const searchTerm = normalizeParam(searchParams.get("searchTerm"));
 
-  type SortColumn = (typeof sortColumns)[number];
-  type SortDirection = "asc" | "desc" | null;
+  const sortStateDefaultValues: Record<
+    "contractId" | "amount" | "issuedAt" | "dueDate" | "status",
+    "asc" | "desc" | null
+  > = {
+    contractId: null,
+    amount: null,
+    issuedAt: null,
+    dueDate: null,
+    status: null,
+  };
 
   const sortParam = searchParams.getAll("sort");
 
-  const sortStateDefaultValues: Record<SortColumn, SortDirection> =
-    Object.fromEntries(sortColumns.map((col) => [col, null])) as Record<
-      SortColumn,
-      SortDirection
-    >;
-  const sortState: Record<SortColumn, SortDirection> = {
+  const sortState: Record<
+    keyof typeof sortStateDefaultValues,
+    "asc" | "desc" | null
+  > = {
     ...sortStateDefaultValues,
   };
 
@@ -81,7 +81,7 @@ const InvoicesList = () => {
     contractId?: string;
     status?: InvoiceStatus | "";
     searchTerm?: string;
-    sortState?: typeof sortState;
+    sortState?: Record<string, "asc" | "desc" | null>;
   };
 
   const updateSearchParams = (newParams: InvoicesListSearchParams) => {
@@ -93,18 +93,34 @@ const InvoicesList = () => {
       searchTerm: newParams.searchTerm ?? searchTerm,
     };
 
+    if (newParams.contractId === null) {
+      delete params.contractId;
+    } else {
+      params.contractId = String(newParams.contractId);
+    }
+
+    if (newParams.status === null) {
+      delete params.status;
+    } else {
+      params.status = String(newParams.status);
+    }
+
+    if (newParams.searchTerm === null) {
+      delete params.searchTerm;
+    } else {
+      params.searchTerm = String(newParams.searchTerm);
+    }
+
+    // Sorting single-column
     const mergedSort = newParams.sortState ?? sortState;
     const sortParams: string[] = [];
-    for (const [dir, col] of Object.entries(mergedSort)) {
+    for (const [col, dir] of Object.entries(mergedSort)) {
       if (dir) {
         sortParams.push(`${col},${dir}`);
         break;
       }
     }
-
-    if (sortParams.length > 0) {
-      params.sort = sortParams;
-    }
+    if (sortParams.length > 0) params.sort = sortParams;
 
     setSearchParams(params);
   };
@@ -120,23 +136,24 @@ const InvoicesList = () => {
     });
   };
 
-  const toggleSort = (column: SortColumn, direction: SortDirection) => {
+  const toggleSort = (
+    column: keyof typeof sortState,
+    direction: "asc" | "desc"
+  ) => {
     const current = sortState[column];
     const next = current === direction ? null : direction;
 
+    // Only keep clicked column
     const newSortState: typeof sortState = {
-      ...sortStateDefaultValues,
+      contractId: null,
+      amount: null,
+      issuedAt: null,
+      dueDate: null,
+      status: null,
       [column]: next,
     };
 
-    updateSearchParams({
-      page: 0,
-      size,
-      contractId,
-      status,
-      searchTerm,
-      sortState: newSortState,
-    });
+    updateSearchParams({ page: 0, sortState: newSortState });
   };
 
   // Initialize search params on first render
@@ -420,7 +437,9 @@ const InvoicesList = () => {
               ))}
               {invoices?.totalElements === 0 && !isLoadingInvoices && (
                 <tr className="w-full text-center mt-24 text-sm text-gray-500">
-                  <td colSpan={8} className="p-4">No invoices found for the selected filters.</td>
+                  <td colSpan={8} className="p-4">
+                    No invoices found for the selected filters.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -436,7 +455,6 @@ const InvoicesList = () => {
           </div>
         </section>
       )}
-
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { useGetAllPaymentsQuery } from "@/features/payment/paymentApi";
 import { PaymentStatusLabels } from "@/types/formLabels/proposalLabels";
 import { PaymentStatus } from "@/types/ProposalDTO";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import SortButton from "../PaymentsSortButton";
@@ -13,41 +13,40 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
+import { debounce } from "lodash";
 
 const PaymentsList = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTermInput, setSearchTermInput] = useState(
+    searchParams.get("searchTerm") ?? ""
+  );
+
+  const debouncedSearch = useRef(
+    debounce((term: string) => updateSearchParams({ searchTerm: term }), 500)
+  ).current;
 
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
 
-  const contractId = searchParams.get("contractId") ?? "";
-  const invoiceId = searchParams.get("invoiceId") ?? "";
   const status = (searchParams.get("status") as PaymentStatus) ?? "";
   const searchTerm = searchParams.get("searchTerm") ?? "";
 
-  const sortColumns = [
-    "contractId",
-    "milestoneId",
-    "invoiceId",
-    "amount",
-    "status",
-    "paidAt",
-  ] as const;
+  const sortColumns = ["amount", "status", "paidAt"] as const;
 
-  type SortColumn = (typeof sortColumns)[number];
-  type SortDirection = "asc" | "desc" | null;
+  const sortStateDefaultValues: Record<
+    (typeof sortColumns)[number],
+    "asc" | "desc" | null
+  > = Object.fromEntries(sortColumns.map((col) => [col, null])) as Record<
+    (typeof sortColumns)[number],
+    "asc" | "desc" | null
+  >;
 
   const sortParam = searchParams.getAll("sort");
-
-  const sortStateDefaultValues: Record<SortColumn, SortDirection> =
-    Object.fromEntries(sortColumns.map((col) => [col, null])) as Record<
-      SortColumn,
-      SortDirection
-    >;
-  const sortState: Record<SortColumn, SortDirection> = {
-    ...sortStateDefaultValues,
-  };
+  const sortState: Record<(typeof sortColumns)[number], "asc" | "desc" | null> =
+    {
+      ...sortStateDefaultValues,
+    };
 
   sortParam.forEach((s) => {
     const [col, dir] = s.split(",");
@@ -67,8 +66,6 @@ const PaymentsList = () => {
   } = useGetAllPaymentsQuery({
     page,
     size,
-    contractId,
-    invoiceId,
     status,
     searchTerm,
     sort: sortArray,
@@ -77,9 +74,7 @@ const PaymentsList = () => {
   type PaymentsListSearchParams = {
     page?: number;
     size?: number;
-    contractId?: string;
-    invoiceId?: string;
-    status?: string;
+    status?: PaymentStatus | "";
     searchTerm?: string;
     sortState?: typeof sortState;
   };
@@ -88,24 +83,20 @@ const PaymentsList = () => {
     const params: Record<string, string | string[]> = {
       page: String(newParams.page ?? page),
       size: String(newParams.size ?? size),
-      contractId: newParams.contractId ?? contractId,
-      invoiceId: newParams.invoiceId ?? invoiceId,
       status: newParams.status ?? status,
       searchTerm: newParams.searchTerm ?? searchTerm,
     };
 
+    // Single-column sort
     const mergedSort = newParams.sortState ?? sortState;
     const sortParams: string[] = [];
-    for (const [dir, col] of Object.entries(mergedSort)) {
+    for (const [col, dir] of Object.entries(mergedSort)) {
       if (dir) {
         sortParams.push(`${col},${dir}`);
-        break;
+        break; // only keep first sorted column
       }
     }
-
-    if (sortParams.length > 0) {
-      params.sort = sortParams;
-    }
+    if (sortParams.length > 0) params.sort = sortParams;
 
     setSearchParams(params);
   };
@@ -114,28 +105,31 @@ const PaymentsList = () => {
     updateSearchParams({
       page: 0,
       size: 10,
-      contractId: "",
-      invoiceId: "",
       status: "",
       searchTerm: "",
       sortState: { ...sortStateDefaultValues },
     });
+    setSearchTermInput("");
   };
 
-  const toggleSort = (column: SortColumn, direction: SortDirection) => {
+  const toggleSort = (
+    column: keyof typeof sortState,
+    direction: "asc" | "desc"
+  ) => {
     const current = sortState[column];
     const next = current === direction ? null : direction;
 
+    // Only keep clicked column
     const newSortState: typeof sortState = {
-      ...sortStateDefaultValues,
+      amount: null,
+      status: null,
+      paidAt: null,
       [column]: next,
     };
 
     updateSearchParams({
       page: 0,
       size,
-      contractId,
-      invoiceId,
       status,
       searchTerm,
       sortState: newSortState,
@@ -147,8 +141,6 @@ const PaymentsList = () => {
     updateSearchParams({
       page,
       size,
-      contractId,
-      invoiceId,
       status,
       searchTerm,
       sortState,
@@ -160,6 +152,12 @@ const PaymentsList = () => {
     navigate(`/payments/${id}`);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTermInput(value);
+    debouncedSearch(value); // automatically fires 500ms after last keystroke
+  };
+
   return (
     <div className="flex flex-col items-center p-0 m-0 w-full gap-2">
       <section className="w-full bg-gray-200 dark:bg-gray-900 p-2">
@@ -168,15 +166,15 @@ const PaymentsList = () => {
             <legend className="text-xs px-1">General</legend>
             <div className="flex flex-col">
               <label htmlFor="searchTerm" className="text-sm">
-                Search by username:
+                Search by Invoice ID:
               </label>
               <input
-                type="text"
-                id="searchTerm"
-                value={searchTerm}
-                onChange={(e) =>
-                  updateSearchParams({ searchTerm: e.target.value })
-                }
+                value={searchTermInput}
+                onChange={handleInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter")
+                    updateSearchParams({ searchTerm: searchTermInput });
+                }}
                 className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-auto"
               />
             </div>
@@ -202,69 +200,7 @@ const PaymentsList = () => {
           </fieldset>
 
           <fieldset className="flex flex-col gap-1 border border-gray-900 dark:border-gray-700 p-2 rounded">
-            <legend className="text-xs px-1">Invoice</legend>
-
-            <div className="flex flex-col">
-              <label htmlFor="contractId" className="text-sm">
-                Contract:
-              </label>
-              <select
-                name="contractId"
-                id="contractId"
-                onChange={(e) =>
-                  updateSearchParams({
-                    contractId: e.target.value
-                      ? (e.target.value as string)
-                      : "",
-                  })
-                }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
-                value={contractId ?? ""}
-              >
-                <option value={""}>All Contracts</option>
-                {payments?.content
-                  .map((payment) => payment.contract)
-                  .filter(
-                    (value, index, self) =>
-                      index === self.findIndex((t) => t.id === value.id) // unique
-                  )
-                  .map((contract) => (
-                    <option key={contract.id} value={contract.id}>
-                      {contract.title}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="invoiceId" className="text-sm">
-                Invoice:
-              </label>
-              <select
-                name="invoiceId"
-                id="invoiceId"
-                onChange={(e) =>
-                  updateSearchParams({
-                    invoiceId: e.target.value ? (e.target.value as string) : "",
-                  })
-                }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
-                value={invoiceId ?? ""}
-              >
-                <option value={""}>All Payments</option>
-                {payments?.content
-                  .map((inv) => inv.invoice)
-                  .filter(
-                    (value, index, self) =>
-                      index === self.findIndex((t) => t.id === value.id) // unique
-                  )
-                  .map((invoice) => (
-                    <option key={invoice.id} value={invoice.id}>
-                      ({invoice.id})
-                    </option>
-                  ))}
-              </select>
-            </div>
-
+            <legend className="text-xs px-1">Payment</legend>
             <div className="flex flex-col">
               <label htmlFor="status" className="text-sm">
                 Status:
@@ -310,70 +246,27 @@ const PaymentsList = () => {
               <tr className="bg-gray-300 dark:bg-gray-800">
                 <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                   <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">No.</span>
+                    <span className="flex-1 text-center">No.crt.</span>
                   </div>
                 </th>
                 <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                   <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Contract</span>
-                    <div className="flex gap-1">
-                      <SortButton
-                        column="contractId"
-                        direction="asc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowDownAZ}
-                      />
-                      <SortButton
-                        column="contractId"
-                        direction="desc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowUpAZ}
-                      />
-                    </div>
+                    <span className="flex-1 text-center">Payment ID</span>
                   </div>
                 </th>
                 <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                   <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Milestone</span>
-                    <div className="flex gap-1">
-                      <SortButton
-                        column="invoiceId"
-                        direction="asc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowDownAZ}
-                      />
-                      <SortButton
-                        column="contractId"
-                        direction="desc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowUpAZ}
-                      />
-                    </div>
+                    <span className="flex-1 text-center">Contract ID</span>
                   </div>
                 </th>
                 <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                   <div className="flex items-center justify-between">
-                    <span className="flex-1 text-center">Invoice</span>
-                    <div className="flex gap-1">
-                      <SortButton
-                        column="invoiceId"
-                        direction="asc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowDownAZ}
-                      />
-                      <SortButton
-                        column="contractId"
-                        direction="desc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowUpAZ}
-                      />
-                    </div>
+                    <span className="flex-1 text-center">Milestone ID</span>
+                  </div>
+                </th>
+                <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
+                  <div className="flex items-center justify-between">
+                    <span className="flex-1 text-center">Invoice ID</span>
                   </div>
                 </th>
 
@@ -451,14 +344,16 @@ const PaymentsList = () => {
                   onClick={() => navigateToPayment(payment.id)}
                 >
                   <td className="border border-gray-400">{index + 1}</td>
+
+                  <td className="border border-gray-400">{payment.id}</td>
                   <td className="border border-gray-400">
-                    {payment.contract.title}
-                  </td>
-                  <td className="border border-gray-400">
-                    {payment.invoice.id}
+                    {payment.contract.id}
                   </td>
                   <td className="border border-gray-400">
                     {payment.milestone ? payment.milestone.id : "N/A"}
+                  </td>
+                  <td className="border border-gray-400">
+                    {payment.invoice.id}
                   </td>
                   <td className="border border-gray-400">
                     {formatCurrency(Number(payment.amount))}

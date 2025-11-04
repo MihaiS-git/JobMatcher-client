@@ -1,4 +1,4 @@
-type SortColumn = "customerName" | "freelancerName" | "status" | "amount" | "startDate" | "endDate" | "paymentType"
+type SortColumn = "status" | "amount" | "startDate" | "endDate";
 
 type SortButtonProps = {
   column: SortColumn;

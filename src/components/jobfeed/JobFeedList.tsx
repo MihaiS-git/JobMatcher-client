@@ -27,6 +27,7 @@ const JobFeedList = () => {
 
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
+  
   const categoryId = searchParams.get("categoryId")
     ? Number(searchParams.get("categoryId"))
     : undefined;

@@ -21,34 +21,18 @@ export const paymentApi = createApi({
       {
         page?: number;
         size?: number;
-        contractId?: string;
-        invoiceId?: string;
         status?: string;
         searchTerm?: string;
         sort?: string[];
       }
     >({
-query: ({ sort, ...rest }) => {
-        const params = new URLSearchParams();
-
-        Object.entries(rest).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== "") {
-            params.append(key, String(value));
-          }
-        });
-
-        // Handle sort as repeated params
-        if (sort && sort.length > 0) {
-          sort.forEach((s) => params.append("sort", s));
-        } else {
-          params.append("sort", "lastUpdate,desc"); // default
-        }
-
-        return {
-          url: "/payments",
-          params,
-        };
-      },
+      query: ({ sort, ...rest }) => ({
+        url: "/payments",
+        params: {
+          ...rest,
+          sort: sort ?? "paidAt,desc",
+        },
+      }),
       providesTags: (result) =>
         result
           ? [
