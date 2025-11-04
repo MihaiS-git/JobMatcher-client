@@ -6,7 +6,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useGetProjectByIdQuery } from "@/features/projects/projectsApi";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import type { ProposalStatus } from "@/types/ProposalDTO";
 import useAuth from "@/hooks/useAuth";
@@ -19,7 +19,6 @@ type ProposalProps = {
 
 const ProposalDetails = ({ id }: ProposalProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const auth = useAuth();
   const role = auth?.user?.role;
 
@@ -41,8 +40,6 @@ const ProposalDetails = ({ id }: ProposalProps) => {
   const error = proposalError || projectError || updateError;
 
   const navigateToEditProposal = () => {
-    const from = location.pathname;
-    sessionStorage.setItem("lastProposalDetailsURL", from);
     navigate(`/proposals/edit/${id}`);
   };
 
@@ -265,20 +262,25 @@ const ProposalDetails = ({ id }: ProposalProps) => {
                 variant="default"
                 className="bg-blue-500 text-gray-200 rounded-sm border border-gray-200 hover:bg-blue-400 w-35"
                 onClick={navigateToEditProposal}
-                disabled={isLoading || ["COMPLETED", "STOPPED"].includes(project?.status ?? "")}
+                disabled={
+                  isLoading ||
+                  ["COMPLETED", "STOPPED"].includes(project?.status ?? "")
+                }
               >
                 Edit Proposal
               </Button>
             )}
 
           {role === "STAFF" &&
-            ["ACCEPTED", "PENDING"].includes(proposal?.status ?? "") 
-            && (
+            ["ACCEPTED", "PENDING"].includes(proposal?.status ?? "") && (
               <Button
                 variant="destructive"
                 className="rounded-sm border border-gray-200 w-35"
                 onClick={handleWithdraw}
-                disabled={isLoading || ["COMPLETED", "STOPPED"].includes(project?.status ?? "")}
+                disabled={
+                  isLoading ||
+                  ["COMPLETED", "STOPPED"].includes(project?.status ?? "")
+                }
               >
                 Withdraw
               </Button>

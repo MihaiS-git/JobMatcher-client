@@ -1,4 +1,3 @@
-import BackButton from "@/components/BackButton";
 import MilestonesEditForm from "@/components/forms/milestone/MilestonesEditForm";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
@@ -25,7 +24,6 @@ const MilestoneEditPage = () => {
         aria-labelledby="add-milestones-heading"
       >
         <PageTitle title="Edit Milestone" id="edit-milestone-heading" />
-        <BackButton label={"lastContractMilestonesURL"} />
         <MilestonesEditForm
           milestoneId={milestoneId}
           role={role}

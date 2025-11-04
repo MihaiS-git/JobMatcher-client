@@ -6,7 +6,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { toTitleCase } from "@/utils/stringEdit";
 import { Button } from "../ui/button";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import ProposalsList from "../proposal/ProposalsList";
 import LoadingSpinner from "../LoadingSpinner";
@@ -22,7 +22,6 @@ type ProjectDetailsProps = {
 
 const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { data: project, isLoading, error } = useGetProjectByIdQuery(projectId);
 
   const auth = useAuth();
@@ -62,20 +61,14 @@ const ProjectDetails = ({ projectId }: ProjectDetailsProps) => {
     useUpdateProjectStatusMutation();
 
   const handleApply = () => {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("lastProjectURL", from);
     navigate(`/projects/${projectId}/proposals/new`);
   };
 
   const navigateToProposal = () => {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("lastProjectURL", from);
     navigate(`/proposals/${existingProposal?.id}`);
   };
 
   function navigateToContract(contractId: string): void {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("lastProjectURL", from);
     navigate(`/contracts/${contractId}`);
   }
 

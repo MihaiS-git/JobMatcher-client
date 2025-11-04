@@ -3,7 +3,7 @@ import type { MilestoneResponseDTO } from "@/types/MilestoneDTO";
 import { formatDate } from "@/utils/formatDate";
 import { parseApiError } from "@/utils/parseApiError";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FeedbackMessage from "../FeedbackMessage";
 import { MilestoneStatusLabels } from "@/types/formLabels/milestoneLabels";
@@ -15,7 +15,6 @@ type MilestonesTableProps = {
 
 const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [apiError, setApiError] = useState<string>("");
 
   const {
@@ -39,8 +38,6 @@ const MilestonesTable = ({ contractId }: MilestonesTableProps) => {
   }, [milestonesError]);
 
   const handleMilestoneClick = (id: string): void => {
-    const from = location.pathname;
-    sessionStorage.setItem("lastContractMilestonesURL", from);
     navigate(`/contracts/${contractId}/milestones/${id}/edit`);
   };
 

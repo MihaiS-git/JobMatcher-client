@@ -140,8 +140,6 @@ const ProposalsList = () => {
   }, []);
 
   function handleProposalClick(id: string) {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("lastProjectURL", from);
     navigate(`/proposals/${id}`);
   }
 

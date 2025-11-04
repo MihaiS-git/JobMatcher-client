@@ -1,4 +1,3 @@
-import BackButton from "@/components/BackButton";
 import UpsertProposalForm from "@/components/forms/project/UpsertProposalForm";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
@@ -14,7 +13,6 @@ const CreateProposalPage = () => {
         aria-labelledby="new-proposal-heading"
       >
         <PageTitle title="Create Proposal" id="new-proposal-heading" />
-        <BackButton label={"lastProjectURL"} />
         <UpsertProposalForm projectId={projectId} />
       </section>
     </PageContent>

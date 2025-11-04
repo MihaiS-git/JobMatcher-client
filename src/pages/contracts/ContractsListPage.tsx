@@ -1,4 +1,3 @@
-import BackButton from "@/components/BackButton";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
@@ -14,7 +13,6 @@ const ContractsListPage = () => {
         aria-labelledby="contracts-list-heading"
       >
         <PageTitle title="Contracts List" id="contracts-list-page" />
-        <BackButton label={"lastProjectURL"} />
 
         <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
           <ContractsList />

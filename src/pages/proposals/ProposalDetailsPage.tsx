@@ -1,4 +1,3 @@
-import BackButton from "@/components/BackButton";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import ProposalDetails from "@/components/proposal/ProposalDetails";
@@ -14,7 +13,6 @@ const ProposalDetailsPage = () => {
         aria-labelledby="new-proposal-heading"
       >
         <PageTitle title="Proposal Details" id="proposal-detail-page" />
-        <BackButton label={"lastProjectURL"} />
         <ProposalDetails id={id!} />
       </section>
     </PageContent>

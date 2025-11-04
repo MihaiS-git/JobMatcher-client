@@ -3,7 +3,6 @@ import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import { lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
-import BackButton from "../../components/BackButton";
 
 const UpsertProjectForm = lazy(
   () => import("@/components/forms/project/UpsertProjectForm")
@@ -19,7 +18,6 @@ const EditProjectPage = () => {
         aria-labelledby="edit-project-heading"
       >
         <PageTitle title="Edit Project" id="edit-project-heading" />
-        <BackButton label={"lastURL"}/>
         <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
           <UpsertProjectForm projectId={projectId!} />
         </Suspense>

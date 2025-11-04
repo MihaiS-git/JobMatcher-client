@@ -4,7 +4,7 @@ import {
 import { InvoiceStatusLabels } from "@/types/formLabels/invoiceLabels";
 import { InvoiceStatus } from "@/types/InvoiceDTO";
 import { useEffect } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
   ArrowDownAZ,
@@ -19,7 +19,6 @@ import PagePagination from "../PagePagination";
 
 const InvoicesList = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? 0);
@@ -154,8 +153,6 @@ const InvoicesList = () => {
   }, []);
 
   const navigateToInvoice = (id: string) => {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("invoicesListPage", from);
     navigate(`/invoices/${id}`);
   };
 

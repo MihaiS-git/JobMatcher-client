@@ -5,7 +5,7 @@ import {
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
 import { ProjectStatus } from "@/types/ProjectDTO";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
   ArrowDown01,
@@ -26,7 +26,6 @@ import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const ProjectList = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const auth = useAuth();
@@ -203,14 +202,10 @@ const ProjectList = () => {
   }, []);
 
   function handleProjectClick(id: string) {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("lastURL", from);
     navigate(`/projects/${id}`);
   }
 
   function handleEditProject(id: string): void {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("lastURL", from);
     navigate(`/projects/${id}/edit`);
   }
 

@@ -1,4 +1,3 @@
-import BackButton from "@/components/BackButton";
 import FeedbackMessage from "@/components/FeedbackMessage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
@@ -37,7 +36,6 @@ const MilestonesPage = () => {
         aria-labelledby="milestones-heading"
       >
         <PageTitle title="Milestones" id="milestones-heading" />
-        <BackButton label={"lastContractURL"} />
         <MilestonesTable contractId={contractId} />
         {contractError && <FeedbackMessage type="error" message={apiError} />}
         {isLoadingContract && <LoadingSpinner fullScreen={false} size={24} />}

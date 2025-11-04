@@ -2,7 +2,7 @@ import { useGetContractByIdQuery } from "@/features/contracts/contractsApi";
 import LoadingSpinner from "../LoadingSpinner";
 import { useEffect, useState } from "react";
 import { parseApiError } from "@/utils/parseApiError";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { Button } from "../ui/button";
@@ -18,7 +18,6 @@ type ContractDetailsProps = {
 
 const ContractDetails = ({ contractId }: ContractDetailsProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [successMessage, setSuccessMessage] = useState<string | null>("");
   const [apiError, setApiError] = useState<string>("");
 
@@ -49,8 +48,6 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
   }
 
   const handleMilestonesClick = (id: string) => {
-    const from = location.pathname;
-    sessionStorage.setItem("lastContractURL", from);
     navigate(`/contracts/${id}/add-milestones`);
   };
 
@@ -76,8 +73,6 @@ const ContractDetails = ({ contractId }: ContractDetailsProps) => {
   const handleCreateInvoice = async (contractId: string) => {
     try {
       const invoice = await createInvoice({ contractId }).unwrap();
-      const from = location.pathname;
-      sessionStorage.setItem("lastContractURL", from);
       setSuccessMessage("Invoice created successfully.");
       setApiError("");
       navigate(`/invoices/${invoice.id}`);

@@ -2,7 +2,7 @@ import { useGetAllPaymentsQuery } from "@/features/payment/paymentApi";
 import { PaymentStatusLabels } from "@/types/formLabels/proposalLabels";
 import { PaymentStatus } from "@/types/ProposalDTO";
 import { useEffect } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import SortButton from "../PaymentsSortButton";
 import {
@@ -16,7 +16,6 @@ import { formatDate } from "@/utils/formatDate";
 
 const PaymentsList = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? 0);
@@ -158,8 +157,6 @@ const PaymentsList = () => {
   }, []);
 
   const navigateToPayment = (id: string) => {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("paymentsListPage", from);
     navigate(`/payments/${id}`);
   };
 

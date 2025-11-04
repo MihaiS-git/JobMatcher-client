@@ -6,7 +6,6 @@ import { useGetFreelancerByIdQuery } from "@/features/profile/freelancerApi";
 import { useGetCustomerByIdQuery } from "@/features/profile/customerApi";
 import { useParams } from "react-router-dom";
 import ProfileData from "@/components/profile/ProfileData";
-/* import BackButton from "../../components/BackButton"; */
 
 const PublicProfilePage = () => {
   const { type, profileId } = useParams<{
@@ -40,8 +39,6 @@ const PublicProfilePage = () => {
         aria-labelledby="public-profile-heading"
       >
         <PageTitle title="Public Profile" id="public-profile-heading" />
-        {/* <BackButton /> */}
-
         <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
           {type === "freelancer" && freelancerQuery.data && (
             <ProfileData type="freelancer" profile={freelancerQuery.data} />

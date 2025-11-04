@@ -13,7 +13,7 @@ import { ContractStatusLabels } from "@/types/formLabels/contractLabels";
 import { PaymentType } from "@/types/PaymentDTO";
 import { parseApiError } from "@/utils/parseApiError";
 import { useEffect } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import SortButton from "../ContractsSortButton";
 import {
@@ -29,7 +29,6 @@ import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const ContractsList = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const auth = useAuth();
@@ -212,8 +211,6 @@ const ContractsList = () => {
   }, []);
 
   function navigateToContract(id: string) {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("contractListURL", from);
     navigate(`/contracts/${id}`);
   }
 

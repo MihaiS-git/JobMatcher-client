@@ -1,4 +1,3 @@
-import BackButton from "@/components/BackButton";
 import FeedbackMessage from "@/components/FeedbackMessage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
@@ -30,7 +29,6 @@ const PortfolioItemDetailPage = () => {
         aria-labelledby="portfolio-item-details-heading"
       >
         <PageTitle title="Portfolio Item Details" id="portfolio-item-details-heading" />
-        <BackButton label={"fromFreelancerPortfolio"} />
         {isLoadingItem && <LoadingSpinner fullScreen={true} size={36}/>}
         {apiError && <FeedbackMessage message={apiError ?? "Error loading portfolio item."} type="error" />}
         {item && <PortfolioItemDetailsCard itemId={item.id} />}

@@ -218,8 +218,6 @@ const MilestonesEditForm = ({
   const handleCreateInvoice = async (milestoneId: string) => {
     try {
       const invoice = await createInvoice({ contractId, milestoneId }).unwrap();
-      const from = location.pathname;
-      sessionStorage.setItem("lastContractMilestonesURL", from);
       setSuccessMessage("Invoice created successfully.");
       setApiError("");
       setValidationErrors(null);

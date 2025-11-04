@@ -1,4 +1,3 @@
-import BackButton from "@/components/BackButton";
 import UpsertProposalForm from "@/components/forms/project/UpsertProposalForm";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
@@ -14,7 +13,6 @@ const EditProposalPage = () => {
         aria-labelledby="edit-proposal-heading"
       >
         <PageTitle title="Edit Proposal" id="edit-proposal-heading" />
-        <BackButton label={"lastProposalDetailsURL"}/>
         <UpsertProposalForm proposalId={id} />
       </section>
     </PageContent>

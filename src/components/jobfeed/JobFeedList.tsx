@@ -3,7 +3,7 @@ import {
 } from "@/features/projects/projectsApi";
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
   ArrowDown01,
@@ -13,7 +13,7 @@ import {
   ArrowUpAZ,
   ArrowUpNarrowWide,
 } from "lucide-react";
-import SortButton from "../ProjectsSortButton";
+import SortButton from "../ProjectsSortButtonJobFeed";
 import PagePagination from "../PagePagination";
 import {
   ProjectStatusLabels,
@@ -23,12 +23,10 @@ import { PaymentTypeLabels } from "@/types/formLabels/paymentLabels";
 
 const JobFeedList = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? 0);
   const size = Number(searchParams.get("size") ?? 10);
-  const status = searchParams.get("status") ?? "";
   const categoryId = searchParams.get("categoryId")
     ? Number(searchParams.get("categoryId"))
     : undefined;
@@ -38,11 +36,10 @@ const JobFeedList = () => {
   const searchTerm = searchParams.get("searchTerm") ?? "";
 
   const sortStateDefaultValues: Record<
-    "title" | "status" | "budget" | "paymentType" | "deadline" | "category",
+    "title" | "budget" | "paymentType" | "deadline" | "category",
     "asc" | "desc" | null
   > = {
     title: null,
-    status: null,
     budget: null,
     paymentType: null,
     deadline: null,
@@ -74,7 +71,6 @@ const JobFeedList = () => {
   } = useGetJobFeedProjectsQuery({
     page,
     size,
-    status,
     categoryId,
     subcategoryId,
     searchTerm,
@@ -161,7 +157,6 @@ const JobFeedList = () => {
     // Only keep clicked column
     const newSortState: typeof sortState = {
       title: null,
-      status: null,
       budget: null,
       paymentType: null,
       deadline: null,
@@ -185,8 +180,6 @@ const JobFeedList = () => {
   }, []);
 
   function handleProjectClick(id: string) {
-    const from = location.pathname + location.search;
-    sessionStorage.setItem("lastURL", from);
     navigate(`/projects/${id}`);
   }
   
@@ -339,22 +332,6 @@ const JobFeedList = () => {
                 <th className="py-2 px-2 max-w-[150px] overflow-hidden whitespace-nowrap text-left relative border border-gray-400">
                   <div className="flex items-center justify-between">
                     <span className="flex-1 text-center">Status</span>
-                    <div className="flex gap-1">
-                      <SortButton
-                        column="status"
-                        direction="asc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowDownNarrowWide}
-                      />
-                      <SortButton
-                        column="status"
-                        direction="desc"
-                        sortState={sortState}
-                        toggleSort={toggleSort}
-                        icon={ArrowUpNarrowWide}
-                      />
-                    </div>
                   </div>
                 </th>
 
