@@ -12,7 +12,6 @@ const PaymentDetails = () => {
     if (!paymentId) {
       return;
     }
-    console.log("Payment ID: ", paymentId);
   }, [paymentId]);
 
   const {

@@ -201,10 +201,6 @@ const FreelancerForm = ({ userId }: Props) => {
     error: freelancerApiError,
   } = useGetFreelancerByUserIdQuery(userId ? userId : skipToken);
 
-  useEffect(() => {
-    if (profile) console.log("Profile", profile);
-  }, [profile]);
-
   const [saveProfile, { isLoading: saveLoading }] = useSaveFreelancerMutation();
   const [updateProfile, { isLoading: updateLoading }] =
     useUpdateFreelancerMutation();
@@ -309,12 +305,9 @@ const FreelancerForm = ({ userId }: Props) => {
 
     try {
       if (!profile?.profileId) {
-        console.log("Saving profile with payload:", payload);
-
         await saveProfile(payload).unwrap();
         setSuccessMessage("Profile saved successfully.");
       } else {
-        console.log("Updating profile with payload:", payload);
         await updateProfile({
           id: profile.profileId,
           data: payload,

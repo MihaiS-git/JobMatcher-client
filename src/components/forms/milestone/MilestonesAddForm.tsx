@@ -119,8 +119,6 @@ const MilestonesAddForm = ({ contractId }: MilestoneFormProps) => {
         plannedStartDate: milestone.plannedStartDate || "",
       };
 
-      console.log("Submitting milestone:", payload);
-
       try {
         await createMilestone({ ...payload, contractId }).unwrap();
         setSuccessMessage("Milestones added successfully.");

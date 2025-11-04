@@ -31,8 +31,6 @@ const CustomerAnalytics = () => {
     error: customerIdError,
   } = useCustomerId();
 
-  console.log("Customer ID: ", customerId);
-
   useEffect(() => {
     if (customerIdError) {
       setApiError(parseApiError(customerIdError));
@@ -52,23 +50,18 @@ const CustomerAnalytics = () => {
       skip: !customerId || isLoadingCustomerId || !!customerIdError,
     });
 
-  useEffect(() => {
-    console.log("Monthly Spending Data: ", monthlySpending);
-    console.log("Project stats: ", projectStats);
-    console.log("Top freelancers: ", topFreelancers);
-  }, [monthlySpending, projectStats, topFreelancers]);
-
   if (!customerId) {
     return <LoadingSpinner fullScreen={true} size={36} />;
   }
-
- 
 
   return (
     <div className="p-4 m-4 xl:p-16 xl:m-16 grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-16 bg-gray-200 dark:bg-gray-800">
       {isLoadingCustomerId && <LoadingSpinner fullScreen={true} size={36} />}
       {customerIdError && (
-        <FeedbackMessage type="error" message={parseApiError(customerIdError)} />
+        <FeedbackMessage
+          type="error"
+          message={parseApiError(customerIdError)}
+        />
       )}
       {apiError && <FeedbackMessage type="error" message={apiError} />}
       {/* Monthly Spending */}

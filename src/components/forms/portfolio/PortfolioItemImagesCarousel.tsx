@@ -41,8 +41,6 @@ const PortfolioItemImagesCarousel = ({ portfolioItemId, images }: Props) => {
       pagination={{ clickable: true }}
       spaceBetween={50}
       slidesPerView={1}
-      onSlideChange={() => console.log("slide change")}
-      onSwiper={(swiper) => console.log(swiper)}
       className="w-70 h-70 mb-2"
     >
       {images.map((src, idx) => (
