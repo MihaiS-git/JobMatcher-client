@@ -3,7 +3,6 @@ import {
 } from "@/features/projects/projectsApi";
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { useSubcategoryByCategoryOptions } from "@/hooks/useSubcategoryByCategoryOptions";
-import { ProjectStatus } from "@/types/ProjectDTO";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import {
