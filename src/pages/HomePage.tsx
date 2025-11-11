@@ -9,7 +9,7 @@ const HomePage = () => {
     description:
       "Welcome to Job Matcher, your go-to platform for freelance jobs.",
     keywords: "freelance, jobs, job matcher, gigs, remote work",
-    url: "https://www.jobmatcher.com/home",
+    url: "https://jobmatcherclient.netlify.app/home",
   });
 
   return (

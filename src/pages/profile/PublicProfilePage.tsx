@@ -43,7 +43,7 @@ const PublicProfilePage = () => {
       <SEO
         title={`${freelancerQuery.data?.username || customerQuery.data?.username} | Job Matcher`}
         description={freelancerQuery.data?.about || customerQuery.data?.about}
-        url={`https://www.netlify.jobmatcher.com/public_profile/${type}/${profileId}`}
+        url={`https://jobmatcherclient.netlify.app/public_profile/${type}/${profileId}`}
         image={freelancerQuery.data?.pictureUrl || customerQuery.data?.pictureUrl}
       />
       <PageContent className="pb-16">
