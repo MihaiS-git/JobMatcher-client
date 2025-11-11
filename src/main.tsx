@@ -7,6 +7,7 @@ import { DashboardDrawerProvider } from "./contexts/DrawerContext.tsx";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import LoadingSpinner from "./components/LoadingSpinner.tsx";
+import { HeadProvider } from "react-head";
 
 // Import React Scan (only in dev mode)
 /* if (import.meta.env.DEV) {
@@ -42,11 +43,13 @@ createRoot(document.getElementById("root")!).render(
       loading={<LoadingSpinner fullScreen={true} size={36} />}
       persistor={persistor}
     >
-      <ThemeProvider>
-        <DashboardDrawerProvider>
-          <App />
-        </DashboardDrawerProvider>
-      </ThemeProvider>
+      <HeadProvider>
+        <ThemeProvider>
+          <DashboardDrawerProvider>
+            <App />
+          </DashboardDrawerProvider>
+        </ThemeProvider>
+      </HeadProvider>
     </PersistGate>
   </Provider>
 );
