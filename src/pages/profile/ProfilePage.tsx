@@ -36,7 +36,7 @@ const ProfilePage = () => {
         <PageTitle title="User Profile" id="edit-profile-heading" />
         <img
           className="text-xs font-light m-4 w-80 h-80"
-          src={user.pictureUrl || "user_icon.png"}
+          src={user.pictureUrl || "/user_icon.png"}
           alt="User profile picture"
         />
 

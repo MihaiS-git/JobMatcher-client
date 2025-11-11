@@ -31,7 +31,7 @@ const DemoComponents = () => {
   const handleLogout = () => {
     dispatch(clearCredentials());
     dispatch({ type: "auth/logout" });
-    navigate("/auth");
+    navigate("/");
   };
 
   const handleDemoLogin = async (type: "freelancer" | "customer") => {

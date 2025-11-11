@@ -21,7 +21,7 @@ const ProfileData = ({
       <div className="flex justify-center w-full md:w-auto">
         <img
           className="m-4 w-60 h-60 object-cover rounded-sm border border-gray-300 dark:border-gray-600"
-          src={profile.pictureUrl || "user_icon.png"}
+          src={profile?.pictureUrl || "/user_icon.png"}
           alt="User profile picture"
           aria-label="user-profile-picture"
           fetchPriority="high"

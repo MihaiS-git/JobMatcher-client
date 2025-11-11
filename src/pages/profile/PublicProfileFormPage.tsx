@@ -34,7 +34,7 @@ const PublicProfilePage = () => {
         <PageTitle title="Public Profile" id="edit-profile-heading" />
         <img
           className="m-4 w-80 h-80"
-          src={authUser?.pictureUrl || "user_icon.png"}
+          src={authUser?.pictureUrl || "/user_icon.png"}
           alt="User profile picture"
           aria-label="user-profile-picture"
           fetchPriority="high"
