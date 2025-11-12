@@ -1,8 +1,11 @@
-import CustomerAnalytics from "@/components/analytics/CustomerAnalytics";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
+
+const CustomerAnalytics = lazy(() =>
+  import("@/components/analytics/CustomerAnalytics")
+);
 
 const CustomerAnalyticsPage = () => {
   return (

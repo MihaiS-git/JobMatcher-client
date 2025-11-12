@@ -16,6 +16,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  ResponsiveContainer,
 } from "recharts";
 import LoadingSpinner from "../LoadingSpinner";
 import useFreelancerId from "@/hooks/useFreelancerId";
@@ -72,7 +73,7 @@ const FreelancerAnalytics = () => {
   }
 
   return (
-    <div className="p-4 m-4 xl:p-16 xl:m-16 grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-16 bg-gray-200 dark:bg-gray-800 dark:text-gray-500">
+    <div className="p-4 m-4 xl:p-16 xl:m-16 grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-16 bg-gray-200 dark:bg-gray-800 dark:text-gray-500 w-full">
       {isLoadingFreelancerId && <LoadingSpinner fullScreen={true} size={36} />}
       {freelancerIdError && <FeedbackMessage type="error" message={apiError} />}
 
@@ -87,22 +88,24 @@ const FreelancerAnalytics = () => {
           ) : (
             <>
               {monthlyEarnings && (
-                <div className="overflow-x-auto xl:overflow-hidden">
+                <div className="overflow-x-auto xl:overflow-hidden text-xs lg:text-base">
                   <h2 className="mb-8">Monthly Earnings</h2>
-                  <LineChart
-                    width={600}
-                    height={300}
-                    data={monthlyEarnings.map((me) => ({
-                      name: `${me.year}-${me.month}`,
-                      total: me.total,
-                    }))}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="total" stroke="#8884d8" />
-                  </LineChart>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart
+                      width={600}
+                      height={300}
+                      data={monthlyEarnings.map((me) => ({
+                        name: `${me.year}-${me.month}`,
+                        total: me.total,
+                      }))}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="total" stroke="#8884d8" />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
               )}
             </>
@@ -123,25 +126,28 @@ const FreelancerAnalytics = () => {
               {jobCompletion && (
                 <div className="overflow-x-auto xl:overflow-hidden">
                   <h2 className="mb-8">Job Completion Rate</h2>
-                  <PieChart width={400} height={300}>
-                    <Pie
-                      data={[
-                        { name: "Completed", value: jobCompletion.completed },
-                        {
-                          name: "Rejected",
-                          value: jobCompletion.total - jobCompletion.completed,
-                        },
-                      ]}
-                      dataKey="value"
-                      nameKey="name"
-                      outerRadius={100}
-                      label
-                    >
-                      <Cell fill="#0088FE" />
-                      <Cell fill="#FF8042" />
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart width={400} height={300}>
+                      <Pie
+                        data={[
+                          { name: "Completed", value: jobCompletion.completed },
+                          {
+                            name: "Rejected",
+                            value:
+                              jobCompletion.total - jobCompletion.completed,
+                          },
+                        ]}
+                        dataKey="value"
+                        nameKey="name"
+                        outerRadius={100}
+                        label
+                      >
+                        <Cell fill="#0088FE" />
+                        <Cell fill="#FF8042" />
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               )}
             </>
@@ -162,13 +168,15 @@ const FreelancerAnalytics = () => {
               {topClients && (
                 <div className="overflow-x-auto xl:overflow-hidden">
                   <h2 className="mb-8">Top Clients</h2>
-                  <BarChart width={600} height={300} data={topClients}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="clientName" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="totalSpent" fill="#00C49F" />
-                  </BarChart>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart width={600} height={300} data={topClients}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="clientName" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="totalSpent" fill="#00C49F" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               )}
             </>
@@ -189,13 +197,15 @@ const FreelancerAnalytics = () => {
               {skillEarnings && (
                 <div className="overflow-x-auto xl:overflow-hidden">
                   <h2 className="mb-8">Earnings per Skill</h2>
-                  <BarChart width={600} height={300} data={skillEarnings}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="skillName" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="earnings" fill="#FFBB28" />
-                  </BarChart>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart width={600} height={300} data={skillEarnings}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="skillName" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="earnings" fill="#FFBB28" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               )}
             </>

@@ -1,8 +1,11 @@
-import FreelancerAnalytics from "@/components/analytics/FreelancerAnalytics";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
+
+const FreelancerAnalytics = lazy(() =>
+  import("@/components/analytics/FreelancerAnalytics")
+);
 
 const FreelancerAnalyticsPage = () => {
   return (

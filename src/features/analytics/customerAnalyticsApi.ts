@@ -25,6 +25,9 @@ export const customerAnalyticsApi = createApi({
 
 export const {
     useGetMonthlySpendingQuery,
+    useLazyGetMonthlySpendingQuery,
     useGetProjectStatsQuery,
+    useLazyGetProjectStatsQuery,
     useGetTopFreelancersQuery,
+    useLazyGetTopFreelancersQuery,
 } = customerAnalyticsApi;
