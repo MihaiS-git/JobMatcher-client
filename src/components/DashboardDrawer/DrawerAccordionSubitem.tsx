@@ -4,9 +4,10 @@ import { NavLink } from "react-router-dom";
 interface SubitemProps {
     targetUrl: string;
     itemTag: string;
+    close: () => void;
 };
 
-const DrawerAccordionSubitem = ({targetUrl, itemTag}: SubitemProps) => {
+const DrawerAccordionSubitem = ({targetUrl, itemTag, close}: SubitemProps) => {
   const isMobile = useIsMobile();
 
   const handleItemClick = () => {

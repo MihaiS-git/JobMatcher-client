@@ -9,6 +9,7 @@ interface DrawerAccordionItemProps {
     value: string;
     label: string;
     items: {targetUrl: string, itemTag: string}[];
+    close: () => void;
 }
 
 interface Subitem {
@@ -16,7 +17,7 @@ interface Subitem {
      itemTag: string;
 };
 
-const DrawerAccordionItem = ({value, label, items }: DrawerAccordionItemProps) => {
+const DrawerAccordionItem = ({value, label, items, close }: DrawerAccordionItemProps) => {
   return (
     <AccordionItem value={value}>
       <AccordionTrigger className="cursor-pointer hover:text-blue-950 dark:hover:text-blue-400">
@@ -25,7 +26,7 @@ const DrawerAccordionItem = ({value, label, items }: DrawerAccordionItemProps) =
       <AccordionContent className="font-medium text-sm ms-4">
         <ul>
             {items.map((item: Subitem) => (
-          <DrawerAccordionSubitem key={item.targetUrl} targetUrl={item.targetUrl} itemTag={item.itemTag} />
+          <DrawerAccordionSubitem key={item.targetUrl} targetUrl={item.targetUrl} itemTag={item.itemTag} close={close} />
             ))}
         </ul>
       </AccordionContent>

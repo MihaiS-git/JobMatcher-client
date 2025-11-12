@@ -39,7 +39,7 @@ const DashboardDrawer = () => {
               Dashboard
             </h2>
 
-            <DrawerAccordion />
+            <DrawerAccordion close={close} />
           </div>
         </aside>
       )}

@@ -2,7 +2,7 @@ import { Accordion } from "@radix-ui/react-accordion";
 import DrawerAccordionItem from "./DrawerAccordionItem";
 import useAuth from "@/hooks/useAuth";
 
-const DrawerAccordion = () => {
+const DrawerAccordion = ({ close }: { close: () => void }) => {
   const auth = useAuth();
   const role = auth?.user?.role;
 
@@ -46,6 +46,7 @@ const DrawerAccordion = () => {
         value="item-1"
         label="Projects"
         items={projectItems}
+        close={close}
       />
 
       {role === "STAFF" && (
@@ -53,6 +54,8 @@ const DrawerAccordion = () => {
           value="item-2"
           label="Proposals"
           items={[{ targetUrl: "/proposals", itemTag: "Proposals List" }]}
+        close={close}
+
         />
       )}
 
@@ -60,18 +63,21 @@ const DrawerAccordion = () => {
         value="item-3"
         label="Financial"
         items={financialItems}
+        close={close}
       />
 
       <DrawerAccordionItem
         value="item-4"
         label="Profile"
         items={profileItems}
+        close={close}
       />
 
       <DrawerAccordionItem
         value="item-5"
         label="Analytics"
         items={analyticsItems}
+        close={close}
       />
     </Accordion>
   );
