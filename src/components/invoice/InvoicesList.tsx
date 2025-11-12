@@ -230,10 +230,10 @@ const InvoicesList = () => {
                       : "",
                   })
                 }
-                className="bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
+                className="w-full max-w-full truncate text-ellipsis bg-white border border-gray-600 text-gray-950 py-1 px-2 rounded flex-1 cursor-pointer"
                 value={contractId ?? ""}
               >
-                <option value={""}>All Contracts</option>
+                <option value={""} className="text-xs">All Contracts</option>
                 {invoices?.content
                   .map((inv) => inv.contract)
                   .filter(
@@ -241,8 +241,10 @@ const InvoicesList = () => {
                       index === self.findIndex((t) => t.id === value.id) // unique
                   )
                   .map((contract) => (
-                    <option key={contract.id} value={contract.id}>
-                      {contract.title} ({contract.id})
+                    <option key={contract.id} value={contract.id} className="text-xs">
+                      {contract.title.length > 50
+                        ? contract.title.slice(0, 50) + "…"
+                        : contract.title}
                     </option>
                   ))}
               </select>
