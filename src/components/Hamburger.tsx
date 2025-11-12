@@ -1,7 +1,5 @@
-import { lazy, Suspense, useState } from "react";
-import LoadingSpinner from "./LoadingSpinner";
-
-const HamburgerMenu = lazy(() => import("./HamburgerMenu"));
+import { useState } from "react";
+import HamburgerMenu from "./HamburgerMenu";
 
 const Hamburger = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,9 +25,7 @@ const Hamburger = () => {
         </div>
       )}
       {isOpen && (
-        <Suspense fallback={<LoadingSpinner fullScreen={false} size={24} />}>
           <HamburgerMenu openState={isOpen} handleClose={handleClose} />
-        </Suspense>
       )}
     </>
   );

@@ -3,8 +3,11 @@ import ThemeToggleButton from "./ThemeToggleButton";
 import MainNavigation from "./MainNavigation";
 import Hamburger from "./Hamburger";
 import DemoComponent from "./DemoComponent";
+import { useAppSelector } from "@/hooks/hooks";
 
 const Header = () => {
+  const isAuth = useAppSelector((state) => state.auth.isAuthenticated);
+
   return (
     <header className="">
       <div className="flex flex-col">
@@ -14,7 +17,7 @@ const Header = () => {
               Job Matcher
             </h1>
           </Link>
-          <DemoComponent />
+          {!isAuth && <DemoComponent />}
           <MainNavigation />
           <div className="flex flex-row gap-2">
             <ThemeToggleButton />
