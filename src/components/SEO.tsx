@@ -13,7 +13,7 @@ const DEFAULT_SEO = {
   description: "The go-to platform for freelance jobs and gigs.",
   keywords: "freelance, jobs, remote work, gigs, Job Matcher",
   url: "https://www.netlify.jobmatcher.com",
-  image: "/default-og-image.png",
+  image: "https://www.netlify.jobmatcher.com/default-og-image.png",
 };
 
 const SEO = ({ title, description, keywords, url, image }: SEOProps) => {
