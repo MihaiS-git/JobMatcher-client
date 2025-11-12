@@ -56,7 +56,7 @@ const CustomerAnalytics = () => {
   }
 
   return (
-    <div className="p-4 m-4 xl:p-16 xl:m-16 grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-16 bg-gray-200 dark:bg-gray-800 w-full">
+    <div className="p-4 m-4 xl:p-16 xl:m-16 grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-16 bg-gray-200 dark:bg-gray-800 dark:text-gray-500 w-full">
       {isLoadingCustomerId && <LoadingSpinner fullScreen={true} size={36} />}
       {customerIdError && (
         <FeedbackMessage
