@@ -3,6 +3,8 @@ import useAuth from "@/hooks/useAuth";
 import { lazy, Suspense, useEffect, useState } from "react";
 import PageTitle from "@/components/PageTitle";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 
 const FreelancerProfileForm = lazy(
   () => import("@/components/forms/profile/FreelancerProfileForm")
@@ -17,6 +19,8 @@ const PublicProfilePage = () => {
   const userRole = authUser?.role;
   const userId = authUser?.id;
   const [role, setRole] = useState<string | undefined>(undefined);
+  const [retryKey1, setRetryKey1] = useState(0);
+  const [retryKey2, setRetryKey2] = useState(0);
 
   useEffect(() => {
     if (userRole) setRole(userRole);
@@ -41,15 +45,41 @@ const PublicProfilePage = () => {
         />
 
         {role === "STAFF" && (
-          <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
-            <FreelancerProfileForm userId={userId} />
-          </Suspense>
+          <ErrorBoundary
+            key={retryKey1}
+            fallback={
+              <SectionErrorFallback
+                title="Failed to load freelancer profile form"
+                message="An error occurred while loading the freelancer profile form."
+                onRetry={() => setRetryKey1((prev) => prev + 1)}
+              />
+            }
+          >
+            <Suspense
+              fallback={<LoadingSpinner fullScreen={false} size={36} />}
+            >
+              <FreelancerProfileForm userId={userId} />
+            </Suspense>
+          </ErrorBoundary>
         )}
 
         {role === "CUSTOMER" && (
-          <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
-            <CustomerProfileForm userId={userId} />
-          </Suspense>
+          <ErrorBoundary
+            key={retryKey2}
+            fallback={
+              <SectionErrorFallback
+                title="Failed to load customer profile form"
+                message="An error occurred while loading the customer profile form."
+                onRetry={() => setRetryKey2((prev) => prev + 1)}
+              />
+            }
+          >
+            <Suspense
+              fallback={<LoadingSpinner fullScreen={false} size={36} />}
+            >
+              <CustomerProfileForm userId={userId} />
+            </Suspense>
+          </ErrorBoundary>
         )}
       </section>
     </PageContent>

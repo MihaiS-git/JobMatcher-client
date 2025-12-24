@@ -1,10 +1,13 @@
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
 import PaymentDetails from "@/components/payments/PaymentDetails";
-import { Suspense } from "react";
+import { useState } from "react";
 
 const PaymentDetailsPage = () => {
+  const [retryKey, setRetryKey] = useState(0);
+  
   return (
     <PageContent className="pb-16">
       <section
@@ -13,9 +16,18 @@ const PaymentDetailsPage = () => {
       >
         <PageTitle title="Payment Details" id="payments-list-page" />
 
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
-          <PaymentDetails />
-        </Suspense>
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load payment details"
+              message="An error occurred while loading the payment details."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
+            <PaymentDetails />
+        </ErrorBoundary>
       </section>
     </PageContent>
   );

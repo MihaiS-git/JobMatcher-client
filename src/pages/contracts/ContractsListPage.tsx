@@ -1,11 +1,13 @@
-import LoadingSpinner from "@/components/LoadingSpinner";
+import ContractsList from "@/components/contract/ContractsList";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { lazy, Suspense } from "react";
-
-const ContractsList = lazy(() => import("@/components/contract/ContractsList"));
+import { useState } from "react";
 
 const ContractsListPage = () => {
+  const [retryKey, setRetryKey] = useState(0);
+
   return (
     <PageContent className="pb-16">
       <section
@@ -14,10 +16,18 @@ const ContractsListPage = () => {
       >
         <PageTitle title="Contracts List" id="contracts-list-page" />
 
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load contracts list"
+              message="An error occurred while loading the contracts list."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
           <ContractsList />
-        </Suspense>
-
+        </ErrorBoundary>
       </section>
     </PageContent>
   );

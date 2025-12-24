@@ -1,12 +1,16 @@
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 
 const PortfolioItemUpsertForm = lazy(
   () => import("@/components/forms/portfolio/PortfolioItemUpsertForm")
 );
 
 const PortfolioNewItemPage = () => {
+  const [retryKey, setRetryKey] = useState(0);
+
   return (
     <PageContent className="pb-16">
       <section
@@ -22,9 +26,20 @@ const PortfolioNewItemPage = () => {
         </h1>
 
         <div className="mt-4 p-4">
-          <Suspense fallback={<LoadingSpinner />}>
-            <PortfolioItemUpsertForm itemId={undefined} />
-          </Suspense>
+          <ErrorBoundary
+            key={retryKey}
+            fallback={
+              <SectionErrorFallback
+                title="Failed to load portfolio item form"
+                message="An error occurred while loading the portfolio item form."
+                onRetry={() => setRetryKey((prev) => prev + 1)}
+              />
+            }
+          >
+            <Suspense fallback={<LoadingSpinner />}>
+              <PortfolioItemUpsertForm itemId={undefined} />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </section>
     </PageContent>

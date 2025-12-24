@@ -7,6 +7,8 @@ import FeedbackMessage from "@/components/FeedbackMessage";
 import { useParams } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 
 const PortfolioItemUpsertForm = lazy(
   () => import("@/components/forms/portfolio/PortfolioItemUpsertForm")
@@ -23,6 +25,7 @@ const MultiFileUploadForm = lazy(
 const PortfolioItemPage = () => {
   const auth = useAuth();
   const userId = auth?.user?.id;
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     if (!userId) {
@@ -65,9 +68,20 @@ const PortfolioItemPage = () => {
         </h1>
 
         <div className="flex flex-col items-center w-full mt-4 p-4">
-          <Suspense fallback={<LoadingSpinner fullScreen={false} />}>
-            <PortfolioItemUpsertForm itemId={portfolioItem?.id} />
-          </Suspense>
+          <ErrorBoundary
+            key={retryKey}
+            fallback={
+              <SectionErrorFallback
+                title="Failed to load portfolio item form"
+                message="An error occurred while loading the portfolio item form."
+                onRetry={() => setRetryKey((prev) => prev + 1)}
+              />
+            }
+          >
+            <Suspense fallback={<LoadingSpinner fullScreen={false} />}>
+              <PortfolioItemUpsertForm itemId={portfolioItem?.id} />
+            </Suspense>
+          </ErrorBoundary>
           <hr className="my-4 border-gray-950 dark:border-gray-200 w-full" />
 
           {portfolioItem?.imageUrls && (

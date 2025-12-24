@@ -1,12 +1,14 @@
 import ContractDetails from "@/components/contract/ContractDetails";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { Suspense } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 const ContractDetailPage = () => {
   const { contractId } = useParams<{ contractId: string }>();
+  const [retryKey, setRetryKey] = useState(0);
 
   return (
     <PageContent className="pb-16">
@@ -15,12 +17,22 @@ const ContractDetailPage = () => {
         aria-labelledby="new-contract-heading"
       >
         <PageTitle title="Contract Details" id="contract-detail-page" />
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
-          <ContractDetails contractId={contractId!} />
-        </Suspense>
+
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load contract details"
+              message="An error occurred while loading the contract details."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
+            <ContractDetails contractId={contractId!} />
+        </ErrorBoundary>
       </section>
     </PageContent>
-  )
+  );
 };
 
 export default ContractDetailPage;

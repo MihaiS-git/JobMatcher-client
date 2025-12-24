@@ -1,13 +1,13 @@
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
+import UpsertProjectForm from "@/components/forms/project/UpsertProjectForm";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { lazy, Suspense } from "react";
-
-const UpsertProjectForm = lazy(
-  () => import("@/components/forms/project/UpsertProjectForm")
-);
+import { useState } from "react";
 
 const CreateProjectPage = () => {
+  const [retryKey, setRetryKey] = useState(0);
+
   return (
     <PageContent className="pb-16">
       <section
@@ -16,9 +16,18 @@ const CreateProjectPage = () => {
       >
         <PageTitle title="Create Project" id="create-project-heading" />
 
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
-          <UpsertProjectForm />
-        </Suspense>
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load project form"
+              message="An error occurred while loading the project form."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
+            <UpsertProjectForm />
+        </ErrorBoundary>
       </section>
     </PageContent>
   );

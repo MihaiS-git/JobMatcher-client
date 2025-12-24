@@ -2,16 +2,19 @@ import FeedbackMessage from "@/components/FeedbackMessage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import MilestonesAddForm from "@/components/forms/milestone/MilestonesAddForm";
 import MilestonesTable from "@/components/milestone/milestonesTable";
 import { useGetContractByIdQuery } from "@/features/contracts/contractsApi";
 import { parseApiError } from "@/utils/parseApiError";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const MilestonesPage = () => {
   const { contractId } = useParams();
   const [apiError, setApiError] = useState<string>("");
+  const [retryKey, setRetryKey] = useState(0);
 
   const {
     data: contract,
@@ -43,9 +46,19 @@ const MilestonesPage = () => {
           <>
             <hr className="w-full border-t border-gray-400 my-4" />
             <PageTitle title="Add New Milestones" id="add-milestones-heading" />
-            <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+
+            <ErrorBoundary
+              key={retryKey}
+              fallback={
+                <SectionErrorFallback
+                  title="Failed to load milestones form"
+                  message="An error occurred while loading the milestones form."
+                  onRetry={() => setRetryKey((prev) => prev + 1)}
+                />
+              }
+            >
               <MilestonesAddForm contractId={contractId} />
-            </Suspense>
+            </ErrorBoundary>
           </>
         )}
       </section>

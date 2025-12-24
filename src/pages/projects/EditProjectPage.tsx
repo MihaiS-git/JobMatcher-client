@@ -1,15 +1,14 @@
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
+import UpsertProjectForm from "@/components/forms/project/UpsertProjectForm";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { lazy, Suspense } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-
-const UpsertProjectForm = lazy(
-  () => import("@/components/forms/project/UpsertProjectForm")
-);
 
 const EditProjectPage = () => {
   const { id: projectId } = useParams<{ id: string }>();
+  const [retryKey, setRetryKey] = useState(0);
 
   return (
     <PageContent className="pb-16">
@@ -18,9 +17,19 @@ const EditProjectPage = () => {
         aria-labelledby="edit-project-heading"
       >
         <PageTitle title="Edit Project" id="edit-project-heading" />
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load project edit form"
+              message="An error occurred while loading the project edit form."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
           <UpsertProjectForm projectId={projectId!} />
-        </Suspense>
+        </ErrorBoundary>
       </section>
     </PageContent>
   );

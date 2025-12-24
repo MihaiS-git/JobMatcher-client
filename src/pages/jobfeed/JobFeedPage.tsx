@@ -1,10 +1,13 @@
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import JobFeedList from "@/components/jobfeed/JobFeedList";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { Suspense } from "react";
+import { useState } from "react";
 
 const JobFeedPage = () => {
+  const [retryKey, setRetryKey] = useState(0);
+
   return (
     <PageContent className="pb-16">
       <section
@@ -13,10 +16,18 @@ const JobFeedPage = () => {
       >
         <PageTitle title="Job Feed" id="job-feed-heading" />
 
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load jobs feed"
+              message="An error occurred while loading the jobs feed."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
           <JobFeedList />
-        </Suspense>
-        
+        </ErrorBoundary>
       </section>
     </PageContent>
   );

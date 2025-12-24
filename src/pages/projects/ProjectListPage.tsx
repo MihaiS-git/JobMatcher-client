@@ -1,13 +1,14 @@
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { lazy, Suspense } from "react";
-
-const ProjectList = lazy(() => import("@/components/project/ProjectList"));
+import ProjectList from "@/components/project/ProjectList";
+import { useState } from "react";
 
 const ProjectListPage = () => {
+  const [retryKey, setRetryKey] = useState(0);
 
-    return (
+  return (
     <PageContent className="pb-16">
       <section
         className="flex flex-col items-center p-0 pt-4 pb-16 w-full"
@@ -15,13 +16,21 @@ const ProjectListPage = () => {
       >
         <PageTitle title="Project List" id="project-list-heading" />
 
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load project list"
+              message="An error occurred while loading the project list."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
           <ProjectList />
-        </Suspense>
-        
+        </ErrorBoundary>
       </section>
     </PageContent>
-    );
+  );
 };
 
 export default ProjectListPage;

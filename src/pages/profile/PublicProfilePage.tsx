@@ -1,5 +1,5 @@
 import PageContent from "@/components/PageContent";
-import { Suspense } from "react";
+import { useState } from "react";
 import PageTitle from "@/components/PageTitle";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useGetFreelancerByIdQuery } from "@/features/profile/freelancerApi";
@@ -8,8 +8,11 @@ import { useParams } from "react-router-dom";
 import ProfileData from "@/components/profile/ProfileData";
 import SEO from "@/components/SEO";
 import FeedbackMessage from "@/components/FeedbackMessage";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 
 const PublicProfilePage = () => {
+  const [retryKey, setRetryKey] = useState(0);
   const { type, profileId } = useParams<{
     type: "customer" | "freelancer";
     profileId: string;
@@ -41,10 +44,14 @@ const PublicProfilePage = () => {
   return (
     <>
       <SEO
-        title={`${freelancerQuery.data?.username || customerQuery.data?.username} | Job Matcher`}
+        title={`${
+          freelancerQuery.data?.username || customerQuery.data?.username
+        } | Job Matcher`}
         description={freelancerQuery.data?.about || customerQuery.data?.about}
         url={`https://jobmatcherclient.netlify.app/public_profile/${type}/${profileId}`}
-        image={freelancerQuery.data?.pictureUrl || customerQuery.data?.pictureUrl}
+        image={
+          freelancerQuery.data?.pictureUrl || customerQuery.data?.pictureUrl
+        }
       />
       <PageContent className="pb-16">
         <section
@@ -52,7 +59,16 @@ const PublicProfilePage = () => {
           aria-labelledby="public-profile-heading"
         >
           <PageTitle title="Public Profile" id="public-profile-heading" />
-          <Suspense fallback={<LoadingSpinner fullScreen={false} size={36} />}>
+          <ErrorBoundary
+            key={retryKey}
+            fallback={
+              <SectionErrorFallback
+                title="Failed to load profile data"
+                message="An error occurred while loading the profile data."
+                onRetry={() => setRetryKey((prev) => prev + 1)}
+              />
+            }
+          >
             {type === "freelancer" && freelancerQuery.data && (
               <ProfileData type="freelancer" profile={freelancerQuery.data} />
             )}
@@ -60,7 +76,7 @@ const PublicProfilePage = () => {
             {type === "customer" && customerQuery.data && (
               <ProfileData type="customer" profile={customerQuery.data} />
             )}
-          </Suspense>
+          </ErrorBoundary>
         </section>
       </PageContent>
     </>

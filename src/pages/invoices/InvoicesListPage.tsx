@@ -1,12 +1,13 @@
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import SectionErrorFallback from "@/components/error/SectionErrorFallback";
 import InvoicesList from "@/components/invoice/InvoicesList";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import PageContent from "@/components/PageContent";
 import PageTitle from "@/components/PageTitle";
-import { Suspense } from "react";
-
-
+import { useState } from "react";
 
 const InvoicesListPage = () => {
+  const [retryKey, setRetryKey] = useState(0);
+
   return (
     <PageContent className="pb-16">
       <section
@@ -15,9 +16,18 @@ const InvoicesListPage = () => {
       >
         <PageTitle title="Invoices List" id="invoices-list-page" />
 
-        <Suspense fallback={<LoadingSpinner fullScreen={true} size={36} />}>
+        <ErrorBoundary
+          key={retryKey}
+          fallback={
+            <SectionErrorFallback
+              title="Failed to load invoices list"
+              message="An error occurred while loading the invoices list."
+              onRetry={() => setRetryKey((prev) => prev + 1)}
+            />
+          }
+        >
           <InvoicesList />
-        </Suspense>
+        </ErrorBoundary>
       </section>
     </PageContent>
   );

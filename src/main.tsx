@@ -8,6 +8,8 @@ import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import LoadingSpinner from "./components/LoadingSpinner.tsx";
 import { HeadProvider } from "react-head";
+import { ErrorBoundary } from "./components/error/ErrorBoundary.tsx";
+import GlobalErrorFallback from "./components/error/GlobalErrorFallback.tsx";
 
 // Import React Scan (only in dev mode)
 /* if (import.meta.env.DEV) {
@@ -29,27 +31,21 @@ import { HeadProvider } from "react-head";
   });
 } */
 
-const VITE_GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-if (!VITE_GOOGLE_CLIENT_ID) {
-  throw new Error(
-    "VITE_GOOGLE_CLIENT_ID is not defined! Check your .env or deployment settings."
-  );
-}
-
 createRoot(document.getElementById("root")!).render(
-  <Provider store={store}>
-    <PersistGate
-      loading={<LoadingSpinner fullScreen={true} size={36} />}
-      persistor={persistor}
-    >
-      <HeadProvider>
-        <ThemeProvider>
-          <DashboardDrawerProvider>
-            <App />
-          </DashboardDrawerProvider>
-        </ThemeProvider>
-      </HeadProvider>
-    </PersistGate>
-  </Provider>
+  <ErrorBoundary fallback={<GlobalErrorFallback />}>
+    <Provider store={store}>
+      <PersistGate
+        loading={<LoadingSpinner fullScreen={true} size={36} />}
+        persistor={persistor}
+      >
+        <HeadProvider>
+          <ThemeProvider>
+            <DashboardDrawerProvider>
+              <App />
+            </DashboardDrawerProvider>
+          </ThemeProvider>
+        </HeadProvider>
+      </PersistGate>
+    </Provider>
+  </ErrorBoundary>
 );
