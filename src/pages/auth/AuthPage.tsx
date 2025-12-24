@@ -13,6 +13,7 @@ if (!import.meta.env.VITE_API_ROOT_URL) {
   throw new Error("VITE_API_ROOT_URL is not defined.");
 }
 const API_ROOT_URL = import.meta.env.VITE_API_ROOT_URL;
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
 
 const AuthPage = () => {
   const apiErrorRef = useRef<HTMLParagraphElement | null>(null);
@@ -102,6 +103,15 @@ const AuthPage = () => {
         >
           Authentication Form
         </h1>
+        {DEMO_MODE && (
+          <div className="bg-yellow-200 border border-yellow-600 text-yellow-800 px-4 py-2 mx-8 mb-4 rounded-sm">
+            <p className="text-sm">
+              In demo mode, authentication is disabled. Please use the
+              predefined login buttons in navbar. Enjoy exploring the
+              application!
+            </p>
+          </div>
+        )}
         <form
           className="flex flex-col p-4"
           onSubmit={handleLoginFormSubmit}
@@ -137,6 +147,7 @@ const AuthPage = () => {
               aria-required="true"
               ref={emailInputRef}
               autoComplete="email"
+              disabled={DEMO_MODE === true}
             />
           </div>
 
@@ -181,6 +192,7 @@ const AuthPage = () => {
                 aria-required="true"
                 ref={passwordInputRef}
                 autoComplete="current-password"
+                disabled={DEMO_MODE === true}
               />
               <button
                 type="button"
@@ -188,7 +200,11 @@ const AuthPage = () => {
                 className="ml-2 text-sm text-gray-800"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
@@ -206,7 +222,7 @@ const AuthPage = () => {
             <button
               type="submit"
               className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 w-full py-2 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base"
-              disabled={isLoading}
+              disabled={isLoading || DEMO_MODE === true}
             >
               {loginButtonText}
             </button>
@@ -264,7 +280,7 @@ const AuthPage = () => {
             onClick={handleGoogleLogin}
             className="bg-gray-200 text-gray-950 px-6 py-2 rounded-sm
          hover:bg-gray-300 transition mb-4 w-full flex items-center justify-center border border-gray-950"
-            disabled={loadingGoogle}
+            disabled={loadingGoogle || DEMO_MODE === true}
           >
             {loadingGoogle ? (
               "Loading..."

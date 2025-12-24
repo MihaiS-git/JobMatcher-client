@@ -12,6 +12,8 @@ import { parseApiError } from "../../utils/parseApiError";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { Eye, EyeOff } from "lucide-react";
 
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
+
 const RegistrationPage = () => {
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
@@ -153,6 +155,15 @@ const RegistrationPage = () => {
         >
           Registration Form
         </h1>
+        {DEMO_MODE && (
+          <div className="bg-yellow-200 border border-yellow-600 text-yellow-800 px-4 py-2 mx-8 mb-4 rounded-sm">
+            <p className="text-sm">
+              In demo mode, registration is disabled. Please use the
+              predefined login buttons in navbar. Enjoy exploring the
+              application!
+            </p>
+          </div>
+        )}
         <form
           className="flex flex-col p-4"
           onSubmit={handleRegisterFormSubmit}
@@ -187,7 +198,7 @@ const RegistrationPage = () => {
               aria-describedby={errors.email ? "email-error" : undefined}
               aria-required="true"
               ref={emailInputRef}
-              disabled={isLoading}
+              disabled={isLoading || DEMO_MODE === true}
             />
           </div>
           {errors?.email && (
@@ -229,7 +240,7 @@ const RegistrationPage = () => {
                 }
                 aria-required="true"
                 ref={passwordInputRef}
-                disabled={isLoading}
+                disabled={isLoading || DEMO_MODE === true}
                 autoComplete="new-password"
               />
               <button
@@ -292,7 +303,7 @@ const RegistrationPage = () => {
                 }
                 aria-required="true"
                 ref={confirmPasswordInputRef}
-                disabled={isLoading}
+                disabled={isLoading || DEMO_MODE === true}
                 autoComplete="new-password"
               />
               <button
@@ -351,7 +362,7 @@ const RegistrationPage = () => {
               }
               aria-required="true"
               ref={firstNameInputRef}
-              disabled={isLoading}
+              disabled={isLoading || DEMO_MODE === true}
             />
           </div>
           {errors?.firstName && (
@@ -390,7 +401,7 @@ const RegistrationPage = () => {
               aria-describedby={errors.lastName ? "last-name-error" : undefined}
               aria-required="true"
               ref={lastNameInputRef}
-              disabled={isLoading}
+              disabled={isLoading || DEMO_MODE === true}
             />
           </div>
           {errors?.lastName && (
@@ -422,6 +433,7 @@ const RegistrationPage = () => {
                   onChange={() => setRole("CUSTOMER")}
                   aria-required="true"
                   aria-invalid={errors.role ? "true" : "false"}
+                  disabled={isLoading || DEMO_MODE === true}
                 />
                 <label htmlFor="role-customer" className="mx-4">
                   Customer
@@ -438,6 +450,7 @@ const RegistrationPage = () => {
                   onChange={() => setRole("STAFF")}
                   aria-required="true"
                   aria-invalid={errors.role ? "true" : "false"}
+                  disabled={isLoading || DEMO_MODE === true}
                 />
                 <label htmlFor="role-staff" className="mx-4">
                   Freelancer
@@ -459,7 +472,7 @@ const RegistrationPage = () => {
             <button
               type="submit"
               className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 w-full py-2 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base"
-              disabled={isLoading}
+              disabled={isLoading || DEMO_MODE === true}
             >
               {isLoading ? "Submitting..." : "Submit"}
             </button>

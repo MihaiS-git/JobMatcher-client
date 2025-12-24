@@ -6,6 +6,8 @@ import { useRecoverPasswordMutation } from "../../features/authApi";
 import { parseApiError } from "../../utils/parseApiError";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
+
 const PasswordRecoveryPage = () => {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{ email?: string | null }>({});
@@ -51,7 +53,15 @@ const PasswordRecoveryPage = () => {
         >
           Recover Password Form
         </h1>
-
+        {DEMO_MODE && (
+          <div className="bg-yellow-200 border border-yellow-600 text-yellow-800 px-4 py-2 mx-8 mb-4 rounded-sm">
+            <p className="text-sm">
+              In demo mode, password recovery is disabled. Please use the
+              predefined login buttons in navbar. Enjoy exploring the
+              application!
+            </p>
+          </div>
+        )}
         {message && (
           <p className="text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-800 px-4 py-2 mx-4 mb-4 rounded text-sm text-center">
             {message}
@@ -87,7 +97,7 @@ const PasswordRecoveryPage = () => {
                 const emailError = validateEmail(email);
                 setErrors((prev) => ({ ...prev, email: emailError }));
               }}
-              disabled={isSuccess}
+              disabled={isSuccess || DEMO_MODE === true}
               autoFocus
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "email-error" : undefined}
@@ -108,7 +118,7 @@ const PasswordRecoveryPage = () => {
             <button
               type="submit"
               className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-400 hover:text-blue-200 dark:hover:text-blue-950 w-full py-2 rounded-sm ring-1 ring-blue-900 text-sm xl:text-base"
-              disabled={isLoading || isSuccess}
+              disabled={isLoading || isSuccess || DEMO_MODE === true}
             >
               {isLoading ? "Loading..." : "Recover Password"}
             </button>
